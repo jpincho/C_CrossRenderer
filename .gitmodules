@@ -1,0 +1,6 @@
+[submodule "ExternalModules/CMakeUtils"]
+	path = ExternalModules/CMakeUtils
+	url = git@github.com:jpincho/CMakeUtils
+[submodule "ExternalModules/Platform"]
+	path = ExternalModules/Platform
+	url = git@github.com:jpincho/Platform

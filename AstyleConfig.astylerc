@@ -1,0 +1,11 @@
+style=whitesmith
+pad-paren
+pad-oper
+pad-comma
+indent=tab
+indent-modifiers
+align-pointer=name
+align-reference=name
+#add-braces
+
+formatted
