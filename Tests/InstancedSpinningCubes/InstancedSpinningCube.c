@@ -44,6 +44,9 @@ void WindowFocusChanged_Callback(const crWindowHandle Handle, const bool HasFocu
 	LOG_DEBUG("Window focus %s", HasFocus ? "true" : "false");
 	}
 
+mat4 ModelMatrices[100];
+vec3 Rotations[100];
+
 int main(int argc, char *argv[])
 	{
 	struct crRendererConfiguration Configuration = { 0 };
@@ -53,7 +56,7 @@ int main(int argc, char *argv[])
 	Configuration.InitialWindowDescriptor.Size.x = 1920;
 	Configuration.InitialWindowDescriptor.Size.y = 1080;
 	Configuration.InitialWindowDescriptor.Resizable = true;
-	Configuration.InitialWindowDescriptor.Title = "CrossRenderer - spinning cube test";
+	Configuration.InitialWindowDescriptor.Title = "CrossRenderer - instanced spinning cube test";
 	Configuration.VSyncEnabled = true;
 	if (crInitialize(Configuration) == false)
 		return -1;
@@ -147,6 +150,25 @@ int main(int argc, char *argv[])
 	if (!VertexShaderBufferHandle)
 		return -1;
 
+	struct crShaderBufferDescriptor MatrixSBDescriptor;
+	MatrixSBDescriptor.AccessType = crShaderBufferAccessType_Static;
+	MatrixSBDescriptor.BufferType = crShaderBufferType_Array;
+	MatrixSBDescriptor.Capacity = sizeof(ModelMatrices);
+	MatrixSBDescriptor.Data = &ModelMatrices;
+	MatrixSBDescriptor.DataSize = sizeof(ModelMatrices);
+
+	for (unsigned Index = 0; Index < 100; ++Index)
+		{
+		Rotations[Index].x = (float)rand();
+		Rotations[Index].y = (float)rand();
+		Rotations[Index].z = (float)rand();
+		math_vec3_normalize(&Rotations[Index]);
+		}
+
+	crShaderBufferHandle MatrixShaderBufferHandle = crCreateShaderBuffer(MatrixSBDescriptor);
+	if (!MatrixShaderBufferHandle)
+		return -1;
+
 	struct crShaderBufferDescriptor IndexSBDescriptor;
 	IndexSBDescriptor.AccessType = crShaderBufferAccessType_Static;
 	IndexSBDescriptor.BufferType = crShaderBufferType_Array;
@@ -207,28 +229,36 @@ int main(int argc, char *argv[])
 	IndexStream.StartOffset = 0;
 	IndexStream.Stride = sizeof(uint16_t);
 
+	struct crShaderBufferDataStream MatrixStream;
+	MatrixStream.BufferHandle = MatrixShaderBufferHandle;
+	MatrixStream.ComponentsPerElement = 4;
+	MatrixStream.ComponentType = crShaderBufferComponentType_Float;
+	MatrixStream.NormalizeData = false;
+	MatrixStream.PerInstance = true;
+	MatrixStream.StartOffset = 0;
+	MatrixStream.Stride = sizeof(mat4);
+
 	struct crTextureBindSettings TextureBindSettings = crDefaultTextureBindSettings;
 	TextureBindSettings.Handle = TextureHandle;
-	mat4 MVP, MV;
-	math_mat4_dump(ModelMatrix);
+	mat4 VP;
 	math_mat4_dump(ViewMatrix);
 	math_mat4_dump(ProjectionMatrix);
 
-	math_mat4_multiply_to(&MVP, ViewMatrix, ModelMatrix);
-	math_mat4_multiply_to(&MVP, ProjectionMatrix, MVP);
+	math_mat4_multiply_to(&VP, ProjectionMatrix, ViewMatrix);
 
 	struct crRenderCommand RenderCommand = { 0 };
 	crSetRenderCommandShader(&RenderCommand, ShaderHandle);
 	crSetRenderCommandShaderBufferBinding(&RenderCommand, crGetShaderAttributeHandle(ShaderHandle, "a_VertexPosition"), PositionStream);
 	crSetRenderCommandShaderBufferBinding(&RenderCommand, crGetShaderAttributeHandle(ShaderHandle, "a_TexCoord"), TexCoordStream);
+	crSetRenderCommandShaderBufferBinding(&RenderCommand, crGetShaderAttributeHandle(ShaderHandle, "a_InstanceMatrix"), MatrixStream);
 	crSetRenderCommandIndexShaderBufferBinding(&RenderCommand, IndexStream);
-	crSetRenderCommandUniformMatrix4Value(&RenderCommand, crGetShaderUniformHandle(ShaderHandle, "u_MVP"), MVP);
+	crSetRenderCommandUniformMatrix4Value(&RenderCommand, crGetShaderUniformHandle(ShaderHandle, "u_VP"), VP);
 	crSetRenderCommandTextureBinding(&RenderCommand, crGetShaderUniformHandle(ShaderHandle, "u_Texture"), TextureBindSettings);
-	RenderCommand.InstanceCount = 1;
+	RenderCommand.InstanceCount = 100;
 	RenderCommand.Primitive = crTriangleList;
 	RenderCommand.StartVertex = 0;
 	RenderCommand.VertexCount = 36;
-	RenderCommand.InstanceCount = 1;
+	RenderCommand.InstanceCount = 100;
 	RenderCommand.State.Culling.Enabled = true;
 	RenderCommand.State.Culling.Mode = crCullingMode_Back;
 	RenderCommand.State.Culling.Winding = crCullingFaceWinding_CounterClockwise;
@@ -237,6 +267,7 @@ int main(int argc, char *argv[])
 
 	double LastEndFrameSeconds = Platform_GetPerformanceCurrentTime();
 	double TotalDelta = 0.0;
+
 	while (ShouldQuit == false)
 		{
 		double Seconds = Platform_GetPerformanceCurrentTime();
@@ -248,11 +279,33 @@ int main(int argc, char *argv[])
 		crStartRenderToWindow(crGetMainWindowHandle());
 		crClearFramebufferWithDefaultValues(Framebuffer);
 
-		math_mat4_set_rotation_matrix(&ModelMatrix, TotalDelta * M_PI_4, (vec3) { 0, 1, 0 });
-		math_mat4_multiply_to(&MVP, ViewMatrix, ModelMatrix);
-		math_mat4_multiply_to(&MVP, ProjectionMatrix, MVP);
-		crSetRenderCommandUniformMatrix4Value(&RenderCommand, crGetShaderUniformHandle(ShaderHandle, "u_MVP"), MVP);
 
+		mat4 *MatricesPointer = (mat4 *)crMapShaderBuffer(MatrixShaderBufferHandle, crShaderBufferMapAccessType_WriteOnly);
+		for (unsigned Index = 0; Index < 100; ++Index)
+			{
+			vec3 Offset;
+			Offset.x = (float)(Index / 10);
+			Offset.x /= 5.0f;
+			Offset.y = (float)(Index % 10);
+			Offset.y /= 5.0f;
+			Offset.x -= 1.0f;
+			Offset.y -= 1.0f;
+			Offset.x *= 1.5f;
+			Offset.y *= 1.5f;
+			Offset.z = 0.0f;
+
+			mat4 TranslationMatrix;
+			mat4 RotationMatrix;
+			mat4 ScaleMatrix;
+			math_mat4_set_translation_matrix(&TranslationMatrix, Offset);
+			math_mat4_set_scale_matrix(&ScaleMatrix, (vec3) { 0.1f, 0.1f, 0.1f });
+			math_mat4_set_rotation_matrix(&RotationMatrix, TotalDelta * M_PI_4, Rotations[Index]);
+
+			math_mat4_multiply_to(&ModelMatrix, RotationMatrix, ScaleMatrix);
+			math_mat4_multiply_to(&MatricesPointer[Index], TranslationMatrix, ModelMatrix);
+			}
+
+		crUnmapShaderBuffer(MatrixShaderBufferHandle);
 		crRunCommand(RenderCommand);
 		crDisplayFramebuffer(Framebuffer, crGetMainWindowHandle());
 		crDisplayWindow(crGetMainWindowHandle());
