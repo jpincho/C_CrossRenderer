@@ -78,7 +78,7 @@ bool crGL4ChangeShaderBufferContents(const crShaderBufferHandle Handle, const si
 void *crGL4MapShaderBuffer(const crShaderBufferHandle Handle, const enum crShaderBufferMapAccessType AccessType)
 	{
 	struct crGL4InternalShaderBufferInfo *ShaderBufferInformation = (struct crGL4InternalShaderBufferInfo *)pointer_list_get_node_data(Handle);
-	GLenum GLAccessType = crGL4TranslateShaderBufferAccessType(AccessType);
+	GLenum GLAccessType = crGL4TranslateShaderBufferMapAccessType(AccessType);
 
 	if ((ShaderBufferInformation->MappedPointer) && (ShaderBufferInformation->GLMappedAccessType == GLAccessType))
 		return ShaderBufferInformation->MappedPointer;
