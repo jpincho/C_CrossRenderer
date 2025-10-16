@@ -97,3 +97,57 @@ crTextureHandle LoadTexture(const char *ImageFile, const bool Flip)
 	stbi_image_free(Image);
 	return Texture;
 	}
+
+crTextureHandle LoadCubemapTexture(const char *ImageFile[6], const bool Flip)
+	{
+	uvec2 ImageSize;
+	int Channels;
+	enum crPixelFormat ImageFormat;
+
+	stbi_set_flip_vertically_on_load(Flip ? 1 : 0);
+
+	stbi_uc *Images[6] = { 0 };
+	for (unsigned Face = 0; Face < 6; ++Face)
+		{
+		Images[Face] = stbi_load(ImageFile[Face], &ImageSize.x, &ImageSize.y, &Channels, 0);
+		if (!Images[Face])
+			{
+			LOG_ERROR("Unable to load texture from '%s'", ImageFile[Face]);
+			goto OnError;
+			}
+
+		switch (Channels)
+			{
+			case 3:
+				ImageFormat = crPixelFormat_RedGreenBlue888;
+				break;
+			case 4:
+				ImageFormat = crPixelFormat_RedGreenBlueAlpha8888;
+				break;
+			default:
+				goto OnError;
+			}
+		}
+
+	struct crTextureDescriptor TextureDescriptor = { 0 };
+	TextureDescriptor.Type = crTextureType_TextureCubeMap;
+	TextureDescriptor.Dimensions = ImageSize;
+	TextureDescriptor.Format = ImageFormat;
+	TextureDescriptor.Mipmapped = true;
+	TextureDescriptor.Data = NULL;
+	crTextureHandle Texture = crCreateTexture(TextureDescriptor);
+
+	void *VoidPointer[6];
+	for (unsigned Face = 0; Face < 6; ++Face)
+		VoidPointer[Face] = Images[Face];
+	if (crLoadCubeMapTextureData(Texture, ImageFormat, VoidPointer) == false)
+		goto OnError;
+
+	for (unsigned Face = 0; Face < 6; ++Face)
+		stbi_image_free(Images[Face]);
+	return Texture;
+OnError:
+	for (unsigned Face = 0; Face < 6; ++Face)
+		stbi_image_free(Images[Face]);
+	return crTextureHandle_Invalid;
+	}

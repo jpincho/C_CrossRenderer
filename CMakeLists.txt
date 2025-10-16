@@ -18,6 +18,8 @@ install_local_packages()
 
 # Dependencies installed, configuring CrossRenderer
 include_directories(ExternalModules)
+include_directories(${LOCAL_PACKAGE_INSTALL_LOCATION}/include)
+
 include ( target_warning_options )
 if ( NOT TARGET Platform )
     add_subdirectory ( ExternalModules/Platform )
