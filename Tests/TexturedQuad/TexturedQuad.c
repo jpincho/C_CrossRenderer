@@ -10,40 +10,11 @@ bool LoadFileContents(const char *Filename, char **Contents);
 
 void WindowClosed_Callback(const crWindowHandle Handle)
     {
+    UNUSED(Handle);
     ShouldQuit = true;
     }
 
-void WindowMoved_Callback(const crWindowHandle Handle, const ivec2 NewPosition)
-    {
-    LOG_DEBUG("Window moved to %d %d", NewPosition.x, NewPosition.y);
-    }
-
-void WindowResized_Callback(const crWindowHandle Handle, const ivec2 NewSize)
-    {
-    LOG_DEBUG("Window resized to %d %d", NewSize.x, NewSize.y);
-    }
-
-void MouseClicked_Callback(const crWindowHandle Handle, const int Button, const bool Click)
-    {
-    LOG_DEBUG("Mouse button %u %s", Button, Click ? "clicked" : "released");
-    }
-
-void MouseWheel_Callback(const crWindowHandle Handle, const int Delta)
-    {
-    LOG_DEBUG("Mouse wheel %d", Delta);
-    }
-
-void MouseMoved_Callback(const crWindowHandle Handle, const ivec2 Delta, const ivec2 NewPosition)
-    {
-    LOG_DEBUG("Mouse moved %d %d %d %d", Delta.x, Delta.y, NewPosition.x, NewPosition.y);
-    }
-
-void WindowFocusChanged_Callback(const crWindowHandle Handle, const bool HasFocus)
-    {
-    LOG_DEBUG("Window focus %s", HasFocus ? "true" : "false");
-    }
-
-int main(int argc, char *argv[])
+int main(void)
     {
     crRendererConfiguration Configuration = { 0 };
     Configuration.InitialWindowDescriptor.Fullscreen = false;
@@ -57,15 +28,8 @@ int main(int argc, char *argv[])
     if (crInitialize(Configuration) == false)
         return -1;
 
-    crWindowManagerCallbacks Callbacks;
-    memset(&Callbacks, 0, sizeof(Callbacks));
-    Callbacks.EndWindowResized = WindowResized_Callback;
+    crWindowManagerCallbacks Callbacks = { 0 };
     Callbacks.WindowClosed = WindowClosed_Callback;
-    Callbacks.WindowMoved = WindowMoved_Callback;
-    Callbacks.MouseButton = MouseClicked_Callback;
-    Callbacks.MouseWheel = MouseWheel_Callback;
-    Callbacks.MouseMoved = MouseMoved_Callback;
-    Callbacks.WindowFocusChanged = WindowFocusChanged_Callback;
     crSetWindowManagerCallbacks(Callbacks);
 
     struct Vertex
@@ -84,7 +48,7 @@ int main(int argc, char *argv[])
     uvec2 WindowSize;
     crGetWindowDimensions(crGetMainWindowHandle(), &WindowSize);
     mat4 ProjectionMatrix;
-    math_mat4_set_perspective_matrix(&ProjectionMatrix, M_PI_2, (float)WindowSize.x / (float)WindowSize.y, 0.1f, 10.0f);
+    math_mat4_set_perspective_matrix(&ProjectionMatrix, (float)M_PI_2, (float)WindowSize.x / (float)WindowSize.y, 0.1f, 10.0f);
     mat4 ModelMatrix;
     math_mat4_set_identity_matrix(&ModelMatrix);
     mat4 ViewMatrix;
@@ -152,7 +116,7 @@ int main(int argc, char *argv[])
 
     crTextureBindSettings TextureBindSettings = crDefaultTextureBindSettings;
     TextureBindSettings.Handle = TextureHandle;
-    mat4 MVP, MV;
+    mat4 MVP;
     math_mat4_dump(ModelMatrix);
     math_mat4_dump(ViewMatrix);
     math_mat4_dump(ProjectionMatrix);
@@ -160,14 +124,6 @@ int main(int argc, char *argv[])
     math_mat4_multiply_to(&MVP, ViewMatrix, ModelMatrix);
     math_mat4_multiply_to(&MVP, ProjectionMatrix, MVP);
 
-    //math_mat4_multiply_multiple_to(&MVP, 3, ProjectionMatrix, ViewMatrix, ModelMatrix);
-    //math_mat4_set_identity_matrix(&MVP);
-    //math_mat4_dump(MVP);
-    //math_mat4_multiply_to(&MV, ProjectionMatrix, ViewMatrix);
-    //math_mat4_multiply_to(&MVP, MV, ModelMatrix);
-    //math_mat4_multiply_inplace(&MVP, &ModelMatrix);
-    //math_mat4_multiply_inplace(&MVP, &ViewMatrix);
-    //math_mat4_multiply_inplace(&MVP, &ProjectionMatrix);
     crRenderCommand RenderCommand = { 0 };
     crSetRenderCommandShader(&RenderCommand, ShaderHandle);
     crSetRenderCommandShaderBufferBinding(&RenderCommand, crGetShaderAttributeHandle(ShaderHandle, "a_VertexPosition"), PositionStream);

@@ -11,43 +11,14 @@ bool LoadFileContents(const char *Filename, char **Contents);
 
 void WindowClosed_Callback(const crWindowHandle Handle)
     {
+    UNUSED(Handle);
     ShouldQuit = true;
-    }
-
-void WindowMoved_Callback(const crWindowHandle Handle, const ivec2 NewPosition)
-    {
-    LOG_DEBUG("Window moved to %d %d", NewPosition.x, NewPosition.y);
-    }
-
-void WindowResized_Callback(const crWindowHandle Handle, const ivec2 NewSize)
-    {
-    LOG_DEBUG("Window resized to %d %d", NewSize.x, NewSize.y);
-    }
-
-void MouseClicked_Callback(const crWindowHandle Handle, const int Button, const bool Click)
-    {
-    LOG_DEBUG("Mouse button %u %s", Button, Click ? "clicked" : "released");
-    }
-
-void MouseWheel_Callback(const crWindowHandle Handle, const int Delta)
-    {
-    LOG_DEBUG("Mouse wheel %d", Delta);
-    }
-
-void MouseMoved_Callback(const crWindowHandle Handle, const ivec2 Delta, const ivec2 NewPosition)
-    {
-    LOG_DEBUG("Mouse moved %d %d %d %d", Delta.x, Delta.y, NewPosition.x, NewPosition.y);
-    }
-
-void WindowFocusChanged_Callback(const crWindowHandle Handle, const bool HasFocus)
-    {
-    LOG_DEBUG("Window focus %s", HasFocus ? "true" : "false");
     }
 
 mat4 ModelMatrices[100];
 vec3 Rotations[100];
 
-int main(int argc, char *argv[])
+int main(void)
     {
     crRendererConfiguration Configuration = { 0 };
     Configuration.InitialWindowDescriptor.Fullscreen = false;
@@ -61,15 +32,8 @@ int main(int argc, char *argv[])
     if (crInitialize(Configuration) == false)
         return -1;
 
-    crWindowManagerCallbacks Callbacks;
-    memset(&Callbacks, 0, sizeof(Callbacks));
-    Callbacks.EndWindowResized = WindowResized_Callback;
+    crWindowManagerCallbacks Callbacks = { 0 };
     Callbacks.WindowClosed = WindowClosed_Callback;
-    Callbacks.WindowMoved = WindowMoved_Callback;
-    Callbacks.MouseButton = MouseClicked_Callback;
-    Callbacks.MouseWheel = MouseWheel_Callback;
-    Callbacks.MouseMoved = MouseMoved_Callback;
-    Callbacks.WindowFocusChanged = WindowFocusChanged_Callback;
     crSetWindowManagerCallbacks(Callbacks);
 
     struct Vertex
@@ -134,7 +98,7 @@ int main(int argc, char *argv[])
     uvec2 WindowSize;
     crGetWindowDimensions(crGetMainWindowHandle(), &WindowSize);
     mat4 ProjectionMatrix;
-    math_mat4_set_perspective_matrix(&ProjectionMatrix, M_PI_2, (float)WindowSize.x / (float)WindowSize.y, 0.1f, 10.0f);
+    math_mat4_set_perspective_matrix(&ProjectionMatrix, (float)M_PI_2, (float)WindowSize.x / (float)WindowSize.y, 0.1f, 10.0f);
     mat4 ModelMatrix;
     math_mat4_set_identity_matrix(&ModelMatrix);
     mat4 ViewMatrix;
@@ -311,7 +275,7 @@ int main(int argc, char *argv[])
                 {
                 0.1f, 0.1f, 0.1f
                 });
-            math_mat4_set_rotation_matrix(&RotationMatrix, TotalDelta * M_PI_4, Rotations[Index]);
+            math_mat4_set_rotation_matrix(&RotationMatrix, (float)(TotalDelta * M_PI_4), Rotations[Index]);
 
             math_mat4_multiply_to(&ModelMatrix, RotationMatrix, ScaleMatrix);
             math_mat4_multiply_to(&MatricesPointer[Index], TranslationMatrix, ModelMatrix);

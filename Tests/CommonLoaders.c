@@ -41,8 +41,13 @@ OnError:
 
 bool LoadFileContents(const char *Filename, char **Contents)
     {
-    FILE *FileHandle;
+    FILE *FileHandle = NULL;
+#if defined (PLATFORM_COMPILER_MSVC)
+    if (fopen_s(&FileHandle, Filename, "rt") != 0)
+        return false;
+#else
     FileHandle = fopen(Filename, "rt");
+#endif
     if (FileHandle == NULL)
         return false;
 
@@ -63,7 +68,7 @@ bool LoadFileContents(const char *Filename, char **Contents)
 
 crTextureHandle LoadTexture(const char *ImageFile, const bool Flip)
     {
-    uvec2 ImageSize;
+    ivec2 ImageSize;
     int Channels;
     crPixelFormat ImageFormat;
 
@@ -89,7 +94,8 @@ crTextureHandle LoadTexture(const char *ImageFile, const bool Flip)
 
     crTextureDescriptor TextureDescriptor = { 0 };
     TextureDescriptor.Type = crTextureType_Texture2D;
-    TextureDescriptor.Dimensions = ImageSize;
+    TextureDescriptor.Dimensions.x = ImageSize.x;
+    TextureDescriptor.Dimensions.y = ImageSize.y;
     TextureDescriptor.Format = ImageFormat;
     TextureDescriptor.Mipmapped = true;
     TextureDescriptor.Data = Image;
@@ -100,7 +106,7 @@ crTextureHandle LoadTexture(const char *ImageFile, const bool Flip)
 
 crTextureHandle LoadCubemapTexture(const char *ImageFile[6], const bool Flip)
     {
-    uvec2 ImageSize;
+    ivec2 ImageSize;
     int Channels;
     crPixelFormat ImageFormat;
 
@@ -131,7 +137,8 @@ crTextureHandle LoadCubemapTexture(const char *ImageFile[6], const bool Flip)
 
     crTextureDescriptor TextureDescriptor = { 0 };
     TextureDescriptor.Type = crTextureType_TextureCubeMap;
-    TextureDescriptor.Dimensions = ImageSize;
+    TextureDescriptor.Dimensions.x = ImageSize.x;
+    TextureDescriptor.Dimensions.y = ImageSize.y;
     TextureDescriptor.Format = ImageFormat;
     TextureDescriptor.Mipmapped = true;
     TextureDescriptor.Data = NULL;

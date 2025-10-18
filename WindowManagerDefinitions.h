@@ -18,13 +18,16 @@ typedef struct
 
 typedef void ( *crWindowClosedCallback )( const crWindowHandle Handle );
 typedef void ( *crWindowMovedCallback )( const crWindowHandle Handle, const ivec2 NewPosition );
-typedef void ( *crWindowResizedCallback )( const crWindowHandle Handle, const ivec2 NewSize );
-typedef void ( *crEndWindowResizedCallback )( const crWindowHandle Handle, const ivec2 NewSize );
+typedef void ( *crWindowResizedCallback )( const crWindowHandle Handle, const uvec2 NewSize );
+typedef void ( *crEndWindowResizedCallback )( const crWindowHandle Handle, const uvec2 NewSize );
 typedef void ( *crWindowFocusChangedCallback )( const crWindowHandle Handle, const bool HasFocus );
 
-typedef void ( *MouseButtonCallback )( const crWindowHandle, const int Button, const bool Clicked );
-typedef void ( *MouseMovedCallback )( const crWindowHandle, const ivec2 Delta, const ivec2 NewPosition );
-typedef void ( *MouseWheelCallback ) ( const crWindowHandle, const int Delta );
+typedef void ( *crMouseButtonCallback )( const crWindowHandle, const unsigned Button, const bool Clicked );
+typedef void ( *crMouseMovedCallback )( const crWindowHandle, const ivec2 Delta, const ivec2 NewPosition );
+typedef void ( *crMouseWheelCallback ) ( const crWindowHandle, const int Delta );
+
+typedef void ( *crKeyDownCallback )( const crWindowHandle, const unsigned Key );
+typedef void ( *crKeyUpCallback )( const crWindowHandle, const unsigned Key );
 
 typedef struct
     {
@@ -33,9 +36,11 @@ typedef struct
     crWindowResizedCallback WindowResized;
     crEndWindowResizedCallback EndWindowResized;
     crWindowFocusChangedCallback WindowFocusChanged;
-    MouseButtonCallback MouseButton;
-    MouseMovedCallback MouseMoved;
-    MouseWheelCallback MouseWheel;
+    crKeyDownCallback KeyDown;
+    crKeyUpCallback KeyUp;
+    crMouseButtonCallback MouseButton;
+    crMouseMovedCallback MouseMoved;
+    crMouseWheelCallback MouseWheel;
     } crWindowManagerCallbacks;
 
 END_C_DECLARATIONS

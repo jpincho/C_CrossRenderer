@@ -37,7 +37,7 @@ LRESULT WindowProcedure(HWND WindowHandle, UINT Message, WPARAM wParam, LPARAM l
             {
             if (WindowManagerCallbacks.WindowResized)
                 {
-                ivec2 NewSize;
+                uvec2 NewSize;
                 NewSize.x = LOWORD(lParam);
                 NewSize.y = HIWORD(lParam);
                 WindowManagerCallbacks.WindowResized(WindowHandle, NewSize);
@@ -48,7 +48,7 @@ LRESULT WindowProcedure(HWND WindowHandle, UINT Message, WPARAM wParam, LPARAM l
             {
             if (WindowManagerCallbacks.EndWindowResized)
                 {
-                ivec2 NewSize;
+                uvec2 NewSize;
                 NewSize.x = LOWORD(lParam);
                 NewSize.y = HIWORD(lParam);
                 WindowManagerCallbacks.EndWindowResized(WindowHandle, NewSize);
