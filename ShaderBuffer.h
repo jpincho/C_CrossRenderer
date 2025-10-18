@@ -6,54 +6,54 @@
 typedef void *crShaderBufferHandle;
 #define ShaderBufferHandle_Invalid NULL
 
-enum crShaderBufferComponentType
-	{
-	crShaderBufferComponentType_Float = 0,
-	crShaderBufferComponentType_Unsigned8,
-	crShaderBufferComponentType_Unsigned16,
-	crShaderBufferComponentType_Unsigned32
-	};
+typedef enum
+    {
+    crShaderBufferComponentType_Float = 0,
+    crShaderBufferComponentType_Unsigned8,
+    crShaderBufferComponentType_Unsigned16,
+    crShaderBufferComponentType_Unsigned32
+    } crShaderBufferComponentType;
 
-enum crShaderBufferAccessType
-	{
-	crShaderBufferAccessType_Static,
-	crShaderBufferAccessType_Dynamic,
-	crShaderBufferAccessType_Stream
-	};
+typedef enum
+    {
+    crShaderBufferAccessType_Static,
+    crShaderBufferAccessType_Dynamic,
+    crShaderBufferAccessType_Stream
+    } crShaderBufferAccessType;
 
-enum crShaderBufferMapAccessType
-	{
-	crShaderBufferMapAccessType_ReadOnly,
-	crShaderBufferMapAccessType_WriteOnly,
-	crShaderBufferMapAccessType_ReadWrite
-	};
+typedef enum
+    {
+    crShaderBufferMapAccessType_ReadOnly,
+    crShaderBufferMapAccessType_WriteOnly,
+    crShaderBufferMapAccessType_ReadWrite
+    } crShaderBufferMapAccessType;
 
-enum crShaderBufferType
-	{
-	crShaderBufferType_Array,
-	crShaderBufferType_Uniform
-	};
+typedef enum
+    {
+    crShaderBufferType_Array,
+    crShaderBufferType_Uniform
+    } crShaderBufferType;
 
-struct crShaderBufferDataStream
-	{
-	crShaderBufferHandle BufferHandle;
-	size_t StartOffset;
-	size_t Stride;
-	enum crShaderBufferComponentType ComponentType;
-	size_t ComponentsPerElement;
-	bool NormalizeData;
-	bool PerInstance;
-	};
+typedef struct
+    {
+    crShaderBufferHandle BufferHandle;
+    size_t StartOffset;
+    size_t Stride;
+    crShaderBufferComponentType ComponentType;
+    size_t ComponentsPerElement;
+    bool NormalizeData;
+    bool PerInstance;
+    } crShaderBufferDataStream;
 
-struct crShaderBufferDescriptor
-	{
-	size_t DataSize, Capacity;
-	void *Data;
-	enum crShaderBufferAccessType AccessType;
-	enum crShaderBufferType BufferType;
-	};
+typedef struct
+    {
+    size_t DataSize, Capacity;
+    void *Data;
+    crShaderBufferAccessType AccessType;
+    crShaderBufferType BufferType;
+    } crShaderBufferDescriptor;
 
-inline void crDestroyShaderBufferDescriptor ( struct crShaderBufferDescriptor *Descriptor )
-	{
-	SAFE_DEL_C ( Descriptor->Data );
-	}
+inline void crDestroyShaderBufferDescriptor ( crShaderBufferDescriptor *Descriptor )
+    {
+    SAFE_DEL_C ( Descriptor->Data );
+    }

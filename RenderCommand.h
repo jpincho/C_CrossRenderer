@@ -7,55 +7,55 @@
 
 BEGIN_C_DECLARATIONS
 
-enum crPrimitiveType
-	{
-	crPoints = 0,
-	crLineList,
-	crLineStrip,
-	crTriangleList,
-	crTriangleStrip
-	};
+typedef enum
+    {
+    crPoints = 0,
+    crLineList,
+    crLineStrip,
+    crTriangleList,
+    crTriangleStrip
+    } crPrimitiveType;
 
-struct crShaderTextureBindPair
-	{
-	crShaderUniformHandle UniformHandle;
-	struct crTextureBindSettings BindSettings;
-	};
+typedef struct
+    {
+    crShaderUniformHandle UniformHandle;
+    crTextureBindSettings BindSettings;
+    } crShaderTextureBindPair;
 
-struct crShaderBufferBindPair
-	{
-	crShaderAttributeHandle AttributeHandle;
-	struct crShaderBufferDataStream DataStream;
-	};
+typedef struct
+    {
+    crShaderAttributeHandle AttributeHandle;
+    crShaderBufferDataStream DataStream;
+    } crShaderBufferBindPair;
 
-struct crShaderUniformValuePair
-	{
-	crShaderUniformHandle UniformHandle;
-	struct crShaderUniformValue UniformValue;
-	};
+typedef struct
+    {
+    crShaderUniformHandle UniformHandle;
+    crShaderUniformValue UniformValue;
+    } crShaderUniformValuePair;
 
-struct crRenderCommand
-	{
-	crShaderHandle Shader;
-	struct crShaderUniformValuePair *UniformValues;
-	unsigned UniformValueCount;
-	struct crShaderBufferBindPair *ShaderBufferBindings;
-	unsigned ShaderBufferBindingCount;
-	struct crShaderTextureBindPair *ShaderTextureBindings;
-	unsigned ShaderTextureBindingCount;
+typedef struct
+    {
+    crShaderHandle Shader;
+    crShaderUniformValuePair *UniformValues;
+    unsigned UniformValueCount;
+    crShaderBufferBindPair *ShaderBufferBindings;
+    unsigned ShaderBufferBindingCount;
+    crShaderTextureBindPair *ShaderTextureBindings;
+    unsigned ShaderTextureBindingCount;
 
-	struct crShaderBufferDataStream IndexBufferStream;
-	enum crPrimitiveType Primitive;
-	unsigned VertexCount, StartVertex;
+    crShaderBufferDataStream IndexBufferStream;
+    crPrimitiveType Primitive;
+    unsigned VertexCount, StartVertex;
 
-	size_t InstanceCount;
-	struct crRenderState State;
-	};
+    size_t InstanceCount;
+    crRenderState State;
+    } crRenderCommand;
 
-void crSetRenderCommandShader ( struct crRenderCommand *Command, const crShaderHandle NewShader );
-bool crSetRenderCommandIndexShaderBufferBinding ( struct crRenderCommand *Command, const struct crShaderBufferDataStream Stream );
-bool crSetRenderCommandShaderBufferBinding( struct crRenderCommand *Command, const crShaderAttributeHandle AttributeHandle, const struct crShaderBufferDataStream Stream );
-#define DEFINE_crSetRenderCommandUniformValue(VAR_TYPE,VALUE_TYPE) bool crSetRenderCommandUniform##VALUE_TYPE##Value(struct crRenderCommand *Command, const int UniformIndex, const VAR_TYPE Value);
+void crSetRenderCommandShader ( crRenderCommand *Command, const crShaderHandle NewShader );
+bool crSetRenderCommandIndexShaderBufferBinding ( crRenderCommand *Command, const crShaderBufferDataStream Stream );
+bool crSetRenderCommandShaderBufferBinding ( crRenderCommand *Command, const crShaderAttributeHandle AttributeHandle, const crShaderBufferDataStream Stream );
+#define DEFINE_crSetRenderCommandUniformValue(VAR_TYPE,VALUE_TYPE) bool crSetRenderCommandUniform##VALUE_TYPE##Value(crRenderCommand *Command, const int UniformIndex, const VAR_TYPE Value);
 
 DEFINE_crSetRenderCommandUniformValue ( bool, Bool );
 DEFINE_crSetRenderCommandUniformValue ( ivec2, Bool2 );
@@ -79,5 +79,5 @@ DEFINE_crSetRenderCommandUniformValue ( mat4, Matrix4 );
 #undef DEFINE_crSetRenderCommandUniformValue
 END_C_DECLARATIONS
 
-bool crSetRenderCommandTextureBinding ( struct crRenderCommand *Command, const crShaderUniformHandle UniformHandle, const struct crTextureBindSettings Binding );
+bool crSetRenderCommandTextureBinding ( crRenderCommand *Command, const crShaderUniformHandle UniformHandle, const crTextureBindSettings Binding );
 

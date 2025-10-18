@@ -1,1 +1,4 @@
-"CrossRendererConfig.h" 
+.vs
+out
+CrossRendererConfig.h
+*.orig

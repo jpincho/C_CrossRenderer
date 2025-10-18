@@ -8,100 +8,100 @@
 
 #include "../CrossRenderer.h"
 
-struct OpenGLInformationStruct
-	{
-	GLint MaxTextureUnits;
-	struct version OpenGLVersion, GLSLVersion;
-	bool DirectStateAccessEnabled, DirectStateAccessAvailable;
-	bool SeamlessCubeMapEnabled, SeamlessCubeMapAvailable;
-	char **Extensions;
-	unsigned ExtensionCount;
-	pointer_list Framebuffers;
-	pointer_list Textures;
-	pointer_list ShaderBuffers;
-	pointer_list Shaders;
-	};
+typedef struct
+    {
+    GLint MaxTextureUnits;
+    struct version OpenGLVersion, GLSLVersion;
+    bool DirectStateAccessEnabled, DirectStateAccessAvailable;
+    bool SeamlessCubeMapEnabled, SeamlessCubeMapAvailable;
+    char **Extensions;
+    unsigned ExtensionCount;
+    pointer_list Framebuffers;
+    pointer_list Textures;
+    pointer_list ShaderBuffers;
+    pointer_list Shaders;
+    } OpenGLInformationStruct;
 
-extern struct OpenGLInformationStruct crGL4Information;
+extern OpenGLInformationStruct crGL4Information;
 
-struct crGL4InternalTextureInfo
-	{
-	uvec2 Dimensions;
-	GLuint OpenGLID;
-	GLint GLMinFilter, GLMagFilter, GLSWrap, GLTWrap;
-	GLenum GLTextureType;
-	bool Mipmapped;
-	enum crPixelFormat Format;
-	};
+typedef struct
+    {
+    uvec2 Dimensions;
+    GLuint OpenGLID;
+    GLint GLMinFilter, GLMagFilter, GLSWrap, GLTWrap;
+    GLenum GLTextureType;
+    bool Mipmapped;
+    crPixelFormat Format;
+    } crGL4InternalTextureInfo;
 
-struct crGL4InternalShaderBufferInfo
-	{
-	GLuint OpenGLID;
-	GLenum GLAccessType;
-	GLenum GLBufferType;
-	GLenum GLMappedAccessType;
-	void *MappedPointer;
-	size_t DataSize, Capacity;
-	};
+typedef struct
+    {
+    GLuint OpenGLID;
+    GLenum GLAccessType;
+    GLenum GLBufferType;
+    GLenum GLMappedAccessType;
+    void *MappedPointer;
+    size_t DataSize, Capacity;
+    } crGL4InternalShaderBufferInfo;
 
-struct crGL4InternalFramebufferInfo
-	{
-	uvec2 Dimensions;
-	GLuint OpenGLID;
-	crTextureHandle *ColorTextures;
-	unsigned ColorTextureCount;
-	crTextureHandle DepthTexture;
-	crTextureHandle StencilTexture;
-	vec4 ClearColor;
-	float ClearDepth;
-	};
+typedef struct
+    {
+    uvec2 Dimensions;
+    GLuint OpenGLID;
+    crTextureHandle *ColorTextures;
+    unsigned ColorTextureCount;
+    crTextureHandle DepthTexture;
+    crTextureHandle StencilTexture;
+    vec4 ClearColor;
+    float ClearDepth;
+    } crGL4InternalFramebufferInfo;
 
-struct crGL4InternalUniformInfo
-	{
-	GLint OpenGLID;
-	struct crShaderUniformValue CurrentValue;
-	enum crShaderUniformType Type;
-	char *Name;
-	};
+typedef struct
+    {
+    GLint OpenGLID;
+    crShaderUniformValue CurrentValue;
+    crShaderUniformType Type;
+    char *Name;
+    } crGL4InternalUniformInfo;
 
-struct crGL4InternalAttributeInfo
-	{
-	GLint OpenGLID;
-	bool Enabled;
-	enum crShaderAttributeType Type;
-	char *Name;
-	};
+typedef struct
+    {
+    GLint OpenGLID;
+    bool Enabled;
+    crShaderAttributeType Type;
+    char *Name;
+    } crGL4InternalAttributeInfo;
 
-struct crGL4InternalShaderInfo
-	{
-	GLuint OpenGLID;
-	struct crGL4InternalUniformInfo *Uniforms;
-	unsigned UniformCount;
-	struct crGL4InternalUniformInfo *UniformBlocks;
-	unsigned UniformBlockCount;
-	struct crGL4InternalAttributeInfo *Attributes;
-	unsigned AttributeCount;
+typedef struct
+    {
+    GLuint OpenGLID;
+    crGL4InternalUniformInfo *Uniforms;
+    unsigned UniformCount;
+    crGL4InternalUniformInfo *UniformBlocks;
+    unsigned UniformBlockCount;
+    crGL4InternalAttributeInfo *Attributes;
+    unsigned AttributeCount;
 
-	struct crShaderInformation GeneralInformation;
-	};
+    crShaderInformation GeneralInformation;
+    } crGL4InternalShaderInfo;
 
 void OpenGLMessageCallback ( GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam );
 const char *crGL4StringifyOpenGL ( GLenum Value );
 bool crGL4CheckError ( void );
 
-GLenum crGL4TranslateDepthTestMode ( const enum crDepthTestMode Input );
-GLenum crGL4TranslateBlendMode ( const enum crBlendMode Input );
-GLenum crGL4TranslateStencilFunction ( const enum crStencilFunction Input );
-GLenum crGL4TranslateStencilFailAction ( const enum crStencilFailAction Input );
-GLenum crGL4TranslateCullingMode ( const enum crCullingMode Input );
-GLenum crGL4TranslateCullingFaceWinding ( const enum crCullingFaceWinding Input );
-GLenum crGL4TranslatePrimitive ( const enum crPrimitiveType Input );
-GLenum crGL4TranslateTextureFilter ( const enum crTextureFilter Input );
-GLenum crGL4TranslateTextureWrapMode ( const enum crTextureWrapMode Input );
-GLenum crGL4TranslateTextureType ( const enum crTextureType Input );
-GLenum crGL4TranslateShaderBufferComponentType ( const enum crShaderBufferComponentType Input );
-GLenum crGL4TranslateShaderBufferAccessType ( const enum crShaderBufferAccessType Input );
-GLenum crGL4TranslateShaderBufferMapAccessType ( const enum crShaderBufferMapAccessType Input );
-GLenum crGL4TranslateShaderBufferType ( const enum crShaderBufferType Input );
-GLenum crGL4TranslatePolygonMode ( const enum crPolygonMode Input );
-enum crShaderUniformType crGL4TranslateOpenGLUniformType ( const GLenum Input );
+GLenum crGL4TranslateDepthTestMode ( const crDepthTestMode Input );
+GLenum crGL4TranslateBlendMode ( const crBlendMode Input );
+GLenum crGL4TranslateStencilFunction ( const crStencilFunction Input );
+GLenum crGL4TranslateStencilFailAction ( const crStencilFailAction Input );
+GLenum crGL4TranslateCullingMode ( const crCullingMode Input );
+GLenum crGL4TranslateCullingFaceWinding ( const crCullingFaceWinding Input );
+GLenum crGL4TranslatePrimitive ( const crPrimitiveType Input );
+GLenum crGL4TranslateTextureFilter ( const crTextureFilter Input );
+GLenum crGL4TranslateTextureWrapMode ( const crTextureWrapMode Input );
+GLenum crGL4TranslateTextureType ( const crTextureType Input );
+GLenum crGL4TranslateShaderBufferComponentType ( const crShaderBufferComponentType Input );
+GLenum crGL4TranslateShaderBufferAccessType ( const crShaderBufferAccessType Input );
+GLenum crGL4TranslateShaderBufferMapAccessType ( const crShaderBufferMapAccessType Input );
+GLenum crGL4TranslateShaderBufferType ( const crShaderBufferType Input );
+GLenum crGL4TranslatePolygonMode ( const crPolygonMode Input );
+crShaderUniformType crGL4TranslateOpenGLUniformType ( const GLenum Input );

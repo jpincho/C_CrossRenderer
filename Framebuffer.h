@@ -3,16 +3,17 @@
 #include <Platform/defines.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include "PixelFormat.h"
 
 typedef void *crFramebufferHandle;
 #define FramebufferHandle_Invalid NULL
 
-struct crFramebufferDescriptor
-	{
-	vec4 ClearColor;
-	bool DepthEnabled;
-	uint8_t ColorAttachments;
-	enum crPixelFormat ColorAttachmentFormat, DepthFormat;
-	uvec2 Dimensions;
-	float ClearDepth;
-	};
+typedef struct
+    {
+    vec4 ClearColor;
+    bool DepthEnabled;
+    uint8_t ColorAttachments;
+    crPixelFormat ColorAttachmentFormat, DepthFormat;
+    uvec2 Dimensions;
+    float ClearDepth;
+    } crFramebufferDescriptor;

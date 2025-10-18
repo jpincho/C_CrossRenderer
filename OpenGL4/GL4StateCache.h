@@ -2,16 +2,16 @@
 #include "../RenderStateDefinitions.h"
 
 void crGL4SetDefaultViewportSize ( const uvec2 NewSize );
-bool crGL4ApplyState ( const struct crRenderState *NewState );
-bool crGL4ApplyStateWithCache ( const struct crRenderState *NewState );
-bool crGL4ApplyStateWithoutCache ( const struct crRenderState *NewState );
+bool crGL4ApplyState ( const crRenderState *NewState );
+bool crGL4ApplyStateWithCache ( const crRenderState *NewState );
+bool crGL4ApplyStateWithoutCache ( const crRenderState *NewState );
 void crGL4Invalidate ( void );
-struct crRenderState crGL4GetCurrentState ( void );
-void crGL4ConfigureCulling ( const struct crCullingSettings *NewState );
-void crGL4ConfigureBlending ( const struct crBlendSettings *NewSettings );
-void crGL4ConfigureStencil ( const struct crStencilBufferSettings *NewSettings );
-void crGL4ConfigureScissor ( const struct crScissorSettings *NewSettings );
-void crGL4ConfigureViewport ( const struct crViewportSettings *NewSettings );
-void crGL4ConfigureDepthTest ( const struct crDepthTestSettings *NewSettings );
+crRenderState crGL4GetCurrentState ( void );
+void crGL4ConfigureCulling ( const crCullingSettings *NewState );
+void crGL4ConfigureBlending ( const crBlendSettings *NewSettings );
+void crGL4ConfigureStencil ( const crStencilBufferSettings *NewSettings );
+void crGL4ConfigureScissor ( const crScissorSettings *NewSettings );
+void crGL4ConfigureViewport ( const crViewportSettings *NewSettings );
+void crGL4ConfigureDepthTest ( const crDepthTestSettings *NewSettings );
 void crGL4ConfigureFramebuffer ( const crFramebufferHandle NewFramebuffer );
-void crGL4ConfigurePolygonMode ( const struct crPolygonModeSettings *NewSettings );
+void crGL4ConfigurePolygonMode ( const crPolygonModeSettings *NewSettings );

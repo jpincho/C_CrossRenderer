@@ -3,132 +3,132 @@
 #include <stdbool.h>
 #include "Framebuffer.h"
 
-enum crBlendMode
-	{
-	crBlendMode_Zero = 0,
-	crBlendMode_One,
-	crBlendMode_SourceColor,
-	crBlendMode_OneMinusSourceColor,
-	crBlendMode_SourceAlpha,
-	crBlendMode_OneMinusSourceAlpha,
-	crBlendMode_DestinationAlpha,
-	crBlendMode_OneMinusDestinationAlpha,
-	crBlendMode_DestinationColor,
-	crBlendMode_OneMinusDestinationColor,
-	crBlendMode_SourceAlphaSaturate,
-	};
+typedef enum
+    {
+    crBlendMode_Zero = 0,
+    crBlendMode_One,
+    crBlendMode_SourceColor,
+    crBlendMode_OneMinusSourceColor,
+    crBlendMode_SourceAlpha,
+    crBlendMode_OneMinusSourceAlpha,
+    crBlendMode_DestinationAlpha,
+    crBlendMode_OneMinusDestinationAlpha,
+    crBlendMode_DestinationColor,
+    crBlendMode_OneMinusDestinationColor,
+    crBlendMode_SourceAlphaSaturate,
+    } crBlendMode;
 
-enum crStencilFunction
-	{
-	crStencilFunction_Never = 0,
-	crStencilFunction_Less,
-	crStencilFunction_LessOrEqual,
-	crStencilFunction_Greater,
-	crStencilFunction_GreaterOrEqual,
-	crStencilFunction_Equal,
-	crStencilFunction_NotEqual,
-	crStencilFunction_Always
-	};
+typedef enum
+    {
+    crStencilFunction_Never = 0,
+    crStencilFunction_Less,
+    crStencilFunction_LessOrEqual,
+    crStencilFunction_Greater,
+    crStencilFunction_GreaterOrEqual,
+    crStencilFunction_Equal,
+    crStencilFunction_NotEqual,
+    crStencilFunction_Always
+    } crStencilFunction;
 
-enum crStencilFailAction
-	{
-	crStencilFailAction_Zero = 0,
-	crStencilFailAction_Keep,
-	crStencilFailAction_Replace,
-	crStencilFailAction_Increment,
-	crStencilFailAction_Decrement,
-	crStencilFailAction_Invert
-	};
+typedef enum
+    {
+    crStencilFailAction_Zero = 0,
+    crStencilFailAction_Keep,
+    crStencilFailAction_Replace,
+    crStencilFailAction_Increment,
+    crStencilFailAction_Decrement,
+    crStencilFailAction_Invert
+    } crStencilFailAction;
 
-enum crCullingMode
-	{
-	crCullingMode_Front = 0,
-	crCullingMode_Back,
-	crCullingMode_FrontAndBack
-	};
+typedef enum
+    {
+    crCullingMode_Front = 0,
+    crCullingMode_Back,
+    crCullingMode_FrontAndBack
+    } crCullingMode;
 
-enum crCullingFaceWinding
-	{
-	crCullingFaceWinding_Clockwise = 0,
-	crCullingFaceWinding_CounterClockwise
-	};
+typedef enum
+    {
+    crCullingFaceWinding_Clockwise = 0,
+    crCullingFaceWinding_CounterClockwise
+    } crCullingFaceWinding;
 
-enum crDepthTestMode
-	{
-	crDepthTestMode_Never = 0,
-	crDepthTestMode_Less,
-	crDepthTestMode_LessOrEqual,
-	crDepthTestMode_Greater,
-	crDepthTestMode_GreaterOrEqual,
-	crDepthTestMode_Equal,
-	crDepthTestMode_NotEqual,
-	crDepthTestMode_Always
-	};
+typedef enum
+    {
+    crDepthTestMode_Never = 0,
+    crDepthTestMode_Less,
+    crDepthTestMode_LessOrEqual,
+    crDepthTestMode_Greater,
+    crDepthTestMode_GreaterOrEqual,
+    crDepthTestMode_Equal,
+    crDepthTestMode_NotEqual,
+    crDepthTestMode_Always
+    } crDepthTestMode;
 
-enum crPolygonMode
-	{
-	crPolygonMode_Point = 0,
-	crPolygonMode_Line,
-	crPolygonMode_Fill
-	};
+typedef enum
+    {
+    crPolygonMode_Point = 0,
+    crPolygonMode_Line,
+    crPolygonMode_Fill
+    } crPolygonMode;
 
-struct crBlendSettings
-	{
-	bool Enabled;
-	enum crBlendMode Source, Destination;
-	};
+typedef struct
+    {
+    bool Enabled;
+    crBlendMode Source, Destination;
+    } crBlendSettings;
 
-struct crStencilBufferSettings
-	{
-	bool Enabled;
-	unsigned Mask;
-	enum crStencilFunction Function;
-	unsigned FunctionReference, FunctionMask;
-	enum crStencilFailAction OnFail, OnFailZ, OnPassZ;
-	};
+typedef struct
+    {
+    bool Enabled;
+    unsigned Mask;
+    crStencilFunction Function;
+    unsigned FunctionReference, FunctionMask;
+    crStencilFailAction OnFail, OnFailZ, OnPassZ;
+    } crStencilBufferSettings;
 
-struct crScissorSettings
-	{
-	bool Enabled;
-	uvec2 LowerLeft, Dimensions;
-	};
+typedef struct
+    {
+    bool Enabled;
+    uvec2 LowerLeft, Dimensions;
+    } crScissorSettings;
 
-struct crViewportSettings
-	{
-	bool Enabled;
-	uvec2 LowerLeft, Dimensions;
-	};
+typedef struct
+    {
+    bool Enabled;
+    uvec2 LowerLeft, Dimensions;
+    } crViewportSettings;
 
-struct crCullingSettings
-	{
-	bool Enabled;
-	enum crCullingMode Mode;
-	enum crCullingFaceWinding Winding;
-	};
+typedef struct
+    {
+    bool Enabled;
+    crCullingMode Mode;
+    crCullingFaceWinding Winding;
+    } crCullingSettings;
 
-struct crDepthTestSettings
-	{
-	bool Enabled;
-	enum crDepthTestMode Mode;
-	};
+typedef struct
+    {
+    bool Enabled;
+    crDepthTestMode Mode;
+    } crDepthTestSettings;
 
-struct crFramebufferSettings
-	{
-	crFramebufferHandle TargetFramebuffer;
-	};
+typedef struct
+    {
+    crFramebufferHandle TargetFramebuffer;
+    } crFramebufferSettings;
 
-struct crPolygonModeSettings
-	{
-	enum crPolygonMode State;
-	};
+typedef struct
+    {
+    crPolygonMode State;
+    } crPolygonModeSettings;
 
-struct crRenderState
-	{
-	struct crBlendSettings Blending;
-	struct crCullingSettings Culling;
-	struct crStencilBufferSettings Stencil;
-	struct crScissorSettings Scissor;
-	struct crViewportSettings Viewport;
-	struct crDepthTestSettings DepthTest;
-	struct crPolygonModeSettings PolygonMode;
-	};
+typedef struct
+    {
+    crBlendSettings Blending;
+    crCullingSettings Culling;
+    crStencilBufferSettings Stencil;
+    crScissorSettings Scissor;
+    crViewportSettings Viewport;
+    crDepthTestSettings DepthTest;
+    crPolygonModeSettings PolygonMode;
+    } crRenderState;

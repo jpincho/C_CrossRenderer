@@ -10,11 +10,11 @@
 #include "Internal/CrossRendererFunctionPointers.h"
 
 BEGIN_C_DECLARATIONS
-bool crInitialize ( const struct crRendererConfiguration NewConfiguration );
+bool crInitialize ( const crRendererConfiguration NewConfiguration );
 bool crUpdate ( void );
 bool crShutdown ( void );
 
-crWindowHandle crCreateNewWindow ( const struct crRenderWindowDescriptor Descriptor );
+crWindowHandle crCreateNewWindow ( const crRenderWindowDescriptor Descriptor );
 bool crDestroyWindow ( const crWindowHandle WindowHandle );
 bool crUpdateWindows ( const bool Wait );
 bool crSetWindowPosition ( const crWindowHandle WindowHandle, const ivec2 Position );
@@ -31,5 +31,5 @@ crWindowManagerCallbacks crGetWindowManagerCallbacks ( void );
 
 crWindowHandle crGetMainWindowHandle ( void );
 
-void SetRenderStateToDefault ( struct crRenderState *State );
+void SetRenderStateToDefault ( crRenderState *State );
 END_C_DECLARATIONS

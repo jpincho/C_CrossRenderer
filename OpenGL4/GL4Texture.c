@@ -17,221 +17,224 @@
 // DataType - GL_UNSIGNED_BYTE, GL_BYTE, GL_UNSIGNED_SHORT, GL_SHORT, GL_UNSIGNED_INT, GL_INT, GL_FLOAT, GL_UNSIGNED_BYTE_3_3_2, GL_UNSIGNED_BYTE_2_3_3_REV, GL_UNSIGNED_SHORT_5_6_5, GL_UNSIGNED_SHORT_5_6_5_REV, GL_UNSIGNED_SHORT_4_4_4_4, GL_UNSIGNED_SHORT_4_4_4_4_REV, GL_UNSIGNED_SHORT_5_5_5_1, GL_UNSIGNED_SHORT_1_5_5_5_REV, GL_UNSIGNED_INT_8_8_8_8, GL_UNSIGNED_INT_8_8_8_8_REV, GL_UNSIGNED_INT_10_10_10_2, and GL_UNSIGNED_INT_2_10_10_10_REV.
 
 struct StructPixelFormatData
-	{
-	GLint DataType;
-	GLint Format;
-	GLint SizedFormat;
-	};
+    {
+    GLint DataType;
+    GLint Format;
+    GLint SizedFormat;
+    };
 
 static struct StructPixelFormatData PixelFormatData[] =
-	{
-		{GL_UNSIGNED_BYTE, GL_RED, GL_R8},// Red8
-		{GL_UNSIGNED_BYTE, GL_RG, GL_RG8},// RedGreen88
-		{GL_UNSIGNED_BYTE, GL_RGB, GL_RGB8},// RedGreenBlue888
-		{GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8},// RedGreenBlueAlpha8888
-		{GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8},// AlphaRedGreenBlue8888
-		{GL_UNSIGNED_SHORT, GL_RGB, GL_RGB565},// RedGreenBlue565
-		{GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT24}// DepthComponent
-	};
+    {
+        {GL_UNSIGNED_BYTE, GL_RED, GL_R8},// Red8
+        {GL_UNSIGNED_BYTE, GL_RG, GL_RG8},// RedGreen88
+        {GL_UNSIGNED_BYTE, GL_RGB, GL_RGB8},// RedGreenBlue888
+        {GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8},// RedGreenBlueAlpha8888
+        {GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8},// AlphaRedGreenBlue8888
+        {GL_UNSIGNED_SHORT, GL_RGB, GL_RGB565},// RedGreenBlue565
+        {GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT24}// DepthComponent
+    };
 
-crTextureHandle crGL4CreateTexture(const struct crTextureDescriptor Descriptor)
-	{
-	struct crGL4InternalTextureInfo *NewTexture = calloc(1, sizeof(struct crGL4InternalTextureInfo));
-	assert(NewTexture);
-	pointer_list_node *NewNode = NULL;
+crTextureHandle crGL4CreateTexture(const crTextureDescriptor Descriptor)
+    {
+    crGL4InternalTextureInfo *NewTexture = calloc(1, sizeof(crGL4InternalTextureInfo));
+    assert(NewTexture);
+    pointer_list_node *NewNode = NULL;
 
-	NewTexture->GLSWrap = crGL4TranslateTextureWrapMode(Descriptor.WrapSettings.Horizontal);
-	NewTexture->GLTWrap = crGL4TranslateTextureWrapMode(Descriptor.WrapSettings.Vertical);
-	NewTexture->GLMinFilter = crGL4TranslateTextureFilter(Descriptor.FilterSettings.MinFilter);
-	NewTexture->GLMagFilter = crGL4TranslateTextureFilter(Descriptor.FilterSettings.MagFilter);
-	NewTexture->GLTextureType = crGL4TranslateTextureType(Descriptor.Type);
-	math_uvec2_copy(&NewTexture->Dimensions, Descriptor.Dimensions);
-	NewTexture->Mipmapped = Descriptor.Mipmapped;
-	NewTexture->Format = Descriptor.Format;
+    NewTexture->GLSWrap = crGL4TranslateTextureWrapMode(Descriptor.WrapSettings.Horizontal);
+    NewTexture->GLTWrap = crGL4TranslateTextureWrapMode(Descriptor.WrapSettings.Vertical);
+    NewTexture->GLMinFilter = crGL4TranslateTextureFilter(Descriptor.FilterSettings.MinFilter);
+    NewTexture->GLMagFilter = crGL4TranslateTextureFilter(Descriptor.FilterSettings.MagFilter);
+    NewTexture->GLTextureType = crGL4TranslateTextureType(Descriptor.Type);
+    math_uvec2_copy(&NewTexture->Dimensions, Descriptor.Dimensions);
+    NewTexture->Mipmapped = Descriptor.Mipmapped;
+    NewTexture->Format = Descriptor.Format;
 
-	if (crGL4Information.DirectStateAccessEnabled)
-		{
-		glCreateTextures(NewTexture->GLTextureType, 1, &NewTexture->OpenGLID);
-		if (crGL4CheckError() == false)
-			goto OnError;
+    if (crGL4Information.DirectStateAccessEnabled)
+        {
+        glCreateTextures(NewTexture->GLTextureType, 1, &NewTexture->OpenGLID);
+        if (crGL4CheckError() == false)
+            goto OnError;
 
-		glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_WRAP_S, NewTexture->GLSWrap);
-		glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_WRAP_T, NewTexture->GLTWrap);
-		glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_MIN_FILTER, NewTexture->GLMinFilter);
-		glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_MAG_FILTER, NewTexture->GLMagFilter);
-		if (NewTexture->GLTextureType == GL_TEXTURE_CUBE_MAP)
-			glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		glTextureStorage2D(NewTexture->OpenGLID,
-			1,
-			PixelFormatData[Descriptor.Format].SizedFormat,
-			NewTexture->Dimensions.x, NewTexture->Dimensions.y);
-		}
-	else
-		{
-		glGenTextures(1, &NewTexture->OpenGLID);
-		if (crGL4CheckError() == false)
-			goto OnError;
+        glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_WRAP_S, NewTexture->GLSWrap);
+        glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_WRAP_T, NewTexture->GLTWrap);
+        glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_MIN_FILTER, NewTexture->GLMinFilter);
+        glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_MAG_FILTER, NewTexture->GLMagFilter);
+        if (NewTexture->GLTextureType == GL_TEXTURE_CUBE_MAP)
+            glTextureParameteri(NewTexture->OpenGLID, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTextureStorage2D(NewTexture->OpenGLID,
+                           1,
+                           PixelFormatData[Descriptor.Format].SizedFormat,
+                           NewTexture->Dimensions.x, NewTexture->Dimensions.y);
+        }
+    else
+        {
+        glGenTextures(1, &NewTexture->OpenGLID);
+        if (crGL4CheckError() == false)
+            goto OnError;
 
-		glBindTexture(NewTexture->GLTextureType, NewTexture->OpenGLID);
-		glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_WRAP_S, NewTexture->GLSWrap);
-		glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_WRAP_T, NewTexture->GLTWrap);
-		glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_MIN_FILTER, NewTexture->GLMinFilter);
-		glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_MAG_FILTER, NewTexture->GLMagFilter);
-		if (NewTexture->GLTextureType == GL_TEXTURE_CUBE_MAP)
-			glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		glTexStorage2D(NewTexture->GLTextureType,
-			1,
-			PixelFormatData[Descriptor.Format].SizedFormat,
-			NewTexture->Dimensions.x, NewTexture->Dimensions.y);
-		glBindTexture(GL_TEXTURE_2D, 0);
-		}
+        glBindTexture(NewTexture->GLTextureType, NewTexture->OpenGLID);
+        glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_WRAP_S, NewTexture->GLSWrap);
+        glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_WRAP_T, NewTexture->GLTWrap);
+        glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_MIN_FILTER, NewTexture->GLMinFilter);
+        glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_MAG_FILTER, NewTexture->GLMagFilter);
+        if (NewTexture->GLTextureType == GL_TEXTURE_CUBE_MAP)
+            glTexParameteri(NewTexture->GLTextureType, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        glTexStorage2D(NewTexture->GLTextureType,
+                       1,
+                       PixelFormatData[Descriptor.Format].SizedFormat,
+                       NewTexture->Dimensions.x, NewTexture->Dimensions.y);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        }
 
-	if (crGL4CheckError() == false)
-		goto OnError;
+    if (crGL4CheckError() == false)
+        goto OnError;
 
-	NewNode = pointer_list_add_at_end(&crGL4Information.Textures, NewTexture);
-	if (Descriptor.Data != NULL)
-		{
-		if (crGL4Load2DTextureData(NewNode, Descriptor.Format, Descriptor.Data) == false)
-			{
-			glDeleteTextures(1, &NewTexture->OpenGLID);
-			goto OnError;
-			}
-		}
-	return NewNode;
+    NewNode = pointer_list_add_at_end(&crGL4Information.Textures, NewTexture);
+    if (Descriptor.Data != NULL)
+        {
+        if (crGL4Load2DTextureData(NewNode, Descriptor.Format, Descriptor.Data) == false)
+            {
+            glDeleteTextures(1, &NewTexture->OpenGLID);
+            goto OnError;
+            }
+        }
+    return NewNode;
 
 OnError:
-	SAFE_DEL_C(NewTexture);
-	if (NewNode)
-		pointer_list_destroy_node(&crGL4Information.Textures, NewNode);
-	return crTextureHandle_Invalid;
-	}
+    SAFE_DEL_C(NewTexture);
+    if (NewNode)
+        pointer_list_destroy_node(&crGL4Information.Textures, NewNode);
+    return crTextureHandle_Invalid;
+    }
 
 bool crGL4DeleteTexture(const crTextureHandle Handle)
-	{
-	struct crGL4InternalTextureInfo *TextureInformation = (struct crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
+    {
+    crGL4InternalTextureInfo *TextureInformation = (crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
 
-	glDeleteTextures(1, &TextureInformation->OpenGLID);
-	free(TextureInformation);
-	pointer_list_destroy_node(&crGL4Information.Textures, Handle);
-	return true;
-	}
+    glDeleteTextures(1, &TextureInformation->OpenGLID);
+    free(TextureInformation);
+    pointer_list_destroy_node(&crGL4Information.Textures, Handle);
+    return true;
+    }
 
-bool crGL4Load2DTextureData(const crTextureHandle Handle, const enum crPixelFormat SourcePixelFormat, const void *Data)
-	{
-	struct crGL4InternalTextureInfo *TextureInformation = (struct crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
+bool crGL4Load2DTextureData(const crTextureHandle Handle, const crPixelFormat SourcePixelFormat, const void *Data)
+    {
+    crGL4InternalTextureInfo *TextureInformation = (crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
 
-	return crGL4Update2DTextureRegion(Handle, (uvec2) { 0 }, TextureInformation->Dimensions, SourcePixelFormat, Data);
-	}
+    return crGL4Update2DTextureRegion(Handle, (uvec2)
+        {
+        0
+        }, TextureInformation->Dimensions, SourcePixelFormat, Data);
+    }
 
-bool crGL4Update2DTextureRegion(const crTextureHandle Handle, const uvec2 LowerLeft, const uvec2 RegionDimensions, const enum crPixelFormat SourcePixelFormat, const void *Data)
-	{
-	struct crGL4InternalTextureInfo *TextureInformation = (struct crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
+bool crGL4Update2DTextureRegion(const crTextureHandle Handle, const uvec2 LowerLeft, const uvec2 RegionDimensions, const crPixelFormat SourcePixelFormat, const void *Data)
+    {
+    crGL4InternalTextureInfo *TextureInformation = (crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
 
-	if ((LowerLeft.x + RegionDimensions.x > TextureInformation->Dimensions.x) ||
-		(LowerLeft.y + RegionDimensions.y > TextureInformation->Dimensions.y))
-		return false;
+    if ((LowerLeft.x + RegionDimensions.x > TextureInformation->Dimensions.x) ||
+            (LowerLeft.y + RegionDimensions.y > TextureInformation->Dimensions.y))
+        return false;
 
-	// TODO Rewrite this pixel storage part
-	uint8_t alignment = 1;
-	uint32_t alignment_mask;
-	for (alignment_mask = 1; alignment_mask <= 8; alignment_mask *= 2)
-		{
-		if ((RegionDimensions.x % alignment_mask == 0) && ((intptr_t)(Data) % alignment_mask == 0))
-			alignment = alignment_mask & 0xFF;
-		}
+    // TODO Rewrite this pixel storage part
+    uint8_t alignment = 1;
+    uint32_t alignment_mask;
+    for (alignment_mask = 1; alignment_mask <= 8; alignment_mask *= 2)
+        {
+        if ((RegionDimensions.x % alignment_mask == 0) && ((intptr_t)(Data) % alignment_mask == 0))
+            alignment = alignment_mask & 0xFF;
+        }
 
-	// Set pixel storage parameters
-	glPixelStorei(GL_UNPACK_ALIGNMENT, alignment); // Ensure no padding between rows
-	//glPixelStorei(GL_UNPACK_ROW_LENGTH, 0); // Default row length
-	//glPixelStorei(GL_UNPACK_SKIP_ROWS, 0); // No rows skipped
-	//glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0); // No pixels skipped
+    // Set pixel storage parameters
+    glPixelStorei(GL_UNPACK_ALIGNMENT, alignment); // Ensure no padding between rows
+    //glPixelStorei(GL_UNPACK_ROW_LENGTH, 0); // Default row length
+    //glPixelStorei(GL_UNPACK_SKIP_ROWS, 0); // No rows skipped
+    //glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0); // No pixels skipped
 
-	if (crGL4Information.DirectStateAccessEnabled)
-		{
-		glTextureSubImage2D(TextureInformation->OpenGLID,
-			0,
-			LowerLeft.x, LowerLeft.y,
-			(int)RegionDimensions.x, (int)RegionDimensions.y,
-			PixelFormatData[(int)SourcePixelFormat].Format,
-			PixelFormatData[(int)SourcePixelFormat].DataType,
-			Data);
-		if (!crGL4CheckError())
-			return false;
-		if (TextureInformation->Mipmapped)
-			glGenerateTextureMipmap(TextureInformation->OpenGLID);
-		}
-	else
-		{
-		glBindTexture(GL_TEXTURE_2D, TextureInformation->OpenGLID);
-		glTexSubImage2D(GL_TEXTURE_2D,
-			0,
-			LowerLeft.x, LowerLeft.y,
-			(int)RegionDimensions.x, (int)RegionDimensions.y,
-			PixelFormatData[(int)SourcePixelFormat].Format,
-			PixelFormatData[(int)SourcePixelFormat].DataType,
-			Data);
-		if (!crGL4CheckError())
-			return false;
-		if (TextureInformation->Mipmapped)
-			glGenerateMipmap(GL_TEXTURE_2D);
-		}
+    if (crGL4Information.DirectStateAccessEnabled)
+        {
+        glTextureSubImage2D(TextureInformation->OpenGLID,
+                            0,
+                            LowerLeft.x, LowerLeft.y,
+                            (int)RegionDimensions.x, (int)RegionDimensions.y,
+                            PixelFormatData[(int)SourcePixelFormat].Format,
+                            PixelFormatData[(int)SourcePixelFormat].DataType,
+                            Data);
+        if (!crGL4CheckError())
+            return false;
+        if (TextureInformation->Mipmapped)
+            glGenerateTextureMipmap(TextureInformation->OpenGLID);
+        }
+    else
+        {
+        glBindTexture(GL_TEXTURE_2D, TextureInformation->OpenGLID);
+        glTexSubImage2D(GL_TEXTURE_2D,
+                        0,
+                        LowerLeft.x, LowerLeft.y,
+                        (int)RegionDimensions.x, (int)RegionDimensions.y,
+                        PixelFormatData[(int)SourcePixelFormat].Format,
+                        PixelFormatData[(int)SourcePixelFormat].DataType,
+                        Data);
+        if (!crGL4CheckError())
+            return false;
+        if (TextureInformation->Mipmapped)
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
 
-	return true;
-	}
+    return true;
+    }
 
-bool crGL4LoadCubeMapTextureData(const crTextureHandle Handle, const enum crPixelFormat SourcePixelFormat, void *Data[6])
-	{
-	struct crGL4InternalTextureInfo *TextureInformation = (struct crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
+bool crGL4LoadCubeMapTextureData(const crTextureHandle Handle, const crPixelFormat SourcePixelFormat, void *Data[6])
+    {
+    crGL4InternalTextureInfo *TextureInformation = (crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
 
-	if (crGL4Information.DirectStateAccessEnabled)
-		{
-		for (unsigned Face = 0; Face < 6; ++Face)
-			{
-			glTextureSubImage3D(TextureInformation->OpenGLID,
-				0,
-				0, 0, Face,
-				TextureInformation->Dimensions.x, TextureInformation->Dimensions.y, 1,
-				PixelFormatData[(int)SourcePixelFormat].Format,
-				PixelFormatData[(int)SourcePixelFormat].DataType,
-				Data[Face]);
-			}
-		if (!crGL4CheckError())
-			return false;
-		if (TextureInformation->Mipmapped)
-			glGenerateTextureMipmap(TextureInformation->OpenGLID);
-		}
-	else
-		{
-		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureInformation->OpenGLID);
-		for (unsigned Face = 0; Face < 6; ++Face)
-			{
-			glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face,
-				0,
-				0, 0,
-				TextureInformation->Dimensions.x, TextureInformation->Dimensions.y,
-				PixelFormatData[(int)SourcePixelFormat].Format,
-				PixelFormatData[(int)SourcePixelFormat].DataType,
-				Data[Face]);
-			}
-		if (TextureInformation->Mipmapped)
-			glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
+    if (crGL4Information.DirectStateAccessEnabled)
+        {
+        for (unsigned Face = 0; Face < 6; ++Face)
+            {
+            glTextureSubImage3D(TextureInformation->OpenGLID,
+                                0,
+                                0, 0, Face,
+                                TextureInformation->Dimensions.x, TextureInformation->Dimensions.y, 1,
+                                PixelFormatData[(int)SourcePixelFormat].Format,
+                                PixelFormatData[(int)SourcePixelFormat].DataType,
+                                Data[Face]);
+            }
+        if (!crGL4CheckError())
+            return false;
+        if (TextureInformation->Mipmapped)
+            glGenerateTextureMipmap(TextureInformation->OpenGLID);
+        }
+    else
+        {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, TextureInformation->OpenGLID);
+        for (unsigned Face = 0; Face < 6; ++Face)
+            {
+            glTexSubImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face,
+                            0,
+                            0, 0,
+                            TextureInformation->Dimensions.x, TextureInformation->Dimensions.y,
+                            PixelFormatData[(int)SourcePixelFormat].Format,
+                            PixelFormatData[(int)SourcePixelFormat].DataType,
+                            Data[Face]);
+            }
+        if (TextureInformation->Mipmapped)
+            glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
 
-		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		}
-	return crGL4CheckError();
-	}
+        glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+        }
+    return crGL4CheckError();
+    }
 
 void crGL4GetTextureDimensions(const crTextureHandle Handle, uvec2 *Dimensions)
-	{
-	struct crGL4InternalTextureInfo *TextureInformation = (struct crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
+    {
+    crGL4InternalTextureInfo *TextureInformation = (crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
 
-	math_uvec2_copy(Dimensions, TextureInformation->Dimensions);
-	}
+    math_uvec2_copy(Dimensions, TextureInformation->Dimensions);
+    }
 
-enum crPixelFormat crGL4GetTextureFormat(const crTextureHandle Handle)
-	{
-	struct crGL4InternalTextureInfo *TextureInformation = (struct crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
+crPixelFormat crGL4GetTextureFormat(const crTextureHandle Handle)
+    {
+    crGL4InternalTextureInfo *TextureInformation = (crGL4InternalTextureInfo *)pointer_list_get_node_data(Handle);
 
-	return TextureInformation->Format;
-	}
+    return TextureInformation->Format;
+    }

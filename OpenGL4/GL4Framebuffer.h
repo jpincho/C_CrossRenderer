@@ -2,7 +2,7 @@
 #include "../Framebuffer.h"
 #include "../Texture.h"
 
-crFramebufferHandle crGL4CreateFramebuffer ( const struct crFramebufferDescriptor Descriptor );
+crFramebufferHandle crGL4CreateFramebuffer ( const crFramebufferDescriptor Descriptor );
 bool crGL4DeleteFramebuffer ( const crFramebufferHandle Handle );
 void crGL4SetFramebufferClearColor ( const crFramebufferHandle Handle, const vec4 ClearColor );
 void crGL4SetFramebufferClearDepth ( const crFramebufferHandle Handle, const float ClearDepth );
