@@ -8,49 +8,49 @@
 BEGIN_C_DECLARATIONS
 
 typedef enum
-    {
-    crPoints = 0,
-    crLineList,
-    crLineStrip,
-    crTriangleList,
-    crTriangleStrip
-    } crPrimitiveType;
+	{
+	crPoints = 0,
+	crLineList,
+	crLineStrip,
+	crTriangleList,
+	crTriangleStrip
+	} crPrimitiveType;
 
 typedef struct
-    {
-    crShaderUniformHandle UniformHandle;
-    crTextureBindSettings BindSettings;
-    } crShaderTextureBindPair;
+	{
+	crShaderUniformHandle UniformHandle;
+	crTextureBindSettings BindSettings;
+	} crShaderTextureBindPair;
 
 typedef struct
-    {
-    crShaderAttributeHandle AttributeHandle;
-    crShaderBufferDataStream DataStream;
-    } crShaderBufferBindPair;
+	{
+	crShaderAttributeHandle AttributeHandle;
+	crShaderBufferDataStream DataStream;
+	} crShaderBufferBindPair;
 
 typedef struct
-    {
-    crShaderUniformHandle UniformHandle;
-    crShaderUniformValue UniformValue;
-    } crShaderUniformValuePair;
+	{
+	crShaderUniformHandle UniformHandle;
+	crShaderUniformValue UniformValue;
+	} crShaderUniformValuePair;
 
 typedef struct
-    {
-    crShaderHandle Shader;
-    crShaderUniformValuePair *UniformValues;
-    unsigned UniformValueCount;
-    crShaderBufferBindPair *ShaderBufferBindings;
-    unsigned ShaderBufferBindingCount;
-    crShaderTextureBindPair *ShaderTextureBindings;
-    unsigned ShaderTextureBindingCount;
+	{
+	crShaderHandle Shader;
+	crShaderUniformValuePair *UniformValues;
+	unsigned UniformValueCount;
+	crShaderBufferBindPair *ShaderBufferBindings;
+	unsigned ShaderBufferBindingCount;
+	crShaderTextureBindPair *ShaderTextureBindings;
+	unsigned ShaderTextureBindingCount;
 
-    crShaderBufferDataStream IndexBufferStream;
-    crPrimitiveType Primitive;
-    unsigned VertexCount, StartVertex;
+	crShaderBufferDataStream IndexBufferStream;
+	crPrimitiveType Primitive;
+	unsigned VertexCount, StartVertex;
 
-    size_t InstanceCount;
-    crRenderState State;
-    } crRenderCommand;
+	size_t InstanceCount;
+	crRenderState State;
+	} crRenderCommand;
 
 void crSetRenderCommandShader ( crRenderCommand *Command, const crShaderHandle NewShader );
 bool crSetRenderCommandIndexShaderBufferBinding ( crRenderCommand *Command, const crShaderBufferDataStream Stream );

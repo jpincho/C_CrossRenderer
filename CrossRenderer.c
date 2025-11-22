@@ -19,88 +19,88 @@ return (*cr##name) ( __VA_ARGS__ ) = 0
 #endif
 
 bool SetupFunctionPointers(const crRendererBackend Backend)
-    {
-    switch (Backend)
-        {
+	{
+	switch (Backend)
+		{
 #if defined ( CROSS_RENDERER_OPENGL_CORE_SUPPORT)
 #define DECLARE_INTERFACE_FUNCTION(return,name,...) cr##name = crGL4##name
-        case OpenGLCore:
+		case OpenGLCore:
 #include "Internal/RendererTemplateSignatures.h"
-            break;
+			break;
 #undef DECLARE_INTERFACE_FUNCTION
 #endif
-        default:
-            LOG_ERROR("Renderer backend is not built");
-            return false;
-        }
-    return true;
-    }
+		default:
+			LOG_ERROR("Renderer backend is not built");
+			return false;
+		}
+	return true;
+	}
 
 bool crInitialize(const crRendererConfiguration NewConfiguration)
-    {
-    if (SetupFunctionPointers(NewConfiguration.DesiredRendererBackend) == false)
-        return false;
+	{
+	if (SetupFunctionPointers(NewConfiguration.DesiredRendererBackend) == false)
+		return false;
 
-    if (crInitializeRenderer(NewConfiguration) == false)
-        return false;
-    MainWindowHandle = pointer_list_get_node_data(WindowList.first);
-    return true;
-    }
+	if (crInitializeRenderer(NewConfiguration) == false)
+		return false;
+	MainWindowHandle = PointerList_GetNodeData(WindowList.first);
+	return true;
+	}
 
 bool crUpdate(void)
-    {
-    return true;
-    }
+	{
+	return true;
+	}
 
 bool crShutdown(void)
-    {
-    if (MainWindowHandle)
-        {
-        crDestroyWindow(MainWindowHandle);
-        MainWindowHandle = NULL;
-        }
-    return true;
-    }
+	{
+	if (MainWindowHandle)
+		{
+		crDestroyWindow(MainWindowHandle);
+		MainWindowHandle = NULL;
+		}
+	return true;
+	}
 
 crWindowHandle crGetMainWindowHandle(void)
-    {
-    return MainWindowHandle;
-    }
+	{
+	return MainWindowHandle;
+	}
 
 void crSetWindowManagerCallbacks(crWindowManagerCallbacks NewCallbacks)
-    {
-    WindowManagerCallbacks = NewCallbacks;
-    }
+	{
+	WindowManagerCallbacks = NewCallbacks;
+	}
 
 crWindowManagerCallbacks crGetWindowManagerCallbacks(void)
-    {
-    return WindowManagerCallbacks;
-    }
+	{
+	return WindowManagerCallbacks;
+	}
 
 void SetRenderStateToDefault(crRenderState *State)
-    {
-    memset(State, 0, sizeof(crRenderState));
+	{
+	memset(State, 0, sizeof(crRenderState));
 
-    State->Blending.Source = crBlendMode_SourceAlpha;
-    State->Blending.Destination = crBlendMode_OneMinusSourceAlpha;
-    State->Blending.Enabled = true;
+	State->Blending.Source = crBlendMode_SourceAlpha;
+	State->Blending.Destination = crBlendMode_OneMinusSourceAlpha;
+	State->Blending.Enabled = true;
 
-    State->Culling.Enabled = false;
-    State->Culling.Mode = crCullingMode_Back;
-    State->Culling.Winding = crCullingFaceWinding_CounterClockwise;
+	State->Culling.Enabled = false;
+	State->Culling.Mode = crCullingMode_Back;
+	State->Culling.Winding = crCullingFaceWinding_CounterClockwise;
 
-    State->DepthTest.Enabled = false;
-    State->DepthTest.Mode = crDepthTestMode_LessOrEqual;
+	State->DepthTest.Enabled = false;
+	State->DepthTest.Mode = crDepthTestMode_LessOrEqual;
 
-    State->PolygonMode.State = crPolygonMode_Fill;
+	State->PolygonMode.State = crPolygonMode_Fill;
 
-    State->Scissor.Enabled = false;
+	State->Scissor.Enabled = false;
 
-    State->Stencil.Enabled = false;
-    State->Stencil.Mask = (unsigned)-1;
-    State->Stencil.Function = crStencilFunction_Always;
-    State->Stencil.FunctionReference = State->Stencil.FunctionMask = (unsigned)-1;
-    State->Stencil.OnFail = State->Stencil.OnFailZ = State->Stencil.OnPassZ = crStencilFailAction_Keep;
+	State->Stencil.Enabled = false;
+	State->Stencil.Mask = (unsigned)-1;
+	State->Stencil.Function = crStencilFunction_Always;
+	State->Stencil.FunctionReference = State->Stencil.FunctionMask = (unsigned)-1;
+	State->Stencil.OnFail = State->Stencil.OnFailZ = State->Stencil.OnPassZ = crStencilFailAction_Keep;
 
-    State->Viewport.Enabled = false;
-    }
+	State->Viewport.Enabled = false;
+	}

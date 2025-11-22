@@ -27,7 +27,7 @@ endif()
 if ( NOT TARGET C_Utils )
     add_subdirectory ( ExternalModules/C_Utils )
 endif()
-add_subdirectory(ExternalModules/Math)
+add_subdirectory ( ExternalModules/Math )
 
 # OpenGL backend
 set ( OpenGL_GL_PREFERENCE GLVND )
@@ -84,6 +84,7 @@ target_include_directories ( C_CrossRenderer PUBLIC ${CROSS_RENDERER_INCLUDE_DIR
 target_link_libraries ( C_CrossRenderer PUBLIC ${CROSS_RENDERER_LIBRARIES} )
 target_link_libraries ( C_CrossRenderer PUBLIC Platform )
 target_link_libraries ( C_CrossRenderer PUBLIC C_Utils )
+target_link_libraries ( C_CrossRenderer PUBLIC Math )
 target_warning_options ( C_CrossRenderer HIGH AS_ERRORS )
 
 # Tests

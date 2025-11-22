@@ -1,5 +1,5 @@
 #include "WindowManagerInternal.h"
 
 crWindowManagerCallbacks WindowManagerCallbacks;
-pointer_list WindowList;
+PointerList WindowList;
 crWindowHandle MainWindowHandle = NULL;
