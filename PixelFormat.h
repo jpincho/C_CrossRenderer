@@ -1,5 +1,6 @@
 #pragma once
 
+BEGIN_C_DECLARATIONS
 typedef enum
 	{
 	crPixelFormat_Red8 = 0,
@@ -10,3 +11,4 @@ typedef enum
 	crPixelFormat_RedGreenBlue565,
 	crPixelFormat_DepthComponent,
 	} crPixelFormat;
+END_C_DECLARATIONS

@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include "WindowManagerDefinitions.h"
 
+BEGIN_C_DECLARATIONS
 typedef enum
 	{
 	OpenGLCore,
@@ -15,3 +16,4 @@ typedef struct
 	bool VSyncEnabled;
 	uint8_t RedBits, GreenBits, BlueBits, AlphaBits, DepthBits, StencilBits;
 	} crRendererConfiguration;
+END_C_DECLARATIONS

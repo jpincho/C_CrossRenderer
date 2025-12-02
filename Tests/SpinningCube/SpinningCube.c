@@ -130,13 +130,13 @@ int main(void)
 	if (!IndexShaderBufferHandle)
 		return -1;
 
-	crShaderHandle ShaderHandle = LoadShader(DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.vert",
+	crShaderHandle ShaderHandle = crLoadShader(DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.vert",
 	                              NULL,
 	                              DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.frag");
 	if (!ShaderHandle)
 		return -1;
 
-	crTextureHandle TextureHandle = LoadTexture(DATA_PATH "../TexturedQuad/batman.jpg", true);
+	crTextureHandle TextureHandle = crLoadTexture(DATA_PATH "../TexturedQuad/batman.jpg", true);
 	if (!TextureHandle)
 		return -1;
 
@@ -187,8 +187,8 @@ int main(void)
 	math_mat4_dump(ViewMatrix);
 	math_mat4_dump(ProjectionMatrix);
 
-	math_mat4_multiply_to(&MVP, ViewMatrix, ModelMatrix);
-	math_mat4_multiply_to(&MVP, ProjectionMatrix, MVP);
+	math_mat4_multiply(&MVP, ViewMatrix, ModelMatrix);
+	math_mat4_multiply(&MVP, ProjectionMatrix, MVP);
 
 	crRenderCommand RenderCommand = { 0 };
 	crSetRenderCommandShader(&RenderCommand, ShaderHandle);
@@ -225,8 +225,8 @@ int main(void)
 			{
 			0, 1, 0
 			});
-		math_mat4_multiply_to(&MVP, ViewMatrix, ModelMatrix);
-		math_mat4_multiply_to(&MVP, ProjectionMatrix, MVP);
+		math_mat4_multiply(&MVP, ViewMatrix, ModelMatrix);
+		math_mat4_multiply(&MVP, ProjectionMatrix, MVP);
 		crSetRenderCommandUniformMatrix4Value(&RenderCommand, crGetShaderUniformHandle(ShaderHandle, "u_MVP"), MVP);
 
 		crRunCommand(RenderCommand);

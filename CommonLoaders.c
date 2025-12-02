@@ -2,11 +2,39 @@
 #include <Platform/Logger.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb/stb_image.h>
+#include <fnmatch.h>
 
 #include "../Shader.h"
 #include "../Texture.h"
 
-crShaderHandle LoadShader(const char *VertexFile, const char *GeometryFile, const char *FragmentFile)
+static bool LoadFileContents(const char *Filename, char **Contents)
+	{
+	FILE *FileHandle = NULL;
+#if defined (PLATFORM_COMPILER_MSVC)
+	if (fopen_s(&FileHandle, Filename, "rt") != 0)
+		return false;
+#else
+	FileHandle = fopen(Filename, "rt");
+#endif
+	if (FileHandle == NULL)
+		return false;
+
+	fseek(FileHandle, 0, SEEK_END);
+	size_t FileSize = ftell(FileHandle);
+	fseek(FileHandle, 0, SEEK_SET);
+
+	*Contents = calloc(FileSize + 1, sizeof(char));
+	if (*Contents == NULL)
+		{
+		fclose(FileHandle);
+		return false;
+		}
+	fread(*Contents, sizeof(char), FileSize, FileHandle);
+	fclose(FileHandle);
+	return true;
+	}
+
+crShaderHandle crLoadShader(const char *VertexFile, const char *GeometryFile, const char *FragmentFile)
 	{
 	crShaderCode ShaderCode;
 	crShaderHandle ShaderHandle = crShaderHandle_Invalid;
@@ -39,34 +67,7 @@ OnError:
 	return ShaderHandle;
 	}
 
-bool LoadFileContents(const char *Filename, char **Contents)
-	{
-	FILE *FileHandle = NULL;
-#if defined (PLATFORM_COMPILER_MSVC)
-	if (fopen_s(&FileHandle, Filename, "rt") != 0)
-		return false;
-#else
-	FileHandle = fopen(Filename, "rt");
-#endif
-	if (FileHandle == NULL)
-		return false;
-
-	fseek(FileHandle, 0, SEEK_END);
-	size_t FileSize = ftell(FileHandle);
-	fseek(FileHandle, 0, SEEK_SET);
-
-	*Contents = calloc(FileSize + 1, sizeof(char));
-	if (*Contents == NULL)
-		{
-		fclose(FileHandle);
-		return false;
-		}
-	fread(*Contents, sizeof(char), FileSize, FileHandle);
-	fclose(FileHandle);
-	return true;
-	}
-
-bool LoadTextureDescriptorFromFile(const char *ImageFile, const bool Flip, crTextureDescriptor *Descriptor)
+bool crLoadTextureDescriptorFromFile(const char *ImageFile, const bool Flip, crTextureDescriptor *Descriptor)
 	{
 	ivec2 ImageSize;
 	int Channels;
@@ -113,7 +114,7 @@ bool LoadTextureDescriptorFromFile(const char *ImageFile, const bool Flip, crTex
 	return true;
 	}
 
-bool LoadTextureDescriptorFromMemory(const void *Pointer, const unsigned Length, const bool Flip, crTextureDescriptor *Descriptor)
+bool crLoadTextureDescriptorFromMemory(const void *Pointer, const unsigned Length, const bool Flip, crTextureDescriptor *Descriptor)
 	{
 	ivec2 ImageSize;
 	int Channels;
@@ -160,10 +161,10 @@ bool LoadTextureDescriptorFromMemory(const void *Pointer, const unsigned Length,
 	return true;
 	}
 
-crTextureHandle LoadTexture(const char *ImageFile, const bool Flip)
+crTextureHandle crLoadTexture(const char *ImageFile, const bool Flip)
 	{
 	crTextureDescriptor TextureDescriptor;
-	if (LoadTextureDescriptorFromFile(ImageFile, Flip, &TextureDescriptor) == false)
+	if (crLoadTextureDescriptorFromFile(ImageFile, Flip, &TextureDescriptor) == false)
 		return crTextureHandle_Invalid;
 
 	crTextureHandle Texture = crCreateTexture(TextureDescriptor);
@@ -171,7 +172,7 @@ crTextureHandle LoadTexture(const char *ImageFile, const bool Flip)
 	return Texture;
 	}
 
-crTextureHandle LoadCubemapTexture(const char *ImageFile[6], const bool Flip)
+crTextureHandle crLoadCubemapTexture(const char *ImageFile[6], const bool Flip)
 	{
 	ivec2 ImageSize;
 	int Channels;
@@ -232,3 +233,19 @@ OnError:
 	return crTextureHandle_Invalid;
 	}
 
+bool crIsValidTextureFile(const char *Filename)
+	{
+	char *valid_masks[] = { "*.jpg",
+		"*.jpeg",
+		"*.png",
+		"*.bmp",
+		"*.tga",
+		"*.gif" };
+
+	for (int index = 0; index < _countof(valid_masks); ++index)
+		{
+		if (fnmatch(valid_masks[index], Filename, 0))
+			return true;
+		}
+	return false;
+	}

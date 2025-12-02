@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+BEGIN_C_DECLARATIONS
 typedef void *crTextureHandle;
 #define crTextureHandle_Invalid NULL
 
@@ -66,3 +67,4 @@ inline void crDestroyTextureDescriptor ( crTextureDescriptor *Descriptor )
 	}
 
 extern const crTextureBindSettings crDefaultTextureBindSettings;
+END_C_DECLARATIONS

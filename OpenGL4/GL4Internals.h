@@ -8,10 +8,11 @@
 
 #include "../CrossRenderer.h"
 
+BEGIN_C_DECLARATIONS
 typedef struct
 	{
 	GLint MaxTextureUnits;
-	struct version OpenGLVersion, GLSLVersion;
+	VersionNumber OpenGLVersion, GLSLVersion;
 	bool DirectStateAccessEnabled, DirectStateAccessAvailable;
 	bool SeamlessCubeMapEnabled, SeamlessCubeMapAvailable;
 	char **Extensions;
@@ -105,3 +106,4 @@ GLenum crGL4TranslateShaderBufferMapAccessType ( const crShaderBufferMapAccessTy
 GLenum crGL4TranslateShaderBufferType ( const crShaderBufferType Input );
 GLenum crGL4TranslatePolygonMode ( const crPolygonMode Input );
 crShaderUniformType crGL4TranslateOpenGLUniformType ( const GLenum Input );
+END_C_DECLARATIONS

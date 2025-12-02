@@ -1,4 +1,5 @@
 #pragma once
+#include <Platform/Version.h>
 #include "../RendererDefinitions.h"
 #include "../RenderCommand.h"
 #include "GL4Framebuffer.h"
@@ -6,8 +7,11 @@
 #include "GL4ShaderBuffer.h"
 #include "GL4Texture.h"
 
+BEGIN_C_DECLARATIONS
 bool crGL4InitializeRenderer ( const crRendererConfiguration NewConfiguration );
 bool crGL4ShutdownRenderer ( void );
+VersionNumber crGL4GetGLVersion ( void );
+VersionNumber crGL4GetGLSLVersion ( void );
 bool crGL4IsExtensionAvailable ( const char *Extension );
 bool crGL4EnableDirectStateAccess ( const bool NewState );
 bool crGL4IsDirectStateAccessEnabled ( void );
@@ -27,3 +31,4 @@ bool IsExtensionAvailable ( const char *Extension );
 bool EnableDirectStateAccess ( const bool NewState );
 bool IsDirectStateAccessEnabled ( void );
 #endif
+END_C_DECLARATIONS

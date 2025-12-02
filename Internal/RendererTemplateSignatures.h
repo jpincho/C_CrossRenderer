@@ -6,6 +6,7 @@
 #include "../RenderCommand.h"
 
 // Framebuffer
+BEGIN_C_DECLARATIONS
 DECLARE_INTERFACE_FUNCTION ( crFramebufferHandle, CreateFramebuffer, const crFramebufferDescriptor Descriptor );
 DECLARE_INTERFACE_FUNCTION ( bool, DeleteFramebuffer, const crFramebufferHandle Handle );
 DECLARE_INTERFACE_FUNCTION ( void, SetFramebufferClearColor, const crFramebufferHandle Handle, const vec4 ClearColor );
@@ -48,3 +49,4 @@ DECLARE_INTERFACE_FUNCTION ( bool, StartRenderToWindow, const crWindowHandle Win
 DECLARE_INTERFACE_FUNCTION ( bool, DisplayFramebuffer, const crFramebufferHandle FramebufferHandle, const crWindowHandle WindowHandle );
 DECLARE_INTERFACE_FUNCTION ( bool, DisplayWindow, const crWindowHandle WindowHandle );
 DECLARE_INTERFACE_FUNCTION ( bool, RunCommand, const crRenderCommand Command );
+END_C_DECLARATIONS

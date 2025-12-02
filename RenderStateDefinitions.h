@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include "Framebuffer.h"
 
+BEGIN_C_DECLARATIONS
 typedef enum
 	{
 	crBlendMode_Zero = 0,
@@ -132,3 +133,4 @@ typedef struct
 	crDepthTestSettings DepthTest;
 	crPolygonModeSettings PolygonMode;
 	} crRenderState;
+END_C_DECLARATIONS

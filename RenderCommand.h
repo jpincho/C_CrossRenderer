@@ -6,7 +6,6 @@
 #include "Texture.h"
 
 BEGIN_C_DECLARATIONS
-
 typedef enum
 	{
 	crPoints = 0,
@@ -55,6 +54,7 @@ typedef struct
 void crSetRenderCommandShader ( crRenderCommand *Command, const crShaderHandle NewShader );
 bool crSetRenderCommandIndexShaderBufferBinding ( crRenderCommand *Command, const crShaderBufferDataStream Stream );
 bool crSetRenderCommandShaderBufferBinding ( crRenderCommand *Command, const crShaderAttributeHandle AttributeHandle, const crShaderBufferDataStream Stream );
+bool crSetRenderCommandTextureBinding ( crRenderCommand *Command, const crShaderUniformHandle UniformHandle, const crTextureBindSettings Binding );
 #define DEFINE_crSetRenderCommandUniformValue(VAR_TYPE,VALUE_TYPE) bool crSetRenderCommandUniform##VALUE_TYPE##Value(crRenderCommand *Command, const int UniformIndex, const VAR_TYPE Value);
 
 DEFINE_crSetRenderCommandUniformValue ( bool, Bool );
@@ -76,8 +76,8 @@ DEFINE_crSetRenderCommandUniformValue ( ivec4, Integer4 );
 DEFINE_crSetRenderCommandUniformValue ( mat2, Matrix2 );
 DEFINE_crSetRenderCommandUniformValue ( mat3, Matrix3 );
 DEFINE_crSetRenderCommandUniformValue ( mat4, Matrix4 );
+DEFINE_crSetRenderCommandUniformValue ( crShaderBufferHandle, Block);
 #undef DEFINE_crSetRenderCommandUniformValue
+
+void crDestroyRenderCommand ( crRenderCommand *Command );
 END_C_DECLARATIONS
-
-bool crSetRenderCommandTextureBinding ( crRenderCommand *Command, const crShaderUniformHandle UniformHandle, const crTextureBindSettings Binding );
-

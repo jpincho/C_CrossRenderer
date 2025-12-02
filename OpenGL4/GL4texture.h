@@ -1,6 +1,7 @@
 #pragma once
 #include "../Texture.h"
 
+BEGIN_C_DECLARATIONS
 crTextureHandle crGL4CreateTexture ( const crTextureDescriptor Descriptor );
 bool crGL4DeleteTexture ( const crTextureHandle Handle );
 bool crGL4Load2DTextureData ( const crTextureHandle Handle, const crPixelFormat SourcePixelFormat, const void *data );
@@ -8,4 +9,4 @@ bool crGL4Update2DTextureRegion ( const crTextureHandle Handle, const uvec2 Lowe
 bool crGL4LoadCubeMapTextureData ( const crTextureHandle Handle, const crPixelFormat SourcePixelFormat, void *Data[6] );
 void crGL4GetTextureDimensions ( const crTextureHandle Handle, uvec2 *Dimensions );
 crPixelFormat crGL4GetTextureFormat ( const crTextureHandle Handle );
-
+END_C_DECLARATIONS

@@ -73,13 +73,13 @@ int main(void)
 	if (!VertexShaderBufferHandle)
 		return -1;
 
-	crShaderHandle ShaderHandle = LoadShader(DATA_PATH "/Shaders/OpenGLCore/TexturedQuadTest.vert",
+	crShaderHandle ShaderHandle = crLoadShader(DATA_PATH "/Shaders/OpenGLCore/TexturedQuadTest.vert",
 	                              NULL,
 	                              DATA_PATH "/Shaders/OpenGLCore/TexturedQuadTest.frag");
 	if (!ShaderHandle)
 		return -1;
 
-	crTextureHandle TextureHandle = LoadTexture(DATA_PATH "/batman.jpg", true);
+	crTextureHandle TextureHandle = crLoadTexture(DATA_PATH "/batman.jpg", true);
 	if (!TextureHandle)
 		return -1;
 
@@ -121,8 +121,8 @@ int main(void)
 	math_mat4_dump(ViewMatrix);
 	math_mat4_dump(ProjectionMatrix);
 
-	math_mat4_multiply_to(&MVP, ViewMatrix, ModelMatrix);
-	math_mat4_multiply_to(&MVP, ProjectionMatrix, MVP);
+	math_mat4_multiply(&MVP, ViewMatrix, ModelMatrix);
+	math_mat4_multiply(&MVP, ProjectionMatrix, MVP);
 
 	crRenderCommand RenderCommand = { 0 };
 	crSetRenderCommandShader(&RenderCommand, ShaderHandle);

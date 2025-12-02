@@ -3,6 +3,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+BEGIN_C_DECLARATIONS
 typedef void *crShaderBufferHandle;
 #define ShaderBufferHandle_Invalid NULL
 
@@ -59,3 +60,4 @@ inline void crDestroyShaderBufferDescriptor ( crShaderBufferDescriptor *Descript
 	}
 
 #define SAFE_DELETE_SHADER_BUFFFER(SHADER_BUFFER) do{if((SHADER_BUFFER) != ShaderBufferHandle_Invalid) {crDeleteShaderBuffer((SHADER_BUFFER));(SHADER_BUFFER)=ShaderBufferHandle_Invalid;}}while(0)
+END_C_DECLARATIONS

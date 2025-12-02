@@ -15,12 +15,12 @@ static bool DetectOpenGLInformation(void)
 	{
 	// MAJOR & MINOR only introduced in GL {,ES} 3.0
 	GLint TempMajor = 0, TempMinor = 0;
-	Version_Set(&crGL4Information.OpenGLVersion, 0, 0);
+	VersionNumber_Set(&crGL4Information.OpenGLVersion, 0, 0);
 	glGetIntegerv(GL_MAJOR_VERSION, &TempMajor);
 	glGetIntegerv(GL_MINOR_VERSION, &TempMinor);
 	if ((glGetError() == GL_NO_ERROR) && (TempMajor != 0))
 		{
-		Version_Set(&crGL4Information.OpenGLVersion, TempMajor, TempMinor);
+		VersionNumber_Set(&crGL4Information.OpenGLVersion, TempMajor, TempMinor);
 		}
 	else
 		{
@@ -30,7 +30,7 @@ static bool DetectOpenGLInformation(void)
 			return false;
 		// < v3.0; resort to the old-fashioned way.
 		LOG_DEBUG("Reported GL version string : '%s'", GLVersionString);
-		if (Version_ParseString(&crGL4Information.OpenGLVersion, (const char *)GLVersionString) == false)
+		if (VersionNumber_ParseString(&crGL4Information.OpenGLVersion, (const char *)GLVersionString) == false)
 			return false;
 		}
 	LOG_DEBUG("OpenGL version %d.%d", crGL4Information.OpenGLVersion.major, crGL4Information.OpenGLVersion.minor);
@@ -50,18 +50,18 @@ static bool DetectOpenGLInformation(void)
 	*/
 
 	// Safe assumptions about GLSL
-	if (version_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 2, 0)) Version_Set(&crGL4Information.GLSLVersion, 1, 0);
-	if (version_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 2, 1)) Version_Set(&crGL4Information.GLSLVersion, 1, 2);
-	if (version_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 0)) Version_Set(&crGL4Information.GLSLVersion, 1, 3);
-	if (version_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 1)) Version_Set(&crGL4Information.GLSLVersion, 1, 4);
-	if (version_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 2)) Version_Set(&crGL4Information.GLSLVersion, 1, 5);
-	if (version_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 3)) crGL4Information.GLSLVersion = crGL4Information.OpenGLVersion;
+	if (VersionNumber_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 2, 0)) VersionNumber_Set(&crGL4Information.GLSLVersion, 1, 0);
+	if (VersionNumber_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 2, 1)) VersionNumber_Set(&crGL4Information.GLSLVersion, 1, 2);
+	if (VersionNumber_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 0)) VersionNumber_Set(&crGL4Information.GLSLVersion, 1, 3);
+	if (VersionNumber_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 1)) VersionNumber_Set(&crGL4Information.GLSLVersion, 1, 4);
+	if (VersionNumber_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 2)) VersionNumber_Set(&crGL4Information.GLSLVersion, 1, 5);
+	if (VersionNumber_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 3)) crGL4Information.GLSLVersion = crGL4Information.OpenGLVersion;
 
 	const GLubyte *GLSLVersionString = glGetString(GL_SHADING_LANGUAGE_VERSION);
 	if (GLSLVersionString != NULL)
 		{
 		LOG_DEBUG("Reported GLSL version string : '%s'", GLSLVersionString);
-		if (Version_ParseString(&crGL4Information.GLSLVersion, (const char *)GLSLVersionString) == false)
+		if (VersionNumber_ParseString(&crGL4Information.GLSLVersion, (const char *)GLSLVersionString) == false)
 			LOG_ERROR("Error parsing GLSL version string. Assuming safe values");
 		}
 	LOG_DEBUG("GLSL version %d.%d", crGL4Information.GLSLVersion.major, crGL4Information.GLSLVersion.minor);
@@ -80,7 +80,7 @@ static bool DetectOpenGLInformation(void)
 	crGL4Information.ExtensionCount = 0;
 	crGL4Information.Extensions = NULL;
 	// Method 1 - glGetStringi is only guaranteed to be available after glcore/gles 3.0
-	if (version_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 0))
+	if (VersionNumber_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 0))
 		{
 		// Try to get extensions using the index
 		int ExtensionCount = 0;
@@ -125,10 +125,10 @@ static bool DetectOpenGLInformation(void)
 
 	glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &crGL4Information.MaxTextureUnits);
 
-	crGL4Information.DirectStateAccessAvailable = (version_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 4, 5) || (crGL4IsExtensionAvailable("GL_ARB_direct_state_access")));
+	crGL4Information.DirectStateAccessAvailable = (VersionNumber_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 4, 5) || (crGL4IsExtensionAvailable("GL_ARB_direct_state_access")));
 	crGL4Information.DirectStateAccessEnabled = false;
 
-	crGL4Information.SeamlessCubeMapAvailable = (version_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 2) || (crGL4IsExtensionAvailable("ARB_seamless_cube_map")));
+	crGL4Information.SeamlessCubeMapAvailable = (VersionNumber_GreaterThanOrEqual(crGL4Information.OpenGLVersion, 3, 2) || (crGL4IsExtensionAvailable("ARB_seamless_cube_map")));
 	crGL4Information.SeamlessCubeMapEnabled = false;
 	return true;
 	}
@@ -149,7 +149,7 @@ bool crGL4InitializeRenderer(const crRendererConfiguration NewConfiguration)
 	gladLoadGL();
 	DetectOpenGLInformation();
 
-	if (Version_LesserThan(crGL4Information.OpenGLVersion, 4, 0))
+	if (VersionNumber_LesserThan(crGL4Information.OpenGLVersion, 4, 0))
 		{
 		LOG_ERROR("OpenGL Core 4.0+ needed");
 		goto OnError;
@@ -205,6 +205,15 @@ bool crGL4ShutdownRenderer(void)
 	return true;
 	}
 
+VersionNumber crGL4GetGLVersion(void)
+	{
+	return crGL4Information.OpenGLVersion;
+	}
+
+VersionNumber crGL4GetGLSLVersion(void)
+	{
+	return crGL4Information.GLSLVersion;
+	}
 #if 0
 
 bool DisplayWindow(const RenderWindowHandle &WindowHandle)

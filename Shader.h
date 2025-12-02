@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+BEGIN_C_DECLARATIONS
 typedef void *crShaderHandle;
 #define crShaderHandle_Invalid NULL
 
@@ -145,7 +146,6 @@ inline void crDestroyShaderInformation ( crShaderInformation *Information )
 	SAFE_DEL_C ( Information->UniformBlocks );
 	}
 
-BEGIN_C_DECLARATIONS
 crShaderUniformHandle crGetShaderUniformHandle ( const crShaderHandle ShaderHandle, const char *UniformName );
 crShaderAttributeHandle crGetShaderAttributeHandle ( const crShaderHandle ShaderHandle, const char *AttributeName );
 END_C_DECLARATIONS

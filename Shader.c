@@ -14,6 +14,13 @@ crShaderUniformHandle crGetShaderUniformHandle(const crShaderHandle ShaderHandle
 			return ShaderInformation->Uniforms[Index].Handle;
 			}
 		}
+	for (unsigned Index = 0; Index < ShaderInformation->UniformBlockCount; ++Index)
+		{
+		if (strcmp(ShaderInformation->UniformBlocks[Index].Name, UniformName) == 0)
+			{
+			return ShaderInformation->UniformBlocks[Index].Handle;
+			}
+		}
 	return -1;
 	}
 

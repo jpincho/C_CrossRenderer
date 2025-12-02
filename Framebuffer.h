@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include "PixelFormat.h"
 
+BEGIN_C_DECLARATIONS
 typedef void *crFramebufferHandle;
 #define FramebufferHandle_Invalid NULL
 
@@ -17,3 +18,4 @@ typedef struct
 	uvec2 Dimensions;
 	float ClearDepth;
 	} crFramebufferDescriptor;
+END_C_DECLARATIONS

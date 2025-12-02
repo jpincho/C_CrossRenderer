@@ -152,13 +152,13 @@ int main(void)
 	if (!IndexShaderBufferHandle)
 		return -1;
 
-	crShaderHandle ShaderHandle = LoadShader(DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.vert",
+	crShaderHandle ShaderHandle = crLoadShader(DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.vert",
 	                              NULL,
 	                              DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.frag");
 	if (!ShaderHandle)
 		return -1;
 
-	crTextureHandle TextureHandle = LoadTexture(DATA_PATH "../TexturedQuad/batman.jpg", true);
+	crTextureHandle TextureHandle = crLoadTexture(DATA_PATH "../TexturedQuad/batman.jpg", true);
 	if (!TextureHandle)
 		return -1;
 
@@ -217,7 +217,7 @@ int main(void)
 	math_mat4_dump(ViewMatrix);
 	math_mat4_dump(ProjectionMatrix);
 
-	math_mat4_multiply_to(&VP, ProjectionMatrix, ViewMatrix);
+	math_mat4_multiply(&VP, ProjectionMatrix, ViewMatrix);
 
 	crRenderCommand RenderCommand = { 0 };
 	crSetRenderCommandShader(&RenderCommand, ShaderHandle);
@@ -277,8 +277,8 @@ int main(void)
 				});
 			math_mat4_set_rotation_matrix(&RotationMatrix, (float)(TotalDelta * M_PI_4), Rotations[Index]);
 
-			math_mat4_multiply_to(&ModelMatrix, RotationMatrix, ScaleMatrix);
-			math_mat4_multiply_to(&MatricesPointer[Index], TranslationMatrix, ModelMatrix);
+			math_mat4_multiply(&ModelMatrix, RotationMatrix, ScaleMatrix);
+			math_mat4_multiply(&MatricesPointer[Index], TranslationMatrix, ModelMatrix);
 			}
 
 		crUnmapShaderBuffer(MatrixShaderBufferHandle);
