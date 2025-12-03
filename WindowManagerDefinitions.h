@@ -2,7 +2,7 @@
 #include <Math/mathlib.h>
 #include <stdbool.h>
 #include <Platform/defines.h>
-
+#include "KeyDefinitions.h"
 BEGIN_C_DECLARATIONS
 
 typedef void *crWindowHandle;
@@ -26,21 +26,19 @@ typedef void ( *crMouseButtonCallback )( const crWindowHandle, const unsigned Bu
 typedef void ( *crMouseMovedCallback )( const crWindowHandle, const ivec2 Delta, const ivec2 NewPosition );
 typedef void ( *crMouseWheelCallback ) ( const crWindowHandle, const int Delta );
 
-typedef void ( *crKeyDownCallback )( const crWindowHandle, const unsigned Key );
-typedef void ( *crKeyUpCallback )( const crWindowHandle, const unsigned Key );
+typedef void ( *crKeyStateChangedCallback )( const crWindowHandle, const crKeyCode Key, const bool State );
 
 typedef struct
-	{
-	crWindowClosedCallback WindowClosed;
-	crWindowMovedCallback WindowMoved;
-	crWindowResizedCallback WindowResized;
-	crEndWindowResizedCallback EndWindowResized;
-	crWindowFocusChangedCallback WindowFocusChanged;
-	crKeyDownCallback KeyDown;
-	crKeyUpCallback KeyUp;
-	crMouseButtonCallback MouseButton;
-	crMouseMovedCallback MouseMoved;
-	crMouseWheelCallback MouseWheel;
-	} crWindowManagerCallbacks;
+    {
+    crWindowClosedCallback WindowClosed;
+    crWindowMovedCallback WindowMoved;
+    crWindowResizedCallback WindowResized;
+    crEndWindowResizedCallback EndWindowResized;
+    crWindowFocusChangedCallback WindowFocusChanged;
+	crKeyStateChangedCallback KeyStateChanged;
+    crMouseButtonCallback MouseButton;
+    crMouseMovedCallback MouseMoved;
+    crMouseWheelCallback MouseWheel;
+    } crWindowManagerCallbacks;
 
 END_C_DECLARATIONS

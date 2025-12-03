@@ -11,6 +11,8 @@ typedef void *crShaderHandle;
 
 typedef int crShaderAttributeHandle;
 typedef int crShaderUniformHandle;
+#define crShaderAttributeHandle_Invalid -1
+#define crShaderUniformHandle_Invalid -1
 
 typedef struct
 	{

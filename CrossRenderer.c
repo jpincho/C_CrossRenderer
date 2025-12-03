@@ -40,7 +40,8 @@ bool crInitialize(const crRendererConfiguration NewConfiguration)
 	{
 	if (SetupFunctionPointers(NewConfiguration.DesiredRendererBackend) == false)
 		return false;
-
+    if (crInitializeWindowBackend() == false)
+        return false;
 	if (crInitializeRenderer(NewConfiguration) == false)
 		return false;
 	MainWindowHandle = PointerList_GetNodeData(WindowList.first);

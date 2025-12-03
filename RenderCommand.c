@@ -1,5 +1,6 @@
 #include "RenderCommand.h"
 #include "Internal/CrossRendererFunctionPointers.h"
+#include <Platform/Logger.h>
 #include "Shader.h"
 #include <assert.h>
 #include <string.h>

@@ -6,4 +6,7 @@ BEGIN_C_DECLARATIONS
 extern crWindowManagerCallbacks WindowManagerCallbacks;
 extern PointerList WindowList;
 extern crWindowHandle MainWindowHandle;
+
+bool crInitializeWindowBackend ( void );
+
 END_C_DECLARATIONS;
