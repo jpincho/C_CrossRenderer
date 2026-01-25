@@ -7,15 +7,15 @@
 #include <math.h>
 
 static bool ShouldQuit = false;
-bool LoadFileContents(const char *Filename, char **Contents);
+bool LoadFileContents ( const char *Filename, char **Contents );
 
-void WindowClosed_Callback(const crWindowHandle Handle)
+void WindowClosed_Callback ( const crWindowHandle Handle )
 	{
-	UNUSED(Handle);
+	UNUSED ( Handle );
 	ShouldQuit = true;
 	}
 
-int main(void)
+int main ( void )
 	{
 	crRendererConfiguration Configuration = { 0 };
 	Configuration.InitialWindowDescriptor.Fullscreen = false;
@@ -26,12 +26,12 @@ int main(void)
 	Configuration.InitialWindowDescriptor.Resizable = true;
 	Configuration.InitialWindowDescriptor.Title = "CrossRenderer - spinning cube test";
 	Configuration.VSyncEnabled = true;
-	if (crInitialize(Configuration) == false)
+	if ( crInitialize ( Configuration ) == false )
 		return -1;
 
 	crWindowManagerCallbacks Callbacks = { 0 };
 	Callbacks.WindowClosed = WindowClosed_Callback;
-	crSetWindowManagerCallbacks(Callbacks);
+	crSetWindowManagerCallbacks ( Callbacks );
 
 	struct Vertex
 		{
@@ -93,51 +93,51 @@ int main(void)
 		};
 
 	uvec2 WindowSize;
-	crGetWindowDimensions(crGetMainWindowHandle(), &WindowSize);
+	crGetWindowDimensions ( crGetMainWindowHandle(), &WindowSize );
 	mat4 ProjectionMatrix;
-	math_mat4_set_perspective_matrix(&ProjectionMatrix, (float)M_PI_2, (float)WindowSize.x / (float)WindowSize.y, 0.1f, 10.0f);
+	math_mat4_set_perspective_matrix ( &ProjectionMatrix, ( float ) M_PI_2, ( float ) WindowSize.x / ( float ) WindowSize.y, 0.1f, 10.0f );
 	mat4 ModelMatrix;
-	math_mat4_set_identity_matrix(&ModelMatrix);
+	math_mat4_set_identity_matrix ( &ModelMatrix );
 	mat4 ViewMatrix;
-	math_mat4_set_view_matrix(&ViewMatrix, (vec3)
+	math_mat4_set_view_matrix ( &ViewMatrix, ( vec3 )
 		{
 		0.0f, 0.0f, 2.0f
-		}, (vec3)
+		}, ( vec3 )
 		{
 		0.0f, 0.0f, 0.0f
-		}, (vec3)
+		}, ( vec3 )
 		{
 		0, 1.0f, 0
-		});
+		} );
 
 	crShaderBufferDescriptor VertexSBDescriptor;
 	VertexSBDescriptor.AccessType = crShaderBufferAccessType_Static;
 	VertexSBDescriptor.BufferType = crShaderBufferType_Array;
-	VertexSBDescriptor.Capacity = sizeof(Vertices);
+	VertexSBDescriptor.Capacity = sizeof ( Vertices );
 	VertexSBDescriptor.Data = &Vertices;
-	VertexSBDescriptor.DataSize = sizeof(Vertices);
-	crShaderBufferHandle VertexShaderBufferHandle = crCreateShaderBuffer(VertexSBDescriptor);
-	if (!VertexShaderBufferHandle)
+	VertexSBDescriptor.DataSize = sizeof ( Vertices );
+	crShaderBufferHandle VertexShaderBufferHandle = crCreateShaderBuffer ( VertexSBDescriptor );
+	if ( !VertexShaderBufferHandle )
 		return -1;
 
 	crShaderBufferDescriptor IndexSBDescriptor;
 	IndexSBDescriptor.AccessType = crShaderBufferAccessType_Static;
 	IndexSBDescriptor.BufferType = crShaderBufferType_Array;
-	IndexSBDescriptor.Capacity = sizeof(Indices);
+	IndexSBDescriptor.Capacity = sizeof ( Indices );
 	IndexSBDescriptor.Data = &Indices;
-	IndexSBDescriptor.DataSize = sizeof(Indices);
-	crShaderBufferHandle IndexShaderBufferHandle = crCreateShaderBuffer(IndexSBDescriptor);
-	if (!IndexShaderBufferHandle)
+	IndexSBDescriptor.DataSize = sizeof ( Indices );
+	crShaderBufferHandle IndexShaderBufferHandle = crCreateShaderBuffer ( IndexSBDescriptor );
+	if ( !IndexShaderBufferHandle )
 		return -1;
 
-	crShaderHandle ShaderHandle = crLoadShader(DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.vert",
+	crShaderHandle ShaderHandle = crLoadShader ( DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.vert",
 	                              NULL,
-	                              DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.frag");
-	if (!ShaderHandle)
+	                              DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.frag" );
+	if ( !ShaderHandle )
 		return -1;
 
-	crTextureHandle TextureHandle = crLoadTexture(DATA_PATH "../TexturedQuad/batman.jpg", true);
-	if (!TextureHandle)
+	crTextureHandle TextureHandle = crLoadTexture ( DATA_PATH "../TexturedQuad/batman.jpg", true );
+	if ( !TextureHandle )
 		return -1;
 
 	crFramebufferDescriptor FramebufferDescriptor = { 0 };
@@ -147,10 +147,10 @@ int main(void)
 	FramebufferDescriptor.DepthFormat = crPixelFormat_DepthComponent;
 	FramebufferDescriptor.Dimensions = WindowSize;
 	FramebufferDescriptor.ClearDepth = 1.0f;
-	math_vec4_set(&FramebufferDescriptor.ClearColor, 0.5f, 0.5f, 0.5f, 1.0f);
+	math_vec4_set ( &FramebufferDescriptor.ClearColor, 0.5f, 0.5f, 0.5f, 1.0f );
 
-	crFramebufferHandle Framebuffer = crCreateFramebuffer(FramebufferDescriptor);
-	if (!Framebuffer)
+	crFramebufferHandle Framebuffer = crCreateFramebuffer ( FramebufferDescriptor );
+	if ( !Framebuffer )
 		return -1;
 
 	crShaderBufferDataStream PositionStream;
@@ -159,8 +159,8 @@ int main(void)
 	PositionStream.ComponentType = crShaderBufferComponentType_Float;
 	PositionStream.NormalizeData = false;
 	PositionStream.PerInstance = false;
-	PositionStream.StartOffset = offsetof(struct Vertex, Position);
-	PositionStream.Stride = sizeof(struct Vertex);
+	PositionStream.StartOffset = offsetof ( struct Vertex, Position );
+	PositionStream.Stride = sizeof ( struct Vertex );
 
 	crShaderBufferDataStream TexCoordStream;
 	TexCoordStream.BufferHandle = VertexShaderBufferHandle;
@@ -168,8 +168,8 @@ int main(void)
 	TexCoordStream.ComponentType = crShaderBufferComponentType_Float;
 	TexCoordStream.NormalizeData = false;
 	TexCoordStream.PerInstance = false;
-	TexCoordStream.StartOffset = offsetof(struct Vertex, TexCoord);
-	TexCoordStream.Stride = sizeof(struct Vertex);
+	TexCoordStream.StartOffset = offsetof ( struct Vertex, TexCoord );
+	TexCoordStream.Stride = sizeof ( struct Vertex );
 
 	crShaderBufferDataStream IndexStream;
 	IndexStream.BufferHandle = IndexShaderBufferHandle;
@@ -178,25 +178,25 @@ int main(void)
 	IndexStream.NormalizeData = false;
 	IndexStream.PerInstance = false;
 	IndexStream.StartOffset = 0;
-	IndexStream.Stride = sizeof(uint16_t);
+	IndexStream.Stride = sizeof ( uint16_t );
 
 	crTextureBindSettings TextureBindSettings = crDefaultTextureBindSettings;
 	TextureBindSettings.Handle = TextureHandle;
 	mat4 MVP;
-	math_mat4_dump(ModelMatrix);
-	math_mat4_dump(ViewMatrix);
-	math_mat4_dump(ProjectionMatrix);
+	math_mat4_dump ( ModelMatrix );
+	math_mat4_dump ( ViewMatrix );
+	math_mat4_dump ( ProjectionMatrix );
 
-	math_mat4_multiply(&MVP, ViewMatrix, ModelMatrix);
-	math_mat4_multiply(&MVP, ProjectionMatrix, MVP);
+	math_mat4_multiply ( &MVP, ViewMatrix, ModelMatrix );
+	math_mat4_multiply ( &MVP, ProjectionMatrix, MVP );
 
 	crRenderCommand RenderCommand = { 0 };
-	crSetRenderCommandShader(&RenderCommand, ShaderHandle);
-	crSetRenderCommandShaderBufferBinding(&RenderCommand, crGetShaderAttributeHandle(ShaderHandle, "a_VertexPosition"), PositionStream);
-	crSetRenderCommandShaderBufferBinding(&RenderCommand, crGetShaderAttributeHandle(ShaderHandle, "a_TexCoord"), TexCoordStream);
-	crSetRenderCommandIndexShaderBufferBinding(&RenderCommand, IndexStream);
-	crSetRenderCommandUniformMatrix4Value(&RenderCommand, crGetShaderUniformHandle(ShaderHandle, "u_MVP"), MVP);
-	crSetRenderCommandTextureBinding(&RenderCommand, crGetShaderUniformHandle(ShaderHandle, "u_Texture"), TextureBindSettings);
+	crSetRenderCommandShader ( &RenderCommand, ShaderHandle );
+	crSetRenderCommandShaderBufferBinding ( &RenderCommand, crGetShaderAttributeHandle ( ShaderHandle, "a_VertexPosition" ), PositionStream );
+	crSetRenderCommandShaderBufferBinding ( &RenderCommand, crGetShaderAttributeHandle ( ShaderHandle, "a_TexCoord" ), TexCoordStream );
+	crSetRenderCommandIndexShaderBufferBinding ( &RenderCommand, IndexStream );
+	crSetRenderCommandUniformMatrix4Value ( &RenderCommand, crGetShaderUniformHandle ( ShaderHandle, "u_MVP" ), MVP );
+	crSetRenderCommandTextureBinding ( &RenderCommand, crGetShaderUniformHandle ( ShaderHandle, "u_Texture" ), TextureBindSettings );
 	RenderCommand.InstanceCount = 1;
 	RenderCommand.Primitive = crTriangleList;
 	RenderCommand.StartVertex = 0;
@@ -210,29 +210,29 @@ int main(void)
 
 	double LastEndFrameSeconds = Platform_GetPerformanceCurrentTime();
 	double TotalDelta = 0.0;
-	while (ShouldQuit == false)
+	while ( ShouldQuit == false )
 		{
 		double Seconds = Platform_GetPerformanceCurrentTime();
 		double TimeDelta = Seconds - LastEndFrameSeconds;
-		if (TimeDelta == 0.0)
+		if ( TimeDelta == 0.0 )
 			TimeDelta = 0.01;
 		LastEndFrameSeconds = Seconds;
 		TotalDelta += TimeDelta;
-		crStartRenderToWindow(crGetMainWindowHandle());
-		crClearFramebufferWithDefaultValues(Framebuffer);
+		crStartRenderToWindow ( crGetMainWindowHandle() );
+		crClearFramebufferWithDefaultValues ( Framebuffer );
 
-		math_mat4_set_rotation_matrix(&ModelMatrix, (float)(TotalDelta * M_PI_4), (vec3)
+		math_mat4_set_rotation_matrix ( &ModelMatrix, ( float ) ( TotalDelta * M_PI_4 ), ( vec3 )
 			{
 			0, 1, 0
-			});
-		math_mat4_multiply(&MVP, ViewMatrix, ModelMatrix);
-		math_mat4_multiply(&MVP, ProjectionMatrix, MVP);
-		crSetRenderCommandUniformMatrix4Value(&RenderCommand, crGetShaderUniformHandle(ShaderHandle, "u_MVP"), MVP);
+			} );
+		math_mat4_multiply ( &MVP, ViewMatrix, ModelMatrix );
+		math_mat4_multiply ( &MVP, ProjectionMatrix, MVP );
+		crSetRenderCommandUniformMatrix4Value ( &RenderCommand, crGetShaderUniformHandle ( ShaderHandle, "u_MVP" ), MVP );
 
-		crRunCommand(RenderCommand);
-		crDisplayFramebuffer(Framebuffer, crGetMainWindowHandle());
-		crDisplayWindow(crGetMainWindowHandle());
-		crUpdateWindows(false);
+		crRunCommand ( RenderCommand );
+		crDisplayFramebuffer ( Framebuffer, crGetMainWindowHandle() );
+		crDisplayWindow ( crGetMainWindowHandle() );
+		crUpdateWindows ( false );
 		}
 	return 0;
 	}

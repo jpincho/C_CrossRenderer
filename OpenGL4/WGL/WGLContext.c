@@ -4,7 +4,7 @@
 
 static HGLRC GLContext = NULL;
 
-crOpenGLContext crWGLCreateContext(const crWindowHandle WindowHandle, const crRendererConfiguration NewConfiguration)
+crOpenGLContext crWGLCreateContext ( const crWindowHandle WindowHandle, const crRendererConfiguration NewConfiguration )
 	{
 	// Register the window class
 	WNDCLASSEX WindowClass;
@@ -12,42 +12,42 @@ crOpenGLContext crWGLCreateContext(const crWindowHandle WindowHandle, const crRe
 	HWND FakeWND = NULL;
 	HGLRC FakeContext = NULL;
 
-	if (!GetClassInfoEx(GetModuleHandle(NULL), "CrossRendererFakeWindowClass", &WindowClass))
+	if ( !GetClassInfoEx ( GetModuleHandle ( NULL ), "CrossRendererFakeWindowClass", &WindowClass ) )
 		{
-		memset(&WindowClass, 0, sizeof(WNDCLASSEX));
-		WindowClass.cbSize = sizeof(WNDCLASSEX);
+		memset ( &WindowClass, 0, sizeof ( WNDCLASSEX ) );
+		WindowClass.cbSize = sizeof ( WNDCLASSEX );
 		WindowClass.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 		WindowClass.lpfnWndProc = DefWindowProc;
 		WindowClass.cbClsExtra = 0;
 		WindowClass.cbWndExtra = 0;
-		WindowClass.hInstance = GetModuleHandle(NULL);
-		WindowClass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
-		WindowClass.hCursor = LoadCursor(NULL, IDC_ARROW);
-		WindowClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
+		WindowClass.hInstance = GetModuleHandle ( NULL );
+		WindowClass.hIcon = LoadIcon ( NULL, IDI_APPLICATION );
+		WindowClass.hCursor = LoadCursor ( NULL, IDC_ARROW );
+		WindowClass.hbrBackground = ( HBRUSH ) GetStockObject ( BLACK_BRUSH );
 		WindowClass.lpszMenuName = NULL;
 		WindowClass.lpszClassName = "CrossRendererFakeWindowClass";
-		WindowClass.hIconSm = LoadIcon(NULL, IDI_WINLOGO);
+		WindowClass.hIconSm = LoadIcon ( NULL, IDI_WINLOGO );
 
-		if (!RegisterClassEx(&WindowClass))
+		if ( !RegisterClassEx ( &WindowClass ) )
 			return NULL;
 		}
 
 	// Create an OpenGL 1.1 context, so that I can get the wgl extensions, and THEN create a decent context. Fucking windows
-	FakeWND = CreateWindow(
+	FakeWND = CreateWindow (
 	              "CrossRendererFakeWindowClass", "Fake Window",      // window class, title
 	              WS_CLIPSIBLINGS | WS_CLIPCHILDREN, // style
 	              0, 0,                       // position x, y
 	              1, 1,                       // width, height
 	              NULL, NULL,                 // parent window, menu
-	              NULL, NULL);          // instance, param
-	if (FakeWND == NULL)
+	              NULL, NULL );         // instance, param
+	if ( FakeWND == NULL )
 		return NULL;
 
-	FakeDC = GetDC(FakeWND);
+	FakeDC = GetDC ( FakeWND );
 
 	PIXELFORMATDESCRIPTOR FakePFD;
-	ZeroMemory(&FakePFD, sizeof(FakePFD));
-	FakePFD.nSize = sizeof(FakePFD);
+	ZeroMemory ( &FakePFD, sizeof ( FakePFD ) );
+	FakePFD.nSize = sizeof ( FakePFD );
 	FakePFD.nVersion = 1;
 	FakePFD.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
 	FakePFD.iPixelType = PFD_TYPE_RGBA;
@@ -55,25 +55,25 @@ crOpenGLContext crWGLCreateContext(const crWindowHandle WindowHandle, const crRe
 	FakePFD.cAlphaBits = 8;
 	FakePFD.cDepthBits = 24;
 
-	int FakePFDID = ChoosePixelFormat(FakeDC, &FakePFD);
-	if (FakePFDID == 0)
+	int FakePFDID = ChoosePixelFormat ( FakeDC, &FakePFD );
+	if ( FakePFDID == 0 )
 		return NULL;
 
-	if (SetPixelFormat(FakeDC, FakePFDID, &FakePFD) == false)
+	if ( SetPixelFormat ( FakeDC, FakePFDID, &FakePFD ) == false )
 		return NULL;
 
-	FakeContext = wglCreateContext(FakeDC);
+	FakeContext = wglCreateContext ( FakeDC );
 
-	if (FakeContext == NULL)
+	if ( FakeContext == NULL )
 		goto OnError;
-	if (wglMakeCurrent(FakeDC, FakeContext) == false)
+	if ( wglMakeCurrent ( FakeDC, FakeContext ) == false )
 		goto OnError;
 
-	if (!gladLoadWGL(FakeDC))
+	if ( !gladLoadWGL ( FakeDC ) )
 		goto OnError;
 
 	// Now that the fake context is created and I have the WGL extensions, create a decent context
-	WindowDC = GetWindowDC(WindowHandle);
+	WindowDC = GetWindowDC ( WindowHandle );
 	const int PixelFormatAttributes[] =
 		{
 		WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
@@ -92,13 +92,13 @@ crOpenGLContext crWGLCreateContext(const crWindowHandle WindowHandle, const crRe
 
 	int PixelFormatID;
 	UINT PixelFormatCount;
-	bool PixelFormatFound = wglChoosePixelFormatARB(WindowDC, PixelFormatAttributes, NULL, 1, &PixelFormatID, &PixelFormatCount);
+	bool PixelFormatFound = wglChoosePixelFormatARB ( WindowDC, PixelFormatAttributes, NULL, 1, &PixelFormatID, &PixelFormatCount );
 
-	if (PixelFormatFound == false || PixelFormatCount == 0)
+	if ( PixelFormatFound == false || PixelFormatCount == 0 )
 		goto OnError;
 	PIXELFORMATDESCRIPTOR PFD;
-	DescribePixelFormat(WindowDC, PixelFormatID, sizeof(PFD), &PFD);
-	SetPixelFormat(WindowDC, PixelFormatID, &PFD);
+	DescribePixelFormat ( WindowDC, PixelFormatID, sizeof ( PFD ), &PFD );
+	SetPixelFormat ( WindowDC, PixelFormatID, &PFD );
 
 	int ContextAttributes[] =
 		{
@@ -109,75 +109,75 @@ crOpenGLContext crWGLCreateContext(const crWindowHandle WindowHandle, const crRe
 		0
 		};
 
-	GLContext = wglCreateContextAttribsARB(WindowDC, 0, ContextAttributes);
-	if (GLContext == NULL)
+	GLContext = wglCreateContextAttribsARB ( WindowDC, 0, ContextAttributes );
+	if ( GLContext == NULL )
 		goto OnError;
 
 	// Activate the new context
-	if (!wglMakeCurrent(WindowDC, GLContext))
+	if ( !wglMakeCurrent ( WindowDC, GLContext ) )
 		goto OnError;
 
 	// Delete the old fake context, and window
-	wglDeleteContext(FakeContext);
-	ReleaseDC(FakeWND, FakeDC);
-	DestroyWindow(FakeWND);
+	wglDeleteContext ( FakeContext );
+	ReleaseDC ( FakeWND, FakeDC );
+	DestroyWindow ( FakeWND );
 
-	if (!gladLoadWGL(WindowDC))
+	if ( !gladLoadWGL ( WindowDC ) )
 		goto OnError;
-	ShowWindow(WindowHandle, SW_SHOW);
-	if ((GLAD_WGL_EXT_swap_control) && (NewConfiguration.VSyncEnabled))
+	ShowWindow ( WindowHandle, SW_SHOW );
+	if ( ( GLAD_WGL_EXT_swap_control ) && ( NewConfiguration.VSyncEnabled ) )
 		{
-		wglSwapIntervalEXT(1);
+		wglSwapIntervalEXT ( 1 );
 		}
 	return GLContext;
 OnError:
-	if (GLContext)
+	if ( GLContext )
 		{
-		wglMakeCurrent(NULL, GLContext);
-		wglDeleteContext(GLContext);
+		wglMakeCurrent ( NULL, GLContext );
+		wglDeleteContext ( GLContext );
 		GLContext = NULL;
 		}
-	if (WindowDC)
+	if ( WindowDC )
 		{
-		ReleaseDC(WindowHandle, WindowDC);
+		ReleaseDC ( WindowHandle, WindowDC );
 		WindowDC = NULL;
 		}
-	if (FakeContext)
+	if ( FakeContext )
 		{
-		wglDeleteContext(FakeContext);
+		wglDeleteContext ( FakeContext );
 		FakeContext = NULL;
 		}
-	if (FakeDC)
+	if ( FakeDC )
 		{
-		ReleaseDC(FakeWND, FakeDC);
+		ReleaseDC ( FakeWND, FakeDC );
 		FakeDC = NULL;
 		}
-	if (FakeWND)
+	if ( FakeWND )
 		{
-		DestroyWindow(FakeWND);
+		DestroyWindow ( FakeWND );
 		FakeWND = NULL;
 		}
 
 	return NULL;
 	}
 
-bool crWGLDeleteContext(void)
+bool crWGLDeleteContext ( void )
 	{
-	wglMakeCurrent(NULL, GLContext);
-	wglDeleteContext(GLContext);
+	wglMakeCurrent ( NULL, GLContext );
+	wglDeleteContext ( GLContext );
 	GLContext = NULL;
 	return true;
 	}
 
-bool crWGLMakeContextActive(const crWindowHandle WindowHandle)
+bool crWGLMakeContextActive ( const crWindowHandle WindowHandle )
 	{
-	HDC WindowDC = GetWindowDC(WindowHandle);
-	wglMakeCurrent(WindowDC, GLContext);
+	HDC WindowDC = GetWindowDC ( WindowHandle );
+	wglMakeCurrent ( WindowDC, GLContext );
 	return true;
 	}
 
-void crWGLSwapWindowBuffer(const crWindowHandle WindowHandle)
+void crWGLSwapWindowBuffer ( const crWindowHandle WindowHandle )
 	{
-	HDC WindowDC = GetWindowDC(WindowHandle);
-	SwapBuffers(WindowDC);
+	HDC WindowDC = GetWindowDC ( WindowHandle );
+	SwapBuffers ( WindowDC );
 	}

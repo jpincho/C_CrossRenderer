@@ -5,7 +5,7 @@
 
 BEGIN_C_DECLARATIONS
 typedef void *crShaderBufferHandle;
-#define ShaderBufferHandle_Invalid NULL
+#define crShaderBufferHandle_Invalid NULL
 
 typedef enum
 	{
@@ -59,5 +59,5 @@ inline void crDestroyShaderBufferDescriptor ( crShaderBufferDescriptor *Descript
 	SAFE_DEL_C ( Descriptor->Data );
 	}
 
-#define SAFE_DELETE_SHADER_BUFFFER(SHADER_BUFFER) do{if((SHADER_BUFFER) != ShaderBufferHandle_Invalid) {crDeleteShaderBuffer((SHADER_BUFFER));(SHADER_BUFFER)=ShaderBufferHandle_Invalid;}}while(0)
+#define SAFE_DELETE_SHADER_BUFFER(SHADER_BUFFER) do{if((SHADER_BUFFER) != crShaderBufferHandle_Invalid) {crDeleteShaderBuffer((SHADER_BUFFER));(SHADER_BUFFER)=crShaderBufferHandle_Invalid;}}while(0)
 END_C_DECLARATIONS

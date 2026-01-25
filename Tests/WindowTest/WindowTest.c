@@ -2,49 +2,49 @@
 #include <Platform/Logger.h>
 
 static bool ShouldQuit = false;
-void WindowClosed_Callback(const crWindowHandle Handle)
+void WindowClosed_Callback ( const crWindowHandle Handle )
 	{
-	UNUSED(Handle);
+	UNUSED ( Handle );
 	ShouldQuit = true;
 	}
 
-void WindowMoved_Callback(const crWindowHandle Handle, const ivec2 NewPosition)
+void WindowMoved_Callback ( const crWindowHandle Handle, const ivec2 NewPosition )
 	{
-	UNUSED(Handle);
-	LOG_DEBUG("Window moved to %d %d", NewPosition.x, NewPosition.y);
+	UNUSED ( Handle );
+	LOG_DEBUG ( "Window moved to %d %d", NewPosition.x, NewPosition.y );
 	}
 
-void WindowResized_Callback(const crWindowHandle Handle, const uvec2 NewSize)
+void WindowResized_Callback ( const crWindowHandle Handle, const uvec2 NewSize )
 	{
-	UNUSED(Handle);
-	LOG_DEBUG("Window resized to %u %u", NewSize.x, NewSize.y);
+	UNUSED ( Handle );
+	LOG_DEBUG ( "Window resized to %u %u", NewSize.x, NewSize.y );
 	}
 
-void MouseClicked_Callback(const crWindowHandle Handle, const unsigned Button, const bool Click)
+void MouseClicked_Callback ( const crWindowHandle Handle, const unsigned Button, const bool Click )
 	{
-	UNUSED(Handle);
-	LOG_DEBUG("Mouse button %u %s", Button, Click ? "clicked" : "released");
+	UNUSED ( Handle );
+	LOG_DEBUG ( "Mouse button %u %s", Button, Click ? "clicked" : "released" );
 	}
 
-void MouseWheel_Callback(const crWindowHandle Handle, const int Delta)
+void MouseWheel_Callback ( const crWindowHandle Handle, const int Delta )
 	{
-	UNUSED(Handle);
-	LOG_DEBUG("Mouse wheel %d", Delta);
+	UNUSED ( Handle );
+	LOG_DEBUG ( "Mouse wheel %d", Delta );
 	}
 
-void MouseMoved_Callback(const crWindowHandle Handle, const ivec2 Delta, const ivec2 NewPosition)
+void MouseMoved_Callback ( const crWindowHandle Handle, const ivec2 Delta, const ivec2 NewPosition )
 	{
-	UNUSED(Handle);
-	LOG_DEBUG("Mouse moved %d %d %d %d", Delta.x, Delta.y, NewPosition.x, NewPosition.y);
+	UNUSED ( Handle );
+	LOG_DEBUG ( "Mouse moved %d %d %d %d", Delta.x, Delta.y, NewPosition.x, NewPosition.y );
 	}
 
-void WindowFocusChanged_Callback(const crWindowHandle Handle, const bool HasFocus)
+void WindowFocusChanged_Callback ( const crWindowHandle Handle, const bool HasFocus )
 	{
-	UNUSED(Handle);
-	LOG_DEBUG("Window focus %s", HasFocus ? "true" : "false");
+	UNUSED ( Handle );
+	LOG_DEBUG ( "Window focus %s", HasFocus ? "true" : "false" );
 	}
 
-int main(void)
+int main ( void )
 	{
 	crRenderWindowDescriptor NewWindowDescriptor;
 	NewWindowDescriptor.Fullscreen = false;
@@ -54,8 +54,8 @@ int main(void)
 	NewWindowDescriptor.Size.y = 768;
 	NewWindowDescriptor.Resizable = true;
 	NewWindowDescriptor.Title = "Test window";
-	crWindowHandle WindowHandle = crCreateNewWindow(NewWindowDescriptor);
-	if (!WindowHandle)
+	crWindowHandle WindowHandle = crCreateNewWindow ( NewWindowDescriptor );
+	if ( !WindowHandle )
 		return -1;
 
 	crWindowManagerCallbacks Callbacks = { 0 };
@@ -66,8 +66,8 @@ int main(void)
 	Callbacks.MouseWheel = MouseWheel_Callback;
 	Callbacks.MouseMoved = MouseMoved_Callback;
 	Callbacks.WindowFocusChanged = WindowFocusChanged_Callback;
-	crSetWindowManagerCallbacks(Callbacks);
+	crSetWindowManagerCallbacks ( Callbacks );
 
-	while (ShouldQuit == false) crUpdateWindows(true);
+	while ( ShouldQuit == false ) crUpdateWindows ( true );
 	return 0;
 	}

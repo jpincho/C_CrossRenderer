@@ -76,7 +76,7 @@ DEFINE_crSetRenderCommandUniformValue ( ivec4, Integer4 );
 DEFINE_crSetRenderCommandUniformValue ( mat2, Matrix2 );
 DEFINE_crSetRenderCommandUniformValue ( mat3, Matrix3 );
 DEFINE_crSetRenderCommandUniformValue ( mat4, Matrix4 );
-DEFINE_crSetRenderCommandUniformValue ( crShaderBufferHandle, Block);
+DEFINE_crSetRenderCommandUniformValue ( crShaderBufferHandle, Block );
 #undef DEFINE_crSetRenderCommandUniformValue
 
 void crDestroyRenderCommand ( crRenderCommand *Command );

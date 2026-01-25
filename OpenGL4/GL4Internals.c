@@ -4,69 +4,69 @@ OpenGLInformationStruct crGL4Information;
 
 #define FATAL_ERROR(MSG) {printf("FATAL ERROR at line %u ( %s ) - %s\n", __LINE__, __FILE__, MSG);exit(-1);}
 
-void OpenGLMessageCallback(GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam)
+void OpenGLMessageCallback ( GLenum Source, GLenum Type, GLuint ID, GLenum Severity, GLsizei Length, GLchar const *Message, void const *UserParam )
 	{
-	UNUSED(UserParam);
-	UNUSED(Length);
-	if ((Type == GL_DEBUG_TYPE_OTHER) && (Severity == GL_DEBUG_SEVERITY_NOTIFICATION))
+	UNUSED ( UserParam );
+	UNUSED ( Length );
+	if ( ( Type == GL_DEBUG_TYPE_OTHER ) && ( Severity == GL_DEBUG_SEVERITY_NOTIFICATION ) )
 		return;
-	if (Type == GL_DEBUG_TYPE_ERROR)
-		LOG_ERROR("%s - %s - %s - %X - %s", crGL4StringifyOpenGL(Source), crGL4StringifyOpenGL(Type), crGL4StringifyOpenGL(Severity), ID, Message);
+	if ( Type == GL_DEBUG_TYPE_ERROR )
+		LOG_ERROR ( "%s - %s - %s - %X - %s", crGL4StringifyOpenGL ( Source ), crGL4StringifyOpenGL ( Type ), crGL4StringifyOpenGL ( Severity ), ID, Message );
 	else
-		LOG_DEBUG("%s - %s - %s - %X - %s", crGL4StringifyOpenGL(Source), crGL4StringifyOpenGL(Type), crGL4StringifyOpenGL(Severity), ID, Message);
+		LOG_DEBUG ( "%s - %s - %s - %X - %s", crGL4StringifyOpenGL ( Source ), crGL4StringifyOpenGL ( Type ), crGL4StringifyOpenGL ( Severity ), ID, Message );
 	}
 
-const char *crGL4StringifyOpenGL(GLenum Value)
+const char *crGL4StringifyOpenGL ( GLenum Value )
 	{
-	switch (Value)
+	switch ( Value )
 		{
 #define STRINGIFY(X) case X: return #X;
-			STRINGIFY(GL_FRAMEBUFFER_UNDEFINED);
-			STRINGIFY(GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT);
-			STRINGIFY(GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT);
-			STRINGIFY(GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER);
-			STRINGIFY(GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER);
-			STRINGIFY(GL_FRAMEBUFFER_UNSUPPORTED);
-			STRINGIFY(GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE);
-			STRINGIFY(GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS);
-			STRINGIFY(GL_FRAMEBUFFER_COMPLETE);
+			STRINGIFY ( GL_FRAMEBUFFER_UNDEFINED );
+			STRINGIFY ( GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT );
+			STRINGIFY ( GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT );
+			STRINGIFY ( GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER );
+			STRINGIFY ( GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER );
+			STRINGIFY ( GL_FRAMEBUFFER_UNSUPPORTED );
+			STRINGIFY ( GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE );
+			STRINGIFY ( GL_FRAMEBUFFER_INCOMPLETE_LAYER_TARGETS );
+			STRINGIFY ( GL_FRAMEBUFFER_COMPLETE );
 
-			STRINGIFY(GL_NO_ERROR);
-			STRINGIFY(GL_INVALID_ENUM);
-			STRINGIFY(GL_INVALID_VALUE);
-			STRINGIFY(GL_INVALID_OPERATION);
-			STRINGIFY(GL_STACK_OVERFLOW);
-			STRINGIFY(GL_STACK_UNDERFLOW);
-			STRINGIFY(GL_OUT_OF_MEMORY);
-			STRINGIFY(GL_TABLE_TOO_LARGE);
+			STRINGIFY ( GL_NO_ERROR );
+			STRINGIFY ( GL_INVALID_ENUM );
+			STRINGIFY ( GL_INVALID_VALUE );
+			STRINGIFY ( GL_INVALID_OPERATION );
+			STRINGIFY ( GL_STACK_OVERFLOW );
+			STRINGIFY ( GL_STACK_UNDERFLOW );
+			STRINGIFY ( GL_OUT_OF_MEMORY );
+			STRINGIFY ( GL_TABLE_TOO_LARGE );
 
-			STRINGIFY(GL_DEBUG_SOURCE_API);
-			STRINGIFY(GL_DEBUG_SOURCE_WINDOW_SYSTEM);
-			STRINGIFY(GL_DEBUG_SOURCE_SHADER_COMPILER);
-			STRINGIFY(GL_DEBUG_SOURCE_THIRD_PARTY);
-			STRINGIFY(GL_DEBUG_SOURCE_APPLICATION);
-			STRINGIFY(GL_DEBUG_SOURCE_OTHER);
+			STRINGIFY ( GL_DEBUG_SOURCE_API );
+			STRINGIFY ( GL_DEBUG_SOURCE_WINDOW_SYSTEM );
+			STRINGIFY ( GL_DEBUG_SOURCE_SHADER_COMPILER );
+			STRINGIFY ( GL_DEBUG_SOURCE_THIRD_PARTY );
+			STRINGIFY ( GL_DEBUG_SOURCE_APPLICATION );
+			STRINGIFY ( GL_DEBUG_SOURCE_OTHER );
 
-			STRINGIFY(GL_DEBUG_TYPE_ERROR);
-			STRINGIFY(GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR);
-			STRINGIFY(GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR);
-			STRINGIFY(GL_DEBUG_TYPE_PORTABILITY);
-			STRINGIFY(GL_DEBUG_TYPE_PERFORMANCE);
-			STRINGIFY(GL_DEBUG_TYPE_MARKER);
-			STRINGIFY(GL_DEBUG_TYPE_OTHER);
+			STRINGIFY ( GL_DEBUG_TYPE_ERROR );
+			STRINGIFY ( GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR );
+			STRINGIFY ( GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR );
+			STRINGIFY ( GL_DEBUG_TYPE_PORTABILITY );
+			STRINGIFY ( GL_DEBUG_TYPE_PERFORMANCE );
+			STRINGIFY ( GL_DEBUG_TYPE_MARKER );
+			STRINGIFY ( GL_DEBUG_TYPE_OTHER );
 
-			STRINGIFY(GL_DEBUG_SEVERITY_NOTIFICATION);
-			STRINGIFY(GL_DEBUG_SEVERITY_LOW);
-			STRINGIFY(GL_DEBUG_SEVERITY_MEDIUM);
-			STRINGIFY(GL_DEBUG_SEVERITY_HIGH);
+			STRINGIFY ( GL_DEBUG_SEVERITY_NOTIFICATION );
+			STRINGIFY ( GL_DEBUG_SEVERITY_LOW );
+			STRINGIFY ( GL_DEBUG_SEVERITY_MEDIUM );
+			STRINGIFY ( GL_DEBUG_SEVERITY_HIGH );
 
 		default:
-			FATAL_ERROR("Unhandled OpenGL enum");
+			FATAL_ERROR ( "Unhandled OpenGL enum" );
 		}
 #undef STRINGIFY
 	}
 
-bool crGL4CheckError(void)
+bool crGL4CheckError ( void )
 	{
 #if defined ( CROSS_RENDERER_OPENGL_DISABLE_CHECK_ERROR )
 	return true;
@@ -76,20 +76,20 @@ bool crGL4CheckError(void)
 	do
 		{
 		Error = glGetError();
-		if (Error != GL_NO_ERROR)
+		if ( Error != GL_NO_ERROR )
 			{
 			Result = false;
 			static char ErrorString[100];
-			snprintf(ErrorString, 100, "OpenGL error - %s", crGL4StringifyOpenGL(Error));
-			LOG_ERROR(ErrorString);
+			snprintf ( ErrorString, 100, "OpenGL error - %s", crGL4StringifyOpenGL ( Error ) );
+			LOG_ERROR ( ErrorString );
 			}
 		}
-	while (Error != GL_NO_ERROR);
+	while ( Error != GL_NO_ERROR );
 	return Result;
 #endif
 	}
 
-GLenum crGL4TranslateDepthTestMode(const crDepthTestMode Input)
+GLenum crGL4TranslateDepthTestMode ( const crDepthTestMode Input )
 	{
 	static GLenum Values[] =
 		{
@@ -102,14 +102,14 @@ GLenum crGL4TranslateDepthTestMode(const crDepthTestMode Input)
 		GL_NOTEQUAL,
 		GL_ALWAYS
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid depth test mode");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid depth test mode" );
 	return Values[Input];
 	}
 
 
-GLenum crGL4TranslateBlendMode(const crBlendMode Input)
+GLenum crGL4TranslateBlendMode ( const crBlendMode Input )
 	{
 	static GLenum Values[] =
 		{
@@ -125,13 +125,13 @@ GLenum crGL4TranslateBlendMode(const crBlendMode Input)
 		GL_ONE_MINUS_DST_COLOR,
 		GL_SRC_ALPHA_SATURATE
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid blend mode");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid blend mode" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateStencilFunction(const crStencilFunction Input)
+GLenum crGL4TranslateStencilFunction ( const crStencilFunction Input )
 	{
 	static GLenum Values[] =
 		{
@@ -144,13 +144,13 @@ GLenum crGL4TranslateStencilFunction(const crStencilFunction Input)
 		GL_NOTEQUAL,
 		GL_ALWAYS
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid stencil function");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid stencil function" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateStencilFailAction(const crStencilFailAction Input)
+GLenum crGL4TranslateStencilFailAction ( const crStencilFailAction Input )
 	{
 	static GLenum Values[] =
 		{
@@ -161,13 +161,13 @@ GLenum crGL4TranslateStencilFailAction(const crStencilFailAction Input)
 		GL_DECR,
 		GL_INVERT
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid stencil fail action");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid stencil fail action" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateCullingMode(const crCullingMode Input)
+GLenum crGL4TranslateCullingMode ( const crCullingMode Input )
 	{
 	static GLenum Values[] =
 		{
@@ -178,26 +178,26 @@ GLenum crGL4TranslateCullingMode(const crCullingMode Input)
 		GL_DECR,
 		GL_INVERT
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid culling mode");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid culling mode" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateCullingFaceWinding(const crCullingFaceWinding Input)
+GLenum crGL4TranslateCullingFaceWinding ( const crCullingFaceWinding Input )
 	{
 	static GLenum Values[] =
 		{
 		GL_CW,
 		GL_CCW,
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid culling winding");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid culling winding" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslatePrimitive(const crPrimitiveType Input)
+GLenum crGL4TranslatePrimitive ( const crPrimitiveType Input )
 	{
 	static GLenum Values[] =
 		{
@@ -207,13 +207,13 @@ GLenum crGL4TranslatePrimitive(const crPrimitiveType Input)
 		GL_TRIANGLES,
 		GL_TRIANGLE_STRIP
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid primitive");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid primitive" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateTextureFilter(const crTextureFilter Input)
+GLenum crGL4TranslateTextureFilter ( const crTextureFilter Input )
 	{
 	static GLint Values[] =
 		{
@@ -224,13 +224,13 @@ GLenum crGL4TranslateTextureFilter(const crTextureFilter Input)
 		GL_LINEAR_MIPMAP_LINEAR,
 		GL_LINEAR_MIPMAP_NEAREST
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid texture filter");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid texture filter" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateTextureWrapMode(const crTextureWrapMode Input)
+GLenum crGL4TranslateTextureWrapMode ( const crTextureWrapMode Input )
 	{
 	static GLint Values[] =
 		{
@@ -239,26 +239,26 @@ GLenum crGL4TranslateTextureWrapMode(const crTextureWrapMode Input)
 		GL_CLAMP_TO_EDGE,
 		GL_CLAMP_TO_BORDER
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid texture wrap mode");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid texture wrap mode" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateTextureType(const crTextureType Input)
+GLenum crGL4TranslateTextureType ( const crTextureType Input )
 	{
 	static GLenum Values[] =
 		{
 		GL_TEXTURE_2D,
 		GL_TEXTURE_CUBE_MAP
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid texture type");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid texture type" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateShaderBufferComponentType(const crShaderBufferComponentType Input)
+GLenum crGL4TranslateShaderBufferComponentType ( const crShaderBufferComponentType Input )
 	{
 	static GLenum Values[] =
 		{
@@ -267,13 +267,13 @@ GLenum crGL4TranslateShaderBufferComponentType(const crShaderBufferComponentType
 		GL_UNSIGNED_SHORT,
 		GL_UNSIGNED_INT,
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid shader buffer component type");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid shader buffer component type" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateShaderBufferAccessType(const crShaderBufferAccessType Input)
+GLenum crGL4TranslateShaderBufferAccessType ( const crShaderBufferAccessType Input )
 	{
 	static GLenum Values[] =
 		{
@@ -281,13 +281,13 @@ GLenum crGL4TranslateShaderBufferAccessType(const crShaderBufferAccessType Input
 		GL_DYNAMIC_DRAW,
 		GL_STREAM_DRAW
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid shader buffer access type");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid shader buffer access type" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateShaderBufferMapAccessType(const crShaderBufferMapAccessType Input)
+GLenum crGL4TranslateShaderBufferMapAccessType ( const crShaderBufferMapAccessType Input )
 	{
 	static GLenum Values[] =
 		{
@@ -295,26 +295,26 @@ GLenum crGL4TranslateShaderBufferMapAccessType(const crShaderBufferMapAccessType
 		GL_WRITE_ONLY,
 		GL_READ_WRITE
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid shader buffer type");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid shader buffer type" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslateShaderBufferType(const crShaderBufferType Input)
+GLenum crGL4TranslateShaderBufferType ( const crShaderBufferType Input )
 	{
 	static GLenum Values[] =
 		{
 		GL_ARRAY_BUFFER,
 		GL_UNIFORM_BUFFER,
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid shader buffer type");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid shader buffer type" );
 	return Values[Input];
 	}
 
-GLenum crGL4TranslatePolygonMode(const crPolygonMode Input)
+GLenum crGL4TranslatePolygonMode ( const crPolygonMode Input )
 	{
 	static GLenum Values[] =
 		{
@@ -322,15 +322,15 @@ GLenum crGL4TranslatePolygonMode(const crPolygonMode Input)
 		GL_LINE,
 		GL_FILL
 		};
-	static int Count = sizeof(Values) / sizeof(GLenum);
-	if ((Input >= Count) || (Input < 0))
-		FATAL_ERROR("Invalid polygon mode");
+	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+	if ( ( Input >= Count ) || ( Input < 0 ) )
+		FATAL_ERROR ( "Invalid polygon mode" );
 	return Values[Input];
 	}
 
-crShaderUniformType crGL4TranslateOpenGLUniformType(const GLenum Input)
+crShaderUniformType crGL4TranslateOpenGLUniformType ( const GLenum Input )
 	{
-	switch (Input)
+	switch ( Input )
 		{
 		case GL_FLOAT:
 			return crShaderUniformType_Float;
@@ -382,7 +382,7 @@ crShaderUniformType crGL4TranslateOpenGLUniformType(const GLenum Input)
 		case GL_SAMPLER_CUBE:
 			return crShaderUniformType_SamplerCube;
 		default:
-			LOG_ERROR("Unhandled shader uniform type");
+			LOG_ERROR ( "Unhandled shader uniform type" );
 			return crShaderUniformType_Unknown;
 		}
 	}

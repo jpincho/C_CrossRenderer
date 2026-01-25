@@ -16,29 +16,29 @@ typedef struct
 	const char *Title;
 	} crRenderWindowDescriptor;
 
-typedef void ( *crWindowClosedCallback )( const crWindowHandle Handle );
-typedef void ( *crWindowMovedCallback )( const crWindowHandle Handle, const ivec2 NewPosition );
-typedef void ( *crWindowResizedCallback )( const crWindowHandle Handle, const uvec2 NewSize );
-typedef void ( *crEndWindowResizedCallback )( const crWindowHandle Handle, const uvec2 NewSize );
-typedef void ( *crWindowFocusChangedCallback )( const crWindowHandle Handle, const bool HasFocus );
+typedef void ( *crWindowClosedCallback ) ( const crWindowHandle Handle );
+typedef void ( *crWindowMovedCallback ) ( const crWindowHandle Handle, const ivec2 NewPosition );
+typedef void ( *crWindowResizedCallback ) ( const crWindowHandle Handle, const uvec2 NewSize );
+typedef void ( *crEndWindowResizedCallback ) ( const crWindowHandle Handle, const uvec2 NewSize );
+typedef void ( *crWindowFocusChangedCallback ) ( const crWindowHandle Handle, const bool HasFocus );
 
-typedef void ( *crMouseButtonCallback )( const crWindowHandle, const unsigned Button, const bool Clicked );
-typedef void ( *crMouseMovedCallback )( const crWindowHandle, const ivec2 Delta, const ivec2 NewPosition );
+typedef void ( *crMouseButtonCallback ) ( const crWindowHandle, const unsigned Button, const bool Clicked );
+typedef void ( *crMouseMovedCallback ) ( const crWindowHandle, const ivec2 Delta, const ivec2 NewPosition );
 typedef void ( *crMouseWheelCallback ) ( const crWindowHandle, const int Delta );
 
-typedef void ( *crKeyStateChangedCallback )( const crWindowHandle, const crKeyCode Key, const bool State );
+typedef void ( *crKeyStateChangedCallback ) ( const crWindowHandle, const crKeyCode Key, const bool State );
 
 typedef struct
-    {
-    crWindowClosedCallback WindowClosed;
-    crWindowMovedCallback WindowMoved;
-    crWindowResizedCallback WindowResized;
-    crEndWindowResizedCallback EndWindowResized;
-    crWindowFocusChangedCallback WindowFocusChanged;
+	{
+	crWindowClosedCallback WindowClosed;
+	crWindowMovedCallback WindowMoved;
+	crWindowResizedCallback WindowResized;
+	crEndWindowResizedCallback EndWindowResized;
+	crWindowFocusChangedCallback WindowFocusChanged;
 	crKeyStateChangedCallback KeyStateChanged;
-    crMouseButtonCallback MouseButton;
-    crMouseMovedCallback MouseMoved;
-    crMouseWheelCallback MouseWheel;
-    } crWindowManagerCallbacks;
+	crMouseButtonCallback MouseButton;
+	crMouseMovedCallback MouseMoved;
+	crMouseWheelCallback MouseWheel;
+	} crWindowManagerCallbacks;
 
 END_C_DECLARATIONS

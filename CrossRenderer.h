@@ -31,5 +31,5 @@ crWindowManagerCallbacks crGetWindowManagerCallbacks ( void );
 
 crWindowHandle crGetMainWindowHandle ( void );
 
-void SetRenderStateToDefault ( crRenderState *State );
+void crSetRenderStateToDefault ( crRenderState *State );
 END_C_DECLARATIONS
