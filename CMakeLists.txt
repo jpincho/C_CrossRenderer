@@ -3,32 +3,12 @@ cmake_minimum_required ( VERSION 3.10 )
 project ( C_CrossRenderer )
 
 list ( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/ExternalModules/CMakeUtils )
-include ( LocalPackage )
-set ( LOCAL_PACKAGE_ALLOW_SYSTEM TRUE )
-set_local_package_install_location ( "${PROJECT_BINARY_DIR}/output/" )
+include ( target_warning_options )
 
-foreach ( DEPENDENCY ${CROSS_RENDERER_NECESSARY_DEPENDENCIES} )
-    find_local_package ( ${DEPENDENCY} QUIET )
-    string ( TOUPPER ${DEPENDENCY} UPPERCASE_DEPENDENCY )
-    if (( NOT ${UPPERCASE_DEPENDENCY}_FOUND ) AND ( NOT ${DEPENDENCY}_DIR ))
-        install_local_package ( ${DEPENDENCY} )
-    endif()
-endforeach()
-install_local_packages()
-
-# Dependencies installed, configuring CrossRenderer
 include_directories(ExternalModules)
 include_directories(${LOCAL_PACKAGE_INSTALL_LOCATION}/include)
 
-include ( target_warning_options )
-if ( NOT TARGET Platform )
-    add_subdirectory ( ExternalModules/Platform )
-endif()
-if ( NOT TARGET C_Utils )
-    add_subdirectory ( ExternalModules/C_Utils )
-endif()
-add_subdirectory ( ExternalModules/Math )
-
+# Dependencies installed, configuring CrossRenderer
 # OpenGL backend
 set ( OpenGL_GL_PREFERENCE GLVND )
 find_package ( OpenGL QUIET )
