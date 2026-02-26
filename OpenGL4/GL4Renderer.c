@@ -7,6 +7,9 @@
 #if defined (PLATFORM_COMPILER_MSVC)
 #pragma warning(disable:4996)
 #endif
+#if !defined (PLATFORM_STRNDUP_EXISTS)
+#include <strndup.h>
+#endif
 
 unsigned GeneralVAO;
 static crShaderHandle ActiveShader = NULL;

@@ -2,11 +2,15 @@
 #include <Platform/Logger.h>
 #define STB_IMAGE_IMPLEMENTATION
 
+#if defined (PLATFORM_COMPILER_GCC)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #include <stb/stb_image.h>
 #pragma GCC diagnostic pop
+#elif defined (PLATFORM_COMPILER_MSVC)
+#include <stb/stb_image.h>
+#endif
 
 #include <fnmatch.h>
 
