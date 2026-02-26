@@ -5,7 +5,7 @@
 #include <malloc.h>
 #include <C_Utils/ArrayUtils.h>
 
-#ifdef PLATFORM_COMPILER_MSVC
+#if defined (PLATFORM_COMPILER_MSVC)
 #define strdup _strdup
 #endif
 

@@ -1,7 +1,13 @@
 #include "CommonLoaders.h"
 #include <Platform/Logger.h>
 #define STB_IMAGE_IMPLEMENTATION
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #include <stb/stb_image.h>
+#pragma GCC diagnostic pop
+
 #include <fnmatch.h>
 
 #include "../Shader.h"
@@ -13,8 +19,10 @@ static bool LoadFileContents ( const char *Filename, char **Contents )
 #if defined (PLATFORM_COMPILER_MSVC)
 	if ( fopen_s ( &FileHandle, Filename, "rt" ) != 0 )
 		return false;
-#else
+#elif defined (PLATFORM_COMPILER_GCC)
 	FileHandle = fopen ( Filename, "rt" );
+#else
+#error "Unhandled compiler"
 #endif
 	if ( FileHandle == NULL )
 		return false;
@@ -243,10 +251,15 @@ bool crIsValidTextureFile ( const char *Filename )
 	                        "*.gif"
 	                      };
 
-	for ( int index = 0; index < _countof ( valid_masks ); ++index )
+        for ( unsigned index = 0; index < sizeof ( valid_masks ) / sizeof ( char * ); ++index )
 		{
-		if ( fnmatch ( valid_masks[index], Filename, 0 ) )
-			return true;
+#if defined (PLATFORM_COMPILER_MSVC)
+                if ( PathMatchSpecA ( Filename, valid_masks[index] ) == TRUE )
+                        return true;
+#else
+                if ( fnmatch ( valid_masks[index], Filename, 0 ) )
+                        return true;
+#endif
 		}
 	return false;
 	}

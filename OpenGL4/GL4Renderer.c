@@ -4,7 +4,7 @@
 #include "GL4Context.h"
 #include <string.h>
 
-#if defined(_MSC_VER)
+#if defined (PLATFORM_COMPILER_MSVC)
 #pragma warning(disable:4996)
 #endif
 
@@ -680,6 +680,11 @@ static bool ShaderUniformValueIsEqual ( const crShaderUniformType Type, const cr
 			return math_mat4_equals ( Value1->Matrix4Value, Value2->Matrix4Value );
 		case crShaderUniformType_Block:
 			return Value1->BlockValue == Value2->BlockValue;
+                case crShaderUniformType_Sampler2D:
+                case crShaderUniformType_Sampler3D:
+                case crShaderUniformType_SamplerCube:
+                case crShaderUniformType_Unknown:
+                        break;
 		}
 
 	return false;

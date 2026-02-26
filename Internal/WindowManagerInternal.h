@@ -9,4 +9,4 @@ extern crWindowHandle MainWindowHandle;
 
 bool crInitializeWindowBackend ( void );
 
-END_C_DECLARATIONS;
+END_C_DECLARATIONS

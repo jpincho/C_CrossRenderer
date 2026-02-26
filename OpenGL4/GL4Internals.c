@@ -102,7 +102,7 @@ GLenum crGL4TranslateDepthTestMode ( const crDepthTestMode Input )
 		GL_NOTEQUAL,
 		GL_ALWAYS
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid depth test mode" );
 	return Values[Input];
@@ -125,7 +125,7 @@ GLenum crGL4TranslateBlendMode ( const crBlendMode Input )
 		GL_ONE_MINUS_DST_COLOR,
 		GL_SRC_ALPHA_SATURATE
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid blend mode" );
 	return Values[Input];
@@ -144,7 +144,7 @@ GLenum crGL4TranslateStencilFunction ( const crStencilFunction Input )
 		GL_NOTEQUAL,
 		GL_ALWAYS
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid stencil function" );
 	return Values[Input];
@@ -161,7 +161,7 @@ GLenum crGL4TranslateStencilFailAction ( const crStencilFailAction Input )
 		GL_DECR,
 		GL_INVERT
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid stencil fail action" );
 	return Values[Input];
@@ -178,7 +178,7 @@ GLenum crGL4TranslateCullingMode ( const crCullingMode Input )
 		GL_DECR,
 		GL_INVERT
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid culling mode" );
 	return Values[Input];
@@ -191,7 +191,7 @@ GLenum crGL4TranslateCullingFaceWinding ( const crCullingFaceWinding Input )
 		GL_CW,
 		GL_CCW,
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid culling winding" );
 	return Values[Input];
@@ -207,7 +207,7 @@ GLenum crGL4TranslatePrimitive ( const crPrimitiveType Input )
 		GL_TRIANGLES,
 		GL_TRIANGLE_STRIP
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid primitive" );
 	return Values[Input];
@@ -224,7 +224,7 @@ GLenum crGL4TranslateTextureFilter ( const crTextureFilter Input )
 		GL_LINEAR_MIPMAP_LINEAR,
 		GL_LINEAR_MIPMAP_NEAREST
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid texture filter" );
 	return Values[Input];
@@ -239,7 +239,7 @@ GLenum crGL4TranslateTextureWrapMode ( const crTextureWrapMode Input )
 		GL_CLAMP_TO_EDGE,
 		GL_CLAMP_TO_BORDER
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid texture wrap mode" );
 	return Values[Input];
@@ -252,7 +252,7 @@ GLenum crGL4TranslateTextureType ( const crTextureType Input )
 		GL_TEXTURE_2D,
 		GL_TEXTURE_CUBE_MAP
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid texture type" );
 	return Values[Input];
@@ -267,7 +267,7 @@ GLenum crGL4TranslateShaderBufferComponentType ( const crShaderBufferComponentTy
 		GL_UNSIGNED_SHORT,
 		GL_UNSIGNED_INT,
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid shader buffer component type" );
 	return Values[Input];
@@ -281,7 +281,7 @@ GLenum crGL4TranslateShaderBufferAccessType ( const crShaderBufferAccessType Inp
 		GL_DYNAMIC_DRAW,
 		GL_STREAM_DRAW
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid shader buffer access type" );
 	return Values[Input];
@@ -295,7 +295,7 @@ GLenum crGL4TranslateShaderBufferMapAccessType ( const crShaderBufferMapAccessTy
 		GL_WRITE_ONLY,
 		GL_READ_WRITE
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid shader buffer type" );
 	return Values[Input];
@@ -308,7 +308,7 @@ GLenum crGL4TranslateShaderBufferType ( const crShaderBufferType Input )
 		GL_ARRAY_BUFFER,
 		GL_UNIFORM_BUFFER,
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid shader buffer type" );
 	return Values[Input];
@@ -322,7 +322,7 @@ GLenum crGL4TranslatePolygonMode ( const crPolygonMode Input )
 		GL_LINE,
 		GL_FILL
 		};
-	static int Count = sizeof ( Values ) / sizeof ( GLenum );
+        static unsigned Count = sizeof ( Values ) / sizeof ( GLenum );
 	if ( ( Input >= Count ) || ( Input < 0 ) )
 		FATAL_ERROR ( "Invalid polygon mode" );
 	return Values[Input];

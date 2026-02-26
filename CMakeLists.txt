@@ -6,9 +6,15 @@ list ( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/ExternalModules/CMakeU
 include ( target_warning_options )
 
 include_directories(ExternalModules)
-include_directories(${LOCAL_PACKAGE_INSTALL_LOCATION}/include)
 
-# Dependencies installed, configuring CrossRenderer
+set ( DEPENDENCY_PROJECTS Platform C_Utils Math )
+
+foreach ( DEPENDENCY IN LISTS DEPENDENCY_PROJECTS )
+    if ( NOT TARGET ${DEPENDENCY} )
+        add_subdirectory ( ExternalModules/${DEPENDENCY} )
+    endif()
+endforeach()
+
 # OpenGL backend
 set ( OpenGL_GL_PREFERENCE GLVND )
 find_package ( OpenGL QUIET )

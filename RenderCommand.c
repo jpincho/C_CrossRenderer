@@ -104,11 +104,11 @@ bool crSetRenderCommandUniform##VALUE_TYPE##Value(crRenderCommand *Command, cons
 	return true;\
 	}
 
-IMPLEMENT_crSetRenderCommandUniformValue ( bool, Bool );
-IMPLEMENT_crSetRenderCommandUniformValue ( float, Float );
-IMPLEMENT_crSetRenderCommandUniformValue ( unsigned, UnsignedInteger );
-IMPLEMENT_crSetRenderCommandUniformValue ( int, Integer );
-IMPLEMENT_crSetRenderCommandUniformValue ( crShaderBufferHandle, Block );
+IMPLEMENT_crSetRenderCommandUniformValue ( bool, Bool )
+IMPLEMENT_crSetRenderCommandUniformValue ( float, Float )
+IMPLEMENT_crSetRenderCommandUniformValue ( unsigned, UnsignedInteger )
+IMPLEMENT_crSetRenderCommandUniformValue ( int, Integer )
+IMPLEMENT_crSetRenderCommandUniformValue ( crShaderBufferHandle, Block )
 #undef IMPLEMENT_crSetRenderCommandUniformValue
 
 #define IMPLEMENT_crSetRenderCommandUniformValue(VAR_TYPE,VALUE_TYPE) \
@@ -124,21 +124,21 @@ bool crSetRenderCommandUniform##VALUE_TYPE##Value(crRenderCommand *Command, cons
 	return true;\
 	}
 
-IMPLEMENT_crSetRenderCommandUniformValue ( ivec2, Bool2 );
-IMPLEMENT_crSetRenderCommandUniformValue ( ivec3, Bool3 );
-IMPLEMENT_crSetRenderCommandUniformValue ( ivec4, Bool4 );
-IMPLEMENT_crSetRenderCommandUniformValue ( vec2, Float2 );
-IMPLEMENT_crSetRenderCommandUniformValue ( vec3, Float3 );
-IMPLEMENT_crSetRenderCommandUniformValue ( vec4, Float4 );
-IMPLEMENT_crSetRenderCommandUniformValue ( uvec2, UnsignedInteger2 );
-IMPLEMENT_crSetRenderCommandUniformValue ( uvec3, UnsignedInteger3 );
-IMPLEMENT_crSetRenderCommandUniformValue ( uvec4, UnsignedInteger4 );
-IMPLEMENT_crSetRenderCommandUniformValue ( ivec2, Integer2 );
-IMPLEMENT_crSetRenderCommandUniformValue ( ivec3, Integer3 );
-IMPLEMENT_crSetRenderCommandUniformValue ( ivec4, Integer4 );
-IMPLEMENT_crSetRenderCommandUniformValue ( mat2, Matrix2 );
-IMPLEMENT_crSetRenderCommandUniformValue ( mat3, Matrix3 );
-IMPLEMENT_crSetRenderCommandUniformValue ( mat4, Matrix4 );
+IMPLEMENT_crSetRenderCommandUniformValue ( ivec2, Bool2 )
+IMPLEMENT_crSetRenderCommandUniformValue ( ivec3, Bool3 )
+IMPLEMENT_crSetRenderCommandUniformValue ( ivec4, Bool4 )
+IMPLEMENT_crSetRenderCommandUniformValue ( vec2, Float2 )
+IMPLEMENT_crSetRenderCommandUniformValue ( vec3, Float3 )
+IMPLEMENT_crSetRenderCommandUniformValue ( vec4, Float4 )
+IMPLEMENT_crSetRenderCommandUniformValue ( uvec2, UnsignedInteger2 )
+IMPLEMENT_crSetRenderCommandUniformValue ( uvec3, UnsignedInteger3 )
+IMPLEMENT_crSetRenderCommandUniformValue ( uvec4, UnsignedInteger4 )
+IMPLEMENT_crSetRenderCommandUniformValue ( ivec2, Integer2 )
+IMPLEMENT_crSetRenderCommandUniformValue ( ivec3, Integer3 )
+IMPLEMENT_crSetRenderCommandUniformValue ( ivec4, Integer4 )
+IMPLEMENT_crSetRenderCommandUniformValue ( mat2, Matrix2 )
+IMPLEMENT_crSetRenderCommandUniformValue ( mat3, Matrix3 )
+IMPLEMENT_crSetRenderCommandUniformValue ( mat4, Matrix4 )
 #undef IMPLEMENT_crSetRenderCommandUniformValue
 
 void crDestroyRenderCommand ( crRenderCommand *Command )

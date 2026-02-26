@@ -6,6 +6,11 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+#if defined (PLATFORM_COMPILER_GCC)
+#include <stddef.h>
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#endif
+
 static bool ShouldQuit = false;
 bool LoadFileContents ( const char *Filename, char **Contents );
 
