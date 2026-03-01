@@ -22,15 +22,9 @@ void WindowClosed_Callback ( const crWindowHandle Handle )
 
 int main ( void )
 	{
-	crRendererConfiguration Configuration = { 0 };
-	Configuration.InitialWindowDescriptor.Fullscreen = false;
-	Configuration.InitialWindowDescriptor.Position.x = 100;
-	Configuration.InitialWindowDescriptor.Position.y = 100;
-	Configuration.InitialWindowDescriptor.Size.x = 1920;
-	Configuration.InitialWindowDescriptor.Size.y = 1080;
-	Configuration.InitialWindowDescriptor.Resizable = true;
+	crRendererConfiguration Configuration;
+	crSetConfigurationToDefault(&Configuration);
 	Configuration.InitialWindowDescriptor.Title = "CrossRenderer - spinning cube test";
-	Configuration.VSyncEnabled = true;
 	if ( crInitialize ( Configuration ) == false )
 		return -1;
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "../WindowManagerDefinitions.h"
+#include "../WindowManager/WindowManager.h"
 #include "../RendererDefinitions.h"
 
 BEGIN_C_DECLARATIONS

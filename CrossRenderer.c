@@ -1,6 +1,6 @@
 #include "CrossRenderer.h"
 #include "CrossRendererConfig.h"
-#include "Internal/WindowManagerInternal.h"
+#include "WindowManager/Internal/WindowManagerInternal.h"
 #include "Internal/CrossRendererFunctionPointers.h"
 #include <memory.h>
 #include <Platform/Logger.h>
@@ -36,11 +36,34 @@ bool SetupFunctionPointers ( const crRendererBackend Backend )
 	return true;
 	}
 
+void crSetConfigurationToDefault(crRendererConfiguration *Configuration)
+{
+	memset(Configuration, 0, sizeof(crRendererConfiguration));
+
+	Configuration->InitialWindowDescriptor.Fullscreen = false;
+	Configuration->InitialWindowDescriptor.Position.x = Configuration->InitialWindowDescriptor.Position.y = 0;
+	Configuration->InitialWindowDescriptor.Resizable = true;
+	Configuration->InitialWindowDescriptor.Size.x = 1920;
+	Configuration->InitialWindowDescriptor.Size.y = 1080;
+	Configuration->InitialWindowDescriptor.SupportOpenGL = true;
+	Configuration->InitialWindowDescriptor.Title = "CrossRenderer Window";
+	 
+	Configuration->RedBits = 8;
+	Configuration->GreenBits = 8;
+	Configuration->BlueBits = 8;
+	Configuration->AlphaBits = 8;
+	Configuration->DepthBits = 32;
+	Configuration->StencilBits = 0;
+	Configuration->DesiredRendererBackend = OpenGLCore;
+	Configuration->DesiredWindowManagerBackend = WindowManagerBackend_Windows;
+	Configuration->VSyncEnabled = true;
+}
+
 bool crInitialize ( const crRendererConfiguration NewConfiguration )
 	{
 	if ( SetupFunctionPointers ( NewConfiguration.DesiredRendererBackend ) == false )
 		return false;
-	if ( crInitializeWindowBackend() == false )
+	if (SetupWindowManagerFunctionPointers(NewConfiguration.DesiredWindowManagerBackend) == false)
 		return false;
 	if ( crInitializeRenderer ( NewConfiguration ) == false )
 		return false;

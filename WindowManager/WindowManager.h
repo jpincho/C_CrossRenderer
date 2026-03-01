@@ -1,10 +1,10 @@
 #pragma once
-#include <Math/mathlib.h>
 #include <stdbool.h>
 #include <Platform/defines.h>
+#include <Math/mathlib.h>
 #include "KeyDefinitions.h"
-BEGIN_C_DECLARATIONS
 
+BEGIN_C_DECLARATIONS
 typedef void *crWindowHandle;
 
 typedef struct
@@ -16,6 +16,12 @@ typedef struct
 	const char *Title;
 	} crRenderWindowDescriptor;
 
+typedef enum
+	{
+	WindowManagerBackend_Windows,
+	} crWindowManagerBackend;
+
+// Callbacks
 typedef void ( *crWindowClosedCallback ) ( const crWindowHandle Handle );
 typedef void ( *crWindowMovedCallback ) ( const crWindowHandle Handle, const ivec2 NewPosition );
 typedef void ( *crWindowResizedCallback ) ( const crWindowHandle Handle, const uvec2 NewSize );
@@ -41,4 +47,18 @@ typedef struct
 	crMouseWheelCallback MouseWheel;
 	} crWindowManagerCallbacks;
 
+// Function pointers
+extern crWindowHandle (*crCreateNewWindow) ( const crRenderWindowDescriptor Descriptor );
+extern bool (*crDestroyWindow) ( const crWindowHandle WindowHandle );
+extern bool (*crUpdateWindows) ( const bool Wait );
+extern bool (*crSetWindowPosition) ( const crWindowHandle WindowHandle, const ivec2 Position );
+extern bool (*crGetWindowPosition) ( const crWindowHandle WindowHandle, ivec2 *Position );
+extern bool (*crSetWindowDimensions) ( const crWindowHandle WindowHandle, const uvec2 Dimensions );
+extern bool (*crGetWindowDimensions) ( const crWindowHandle WindowHandle, uvec2 *Dimensions );
+extern bool (*crGetWindowClientAreaDimensions) ( const crWindowHandle WindowHandle, uvec2 *Dimensions );
+extern bool (*crSetWindowTitle) ( const crWindowHandle WindowHandle, const char *Title );
+extern const char *(*crGetWindowTitle) ( const crWindowHandle WindowHandle );
+extern bool (*crActivateWindow) ( const crWindowHandle WindowHandle );
+
+bool SetupWindowManagerFunctionPointers ( const crWindowManagerBackend Backend );
 END_C_DECLARATIONS
