@@ -19,6 +19,7 @@ typedef struct
 typedef enum
 	{
 	WindowManagerBackend_Windows,
+    WindowManagerBackend_X11
 	} crWindowManagerBackend;
 
 // Callbacks

@@ -13,12 +13,13 @@
 
 unsigned GeneralVAO;
 static crShaderHandle ActiveShader = NULL;
+static crOpenGLContext OpenGLContext = NULL;
 
 static bool DetectOpenGLInformation ( void )
 	{
 	// MAJOR & MINOR only introduced in GL {,ES} 3.0
 	GLint TempMajor = 0, TempMinor = 0;
-	VersionNumber_Set ( &crGL4Information.OpenGLVersion, 0, 0 );
+        VersionNumber_Set ( &crGL4Information.OpenGLVersion, 0, 0 );
 	glGetIntegerv ( GL_MAJOR_VERSION, &TempMajor );
 	glGetIntegerv ( GL_MINOR_VERSION, &TempMinor );
 	if ( ( glGetError() == GL_NO_ERROR ) && ( TempMajor != 0 ) )
@@ -60,8 +61,8 @@ static bool DetectOpenGLInformation ( void )
 	if ( VersionNumber_GreaterThanOrEqual ( crGL4Information.OpenGLVersion, 3, 2 ) ) VersionNumber_Set ( &crGL4Information.GLSLVersion, 1, 5 );
 	if ( VersionNumber_GreaterThanOrEqual ( crGL4Information.OpenGLVersion, 3, 3 ) ) crGL4Information.GLSLVersion = crGL4Information.OpenGLVersion;
 
-	const GLubyte *GLSLVersionString = glGetString ( GL_SHADING_LANGUAGE_VERSION );
-	if ( GLSLVersionString != NULL )
+        const GLubyte *GLSLVersionString = glGetString ( GL_SHADING_LANGUAGE_VERSION );
+        if ( GLSLVersionString != NULL )
 		{
 		LOG_DEBUG ( "Reported GLSL version string : '%s'", GLSLVersionString );
 		if ( VersionNumber_ParseString ( &crGL4Information.GLSLVersion, ( const char * ) GLSLVersionString ) == false )
@@ -138,14 +139,14 @@ static bool DetectOpenGLInformation ( void )
 
 bool crGL4InitializeRenderer ( const crRendererConfiguration NewConfiguration )
 	{
-	if ( crGL4InitializeGLContextFunctions() == false )
+        if ( crGL4InitializeGLContextFunctions ( NewConfiguration.DesiredWindowManagerBackend ) == false )
 		return false;
 
 	crWindowHandle NewWindowHandle = crCreateNewWindow ( NewConfiguration.InitialWindowDescriptor );
 	if ( !NewWindowHandle )
 		return false;
 
-	crOpenGLContext OpenGLContext = crGL4CreateGLContext ( NewWindowHandle, NewConfiguration );
+        OpenGLContext = crGL4CreateGLContext ( NewWindowHandle, NewConfiguration );
 	if ( OpenGLContext == NULL )
 		goto OnError;
 
@@ -211,6 +212,8 @@ bool crGL4ShutdownRenderer ( void )
 		glDeleteVertexArrays ( 1, &GeneralVAO );
 		GeneralVAO = 0;
 		}
+        crGL4DeleteGLContext ( OpenGLContext );
+        OpenGLContext = NULL;
 	return true;
 	}
 
@@ -248,7 +251,7 @@ bool crGL4IsDirectStateAccessEnabled ( void )
 bool crGL4StartRenderToWindow ( const crWindowHandle WindowHandle )
 	{
 	crActivateWindow ( WindowHandle );
-	crGL4MakeGLContextActive ( WindowHandle );
+        crGL4MakeGLContextActive ( OpenGLContext, WindowHandle );
 
 	uvec2 WindowDimensions;
 	crGetWindowClientAreaDimensions ( WindowHandle, &WindowDimensions );
@@ -268,7 +271,7 @@ bool crGL4StartRenderToWindow ( const crWindowHandle WindowHandle )
 bool crGL4DisplayFramebuffer ( const crFramebufferHandle FramebufferHandle, const crWindowHandle WindowHandle )
 	{
 	crActivateWindow ( WindowHandle );
-	crGL4MakeGLContextActive ( WindowHandle );
+        crGL4MakeGLContextActive ( OpenGLContext, WindowHandle );
 
 	uvec2 WindowDimensions;
 	// Reset scissor, viewport and stencil to the full window
@@ -280,7 +283,7 @@ bool crGL4DisplayFramebuffer ( const crFramebufferHandle FramebufferHandle, cons
 	crGL4ConfigureScissor ( &DefaultScissorSettings );
 	crGL4ConfigureViewport ( &DefaultViewportSettings );
 	crGL4ConfigureStencil ( &DefaultStencilSettings );
-	crGL4MakeGLContextActive ( WindowHandle );
+        crGL4MakeGLContextActive ( OpenGLContext, WindowHandle );
 
 	crGL4InternalFramebufferInfo *FramebufferInformation = ( crGL4InternalFramebufferInfo * ) PointerList_GetNodeData ( FramebufferHandle );
 	if ( FramebufferInformation->OpenGLID != 0 )
@@ -311,7 +314,7 @@ bool crGL4DisplayWindow ( const crWindowHandle WindowHandle )
 	crGL4ConfigureScissor ( &DefaultScissorSettings );
 	crGL4ConfigureViewport ( &DefaultViewportSettings );
 	crGL4ConfigureStencil ( &DefaultStencilSettings );
-	crGL4SwapGLWindowBuffer ( WindowHandle );
+        crGL4SwapGLWindowBuffer ( OpenGLContext, WindowHandle );
 	return crGL4CheckError();
 	}
 
@@ -496,9 +499,9 @@ static bool SetOpenGLShaderUniformValue ( const crGL4InternalShaderInfo *ShaderI
 		case crShaderUniformType_Matrix4:
 			{
 			if ( crGL4Information.DirectStateAccessEnabled )
-				glProgramUniformMatrix4fv ( ShaderInformation->OpenGLID, ShaderInformation->Uniforms[UniformHandle].OpenGLID, 1, GL_FALSE, Value->Matrix4Value.raw );
+                                glProgramUniformMatrix4fv ( ShaderInformation->OpenGLID, ShaderInformation->Uniforms[UniformHandle].OpenGLID, 1, GL_FALSE, Value->Matrix4Value.flat_raw );
 			else
-				glUniformMatrix4fv ( ShaderInformation->Uniforms[UniformHandle].OpenGLID, 1, GL_FALSE, Value->Matrix4Value.raw );
+                                glUniformMatrix4fv ( ShaderInformation->Uniforms[UniformHandle].OpenGLID, 1, GL_FALSE, Value->Matrix4Value.flat_raw );
 			break;
 			}
 		case crShaderUniformType_Block:

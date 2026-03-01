@@ -7,11 +7,8 @@
 
 // Interface creation
 
-#define DECLARE_INTERFACE_FUNCTION(return,name,...)\
-return (*cr##name) ( __VA_ARGS__ ) = 0
-
+#define DECLARE_INTERFACE_FUNCTION(return,name,...) return (*cr##name) ( __VA_ARGS__ ) = 0
 #include "Internal/RendererTemplateSignatures.h"
-
 #undef DECLARE_INTERFACE_FUNCTION
 
 #if defined ( CROSS_RENDERER_OPENGL_CORE_SUPPORT)
@@ -55,7 +52,11 @@ void crSetConfigurationToDefault(crRendererConfiguration *Configuration)
 	Configuration->DepthBits = 32;
 	Configuration->StencilBits = 0;
 	Configuration->DesiredRendererBackend = OpenGLCore;
+#if defined ( PLATFORM_WINDOWS )
 	Configuration->DesiredWindowManagerBackend = WindowManagerBackend_Windows;
+#elif defined ( PLATFORM_LINUX )
+        Configuration->DesiredWindowManagerBackend = WindowManagerBackend_X11;
+#endif
 	Configuration->VSyncEnabled = true;
 }
 
