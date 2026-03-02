@@ -6,14 +6,28 @@ list ( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/ExternalModules/CMakeU
 include ( target_warning_options )
 
 include_directories(ExternalModules)
-include_directories(${LOCAL_PACKAGE_INSTALL_LOCATION}/include)
 
-# Dependencies installed, configuring CrossRenderer
+set ( DEPENDENCY_PROJECTS Platform C_Utils Math )
+
+foreach ( DEPENDENCY IN LISTS DEPENDENCY_PROJECTS )
+    if ( NOT TARGET ${DEPENDENCY} )
+        add_subdirectory ( ExternalModules/${DEPENDENCY} )
+    endif()
+endforeach()
+
 # OpenGL backend
 set ( OpenGL_GL_PREFERENCE GLVND )
 find_package ( OpenGL QUIET )
 if ( OPENGL_FOUND )
     option ( CROSS_RENDERER_OPENGL_CORE_SUPPORT "Enable support for OpenGL Core" TRUE )
+endif()
+find_package ( X11 QUIET )
+if ( X11_FOUND )
+    option ( CROSS_RENDERER_X11_SUPPORT "Enable support for X11" TRUE )
+endif()
+find_package ( Wayland QUIET )
+if ( WAYLAND_FOUND )
+    option ( CROSS_RENDERER_WAYLAND_SUPPORT "Enable support for Wayland" TRUE )
 endif()
 
 if ( CROSS_RENDERER_OPENGL_CORE_SUPPORT )
@@ -27,20 +41,16 @@ if ( CROSS_RENDERER_OPENGL_CORE_SUPPORT )
         add_library ( GLAD ${GLAD_SOURCES} )
         target_warning_options ( GLAD DISABLED )
     endif()
-    target_include_directories ( GLAD PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ExternalModules/glad_core/include )
+    target_include_directories ( GLAD PUBLIC "${CMAKE_CURRENT_LIST_DIR}/ExternalModules/glad_core/include" )
     list ( APPEND CROSS_RENDERER_LIBRARIES GLAD )
-    if ( CROSS_RENDERER_TARGET_PLATFORM_LINUX )
-        foreach ( LINUX_LIBRARY dl )
-            find_library ( LIBRARY_LOCATION NAMES ${LINUX_LIBRARY} )
-            list ( APPEND CROSS_RENDERER_LIBRARIES ${LIBRARY_LOCATION} )
-        endforeach()
-    endif()
-    if(PLATFORM_WINDOWS)
-        # GLAD WGL 
-        file ( GLOB_RECURSE GLAD_WGL_SOURCES "ExternalModules/glad_wgl/*")
+
+    if ( PLATFORM_WINDOWS )
+        message ( STATUS "${PROJECT_NAME} - Building wgl backend")
+        # GLAD WGL
+        file ( GLOB_RECURSE GLAD_WGL_SOURCES "ExternalModules/glad_wgl/*" )
         add_library ( GLAD_WGL ${GLAD_WGL_SOURCES} )
         target_warning_options ( GLAD_WGL DISABLED )
-        target_include_directories ( GLAD_WGL PUBLIC ${CMAKE_CURRENT_LIST_DIR}/ExternalModules/glad_wgl/include ${CMAKE_CURRENT_LIST_DIR}/ExternalModules/glad_core/include )
+        target_include_directories ( GLAD_WGL PUBLIC "${CMAKE_CURRENT_LIST_DIR}/ExternalModules/glad_wgl/include" "${CMAKE_CURRENT_LIST_DIR}/ExternalModules/glad_core/include" )
         list ( APPEND CROSS_RENDERER_LIBRARIES GLAD_WGL )
         list ( APPEND CROSS_RENDERER_LIBRARIES "OpenGL32" )
 
@@ -48,23 +58,51 @@ if ( CROSS_RENDERER_OPENGL_CORE_SUPPORT )
         file ( GLOB CROSS_RENDERER_WGL_SOURCES "OpenGL4/WGL/*.c" "OpenGL4/WGL/*.h" )
         list ( APPEND CROSS_RENDERER_SOURCE_FILES ${CROSS_RENDERER_WGL_SOURCES} )
     endif()
+
+    if (( PLATFORM_LINUX ) AND ( CROSS_RENDERER_X11_SUPPORT ))
+        message ( STATUS "${PROJECT_NAME} - Building glx backend")
+        # GLAD GLX
+        file ( GLOB_RECURSE GLAD_GLX_SOURCES "ExternalModules/glad_glx/*" )
+        add_library ( GLAD_GLX ${GLAD_GLX_SOURCES} )
+        target_warning_options ( GLAD_GLX DISABLED )
+        target_include_directories ( GLAD_GLX PUBLIC "${CMAKE_CURRENT_LIST_DIR}/ExternalModules/glad_glx/include" "${CMAKE_CURRENT_LIST_DIR}/ExternalModules/glad_core/include" )
+        list ( APPEND CROSS_RENDERER_LIBRARIES GLAD_GLX )
+
+        # GLX backend
+        file ( GLOB CROSS_RENDERER_GLX_SOURCES "OpenGL4/GLX/*.c" "OpenGL4/GLX/*.h" )
+        list ( APPEND CROSS_RENDERER_SOURCE_FILES ${CROSS_RENDERER_GLX_SOURCES} )
+    endif()
 endif()
 
+# Window management
+file ( GLOB COMMON_WINDOW_MANAGER_SOURCE_FILES "WindowManager/*.c" "WindowManager/*.h" "WindowManager/Internal/*.c" "WindowManager/Internal/*.h")
 if ( PLATFORM_WINDOWS)
     message ( STATUS "${PROJECT_NAME} - Building Windows backend" )
-    file(GLOB WINDOW_MANAGER_SOURCES "Windows/*" )
+    file(GLOB WINDOW_MANAGER_SOURCE_FILES "WindowManager/Windows/*" )
 endif()
+if (PLATFORM_LINUX)
+    message ( STATUS "${PROJECT_NAME} - Building X11 backend" )
+    file(GLOB WINDOW_MANAGER_SOURCE_FILES "WindowManager/X11/*" )
+    find_package ( X11  REQUIRED )
+    list ( APPEND CROSS_RENDERER_LIBRARIES ${X11_LIBRARIES} )
+endif()
+
+list ( APPEND WINDOW_MANAGER_SOURCE_FILES ${COMMON_WINDOW_MANAGER_SOURCE_FILES})
+add_library ( WindowManager ${WINDOW_MANAGER_SOURCE_FILES} )
 
 # Main library
 configure_file ( CrossRendererConfig.h.in ${CMAKE_CURRENT_LIST_DIR}/CrossRendererConfig.h )
-file ( GLOB SOURCES "*.c" "*.h" "Renderer/*.c" "Renderer/*.h" ${WINDOW_MANAGER_SOURCES} "Internal/*" CrossRendererConfig.h.in AstyleConfig.astylerc )
+file ( GLOB SOURCES "*.c" "*.h" "Renderer/*.c" "Renderer/*.h" "Internal/*" CrossRendererConfig.h.in AstyleConfig.astylerc )
 list ( APPEND CROSS_RENDERER_SOURCE_FILES ${SOURCES} )
-add_library ( C_CrossRenderer ${CROSS_RENDERER_SOURCE_FILES} )
+add_library ( C_CrossRenderer ${CROSS_RENDERER_SOURCE_FILES}
+    WindowManager/X11/X11Internal.h )
+
 target_include_directories ( C_CrossRenderer PUBLIC ${CROSS_RENDERER_INCLUDE_DIRS} ExternalModules )
 target_link_libraries ( C_CrossRenderer PUBLIC ${CROSS_RENDERER_LIBRARIES} )
 target_link_libraries ( C_CrossRenderer PUBLIC Platform )
 target_link_libraries ( C_CrossRenderer PUBLIC C_Utils )
 target_link_libraries ( C_CrossRenderer PUBLIC Math )
+target_link_libraries ( C_CrossRenderer PUBLIC WindowManager )
 target_warning_options ( C_CrossRenderer HIGH AS_ERRORS )
 
 # Tests

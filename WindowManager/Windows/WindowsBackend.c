@@ -1,10 +1,12 @@
+#include "WindowsBackend.h"
+
 #include "../Internal/WindowManagerInternal.h"
 #include <Platform/Logger.h>
 #include <Windows.h>
 #include <windowsx.h>
 #include <assert.h>
 
-static const TCHAR *WindowClassName = TEXT ( "GUILibWindowClass" );
+static const char *WindowClassName = "CrossWindowClass";
 struct InternalWindowData
 	{
 	ivec2 LastMouseCursorPosition;
@@ -148,7 +150,7 @@ static void InitializeKeyTranslationTables ( void )
 		}
 	}
 
-LRESULT WindowProcedure ( HWND WindowHandle, UINT Message, WPARAM wParam, LPARAM lParam )
+static LRESULT WindowProcedure ( HWND WindowHandle, UINT Message, WPARAM wParam, LPARAM lParam )
 	{
 	struct InternalWindowData *WindowData = ( struct InternalWindowData * ) GetWindowLongPtr ( WindowHandle, GWLP_USERDATA );
 	switch ( Message )
@@ -316,15 +318,15 @@ LRESULT WindowProcedure ( HWND WindowHandle, UINT Message, WPARAM wParam, LPARAM
 	return DefWindowProc ( WindowHandle, Message, wParam, lParam );
 	}
 
-bool crInitializeWindowBackend ( void )
+bool crWindowsInitializeWindowBackend ( void )
 	{
 	InitializeKeyTranslationTables();
 	return true;
 	}
 
-crWindowHandle crCreateNewWindow ( const crRenderWindowDescriptor Descriptor )
+crWindowHandle crWindowsCreateNewWindow ( const crRenderWindowDescriptor Descriptor )
 	{
-	static WNDCLASSEX CRWindowClass = { 0 };
+	static WNDCLASSEXA CRWindowClass = { 0 };
 	if ( CRWindowClass.cbSize == 0 )
 		{
 		CRWindowClass.cbSize = sizeof ( CRWindowClass );
@@ -338,7 +340,7 @@ crWindowHandle crCreateNewWindow ( const crRenderWindowDescriptor Descriptor )
 		CRWindowClass.lpszMenuName = NULL;
 		CRWindowClass.lpszClassName = WindowClassName;
 
-		if ( RegisterClassEx ( &CRWindowClass ) == 0 )
+		if ( RegisterClassExA ( &CRWindowClass ) == 0 )
 			{
 			memset ( &CRWindowClass, 0, sizeof ( CRWindowClass ) );
 			return NULL;
@@ -354,7 +356,7 @@ crWindowHandle crCreateNewWindow ( const crRenderWindowDescriptor Descriptor )
 	Style |= WS_VISIBLE;
 	Style |= WS_SIZEBOX;
 
-	HWND NewHWND = CreateWindowEx ( ExStyle, WindowClassName, Descriptor.Title, Style,
+	HWND NewHWND = CreateWindowExA ( ExStyle, WindowClassName, Descriptor.Title, Style,
 	                                Descriptor.Position.x, Descriptor.Position.y,
 	                                Descriptor.Size.x, Descriptor.Size.y,
 	                                NULL,
@@ -372,7 +374,7 @@ crWindowHandle crCreateNewWindow ( const crRenderWindowDescriptor Descriptor )
 	return NewHWND;
 	}
 
-bool crDestroyWindow ( const crWindowHandle WindowHandle )
+bool crWindowsDestroyWindow ( const crWindowHandle WindowHandle )
 	{
 	if ( IsWindow ( WindowHandle ) )
 		{
@@ -385,7 +387,7 @@ bool crDestroyWindow ( const crWindowHandle WindowHandle )
 	return false;
 	}
 
-bool crUpdateWindows ( const bool Wait )
+bool crWindowsUpdateWindows ( const bool Wait )
 	{
 	MSG Message;
 	// Process all pending messages
@@ -408,7 +410,7 @@ bool crUpdateWindows ( const bool Wait )
 	return true;
 	}
 
-bool crSetWindowPosition ( const crWindowHandle WindowHandle, const ivec2 Position )
+bool crWindowsSetWindowPosition ( const crWindowHandle WindowHandle, const ivec2 Position )
 	{
 	if ( IsWindow ( WindowHandle ) )
 		{
@@ -418,7 +420,7 @@ bool crSetWindowPosition ( const crWindowHandle WindowHandle, const ivec2 Positi
 	return false;
 	}
 
-bool crGetWindowPosition ( const crWindowHandle WindowHandle, ivec2 *Position )
+bool crWindowsGetWindowPosition ( const crWindowHandle WindowHandle, ivec2 *Position )
 	{
 	if ( IsWindow ( WindowHandle ) )
 		{
@@ -431,7 +433,7 @@ bool crGetWindowPosition ( const crWindowHandle WindowHandle, ivec2 *Position )
 	return false;
 	}
 
-bool crSetWindowDimensions ( const crWindowHandle WindowHandle, const uvec2 Dimensions )
+bool crWindowsSetWindowDimensions ( const crWindowHandle WindowHandle, const uvec2 Dimensions )
 	{
 	if ( IsWindow ( WindowHandle ) )
 		{
@@ -441,7 +443,7 @@ bool crSetWindowDimensions ( const crWindowHandle WindowHandle, const uvec2 Dime
 	return false;
 	}
 
-bool crGetWindowDimensions ( const crWindowHandle WindowHandle, uvec2 *Dimensions )
+bool crWindowsGetWindowDimensions ( const crWindowHandle WindowHandle, uvec2 *Dimensions )
 	{
 	if ( IsWindow ( WindowHandle ) )
 		{
@@ -454,7 +456,7 @@ bool crGetWindowDimensions ( const crWindowHandle WindowHandle, uvec2 *Dimension
 	return false;
 	}
 
-bool crGetWindowClientAreaDimensions ( const crWindowHandle WindowHandle, uvec2 *Dimensions )
+bool crWindowsGetWindowClientAreaDimensions ( const crWindowHandle WindowHandle, uvec2 *Dimensions )
 	{
 	if ( IsWindow ( WindowHandle ) )
 		{
@@ -467,7 +469,7 @@ bool crGetWindowClientAreaDimensions ( const crWindowHandle WindowHandle, uvec2 
 	return false;
 	}
 
-bool crSetWindowTitle ( const crWindowHandle WindowHandle, const char *Title )
+bool crWindowsSetWindowTitle ( const crWindowHandle WindowHandle, const char *Title )
 	{
 	if ( IsWindow ( WindowHandle ) )
 		{
@@ -477,7 +479,7 @@ bool crSetWindowTitle ( const crWindowHandle WindowHandle, const char *Title )
 	return false;
 	}
 
-const char *crGetWindowTitle ( const crWindowHandle WindowHandle )
+const char *crWindowsGetWindowTitle ( const crWindowHandle WindowHandle )
 	{
 	static char Title[128];
 	if ( IsWindow ( WindowHandle ) )
@@ -488,7 +490,7 @@ const char *crGetWindowTitle ( const crWindowHandle WindowHandle )
 	return NULL;
 	}
 
-bool crActivateWindow ( const crWindowHandle WindowHandle )
+bool crWindowsActivateWindow ( const crWindowHandle WindowHandle )
 	{
 	UNUSED ( WindowHandle );
 	//HDC WindowDC = GetWindowDC(WindowHandle);

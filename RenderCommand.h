@@ -55,7 +55,7 @@ void crSetRenderCommandShader ( crRenderCommand *Command, const crShaderHandle N
 bool crSetRenderCommandIndexShaderBufferBinding ( crRenderCommand *Command, const crShaderBufferDataStream Stream );
 bool crSetRenderCommandShaderBufferBinding ( crRenderCommand *Command, const crShaderAttributeHandle AttributeHandle, const crShaderBufferDataStream Stream );
 bool crSetRenderCommandTextureBinding ( crRenderCommand *Command, const crShaderUniformHandle UniformHandle, const crTextureBindSettings Binding );
-#define DEFINE_crSetRenderCommandUniformValue(VAR_TYPE,VALUE_TYPE) bool crSetRenderCommandUniform##VALUE_TYPE##Value(crRenderCommand *Command, const int UniformIndex, const VAR_TYPE Value);
+#define DEFINE_crSetRenderCommandUniformValue(VAR_TYPE,VALUE_TYPE) bool crSetRenderCommandUniform##VALUE_TYPE##Value(crRenderCommand *Command, const int UniformIndex, const VAR_TYPE Value)
 
 DEFINE_crSetRenderCommandUniformValue ( bool, Bool );
 DEFINE_crSetRenderCommandUniformValue ( ivec2, Bool2 );
