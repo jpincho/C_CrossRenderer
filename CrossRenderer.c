@@ -3,6 +3,7 @@
 #include "WindowManager/Internal/WindowManagerInternal.h"
 #include "Internal/CrossRendererFunctionPointers.h"
 #include <memory.h>
+#include <Platform/Platform.h>
 #include <Platform/Logger.h>
 
 // Interface creation
@@ -33,9 +34,9 @@ bool SetupFunctionPointers ( const crRendererBackend Backend )
 	return true;
 	}
 
-void crSetConfigurationToDefault(crRendererConfiguration *Configuration)
-{
-	memset(Configuration, 0, sizeof(crRendererConfiguration));
+void crSetConfigurationToDefault ( crRendererConfiguration *Configuration )
+	{
+	memset ( Configuration, 0, sizeof ( crRendererConfiguration ) );
 
 	Configuration->InitialWindowDescriptor.Fullscreen = false;
 	Configuration->InitialWindowDescriptor.Position.x = Configuration->InitialWindowDescriptor.Position.y = 0;
@@ -44,7 +45,7 @@ void crSetConfigurationToDefault(crRendererConfiguration *Configuration)
 	Configuration->InitialWindowDescriptor.Size.y = 1080;
 	Configuration->InitialWindowDescriptor.SupportOpenGL = true;
 	Configuration->InitialWindowDescriptor.Title = "CrossRenderer Window";
-	 
+
 	Configuration->RedBits = 8;
 	Configuration->GreenBits = 8;
 	Configuration->BlueBits = 8;
@@ -55,20 +56,22 @@ void crSetConfigurationToDefault(crRendererConfiguration *Configuration)
 #if defined ( PLATFORM_WINDOWS )
 	Configuration->DesiredWindowManagerBackend = WindowManagerBackend_Windows;
 #elif defined ( PLATFORM_LINUX )
-        Configuration->DesiredWindowManagerBackend = WindowManagerBackend_X11;
+	Configuration->DesiredWindowManagerBackend = WindowManagerBackend_X11;
+#else
+#error "Unhandled platform"
 #endif
 	Configuration->VSyncEnabled = true;
-}
+	}
 
 bool crInitialize ( const crRendererConfiguration NewConfiguration )
 	{
 	if ( SetupFunctionPointers ( NewConfiguration.DesiredRendererBackend ) == false )
 		return false;
-	if (SetupWindowManagerFunctionPointers(NewConfiguration.DesiredWindowManagerBackend) == false)
+	if ( SetupWindowManagerFunctionPointers ( NewConfiguration.DesiredWindowManagerBackend ) == false )
 		return false;
 	if ( crInitializeRenderer ( NewConfiguration ) == false )
 		return false;
-        MainWindowHandle = ( crWindowHandle ) PointerList_GetNodeData ( WindowList.first );
+	MainWindowHandle = ( crWindowHandle ) PointerList_GetNodeData ( WindowList.first );
 	return true;
 	}
 

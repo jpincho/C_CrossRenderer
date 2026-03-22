@@ -68,6 +68,6 @@ int main ( void )
 	Callbacks.WindowFocusChanged = WindowFocusChanged_Callback;
 	crSetWindowManagerCallbacks ( Callbacks );
 
-	while ( ShouldQuit == false ) crUpdateWindows ( true );
+	while ( ShouldQuit == false ) crUpdateWindows ();
 	return 0;
 	}

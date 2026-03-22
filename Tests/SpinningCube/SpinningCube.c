@@ -1,4 +1,5 @@
 #include <CrossRenderer.h>
+#include <Platform/Platform.h>
 #include <Platform/Logger.h>
 #include <Platform/PlatformTime.h>
 #include "../CommonLoaders.h"
@@ -23,7 +24,7 @@ void WindowClosed_Callback ( const crWindowHandle Handle )
 int main ( void )
 	{
 	crRendererConfiguration Configuration;
-	crSetConfigurationToDefault(&Configuration);
+	crSetConfigurationToDefault ( &Configuration );
 	Configuration.InitialWindowDescriptor.Title = "CrossRenderer - spinning cube test";
 	if ( crInitialize ( Configuration ) == false )
 		return -1;
@@ -231,7 +232,7 @@ int main ( void )
 		crRunCommand ( RenderCommand );
 		crDisplayFramebuffer ( Framebuffer, crGetMainWindowHandle() );
 		crDisplayWindow ( crGetMainWindowHandle() );
-		crUpdateWindows ( false );
+		crUpdateWindows ();
 		}
 	return 0;
 	}

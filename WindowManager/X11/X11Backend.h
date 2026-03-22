@@ -5,7 +5,7 @@ BEGIN_C_DECLARATIONS
 bool crX11InitializeWindowBackend ( void );
 crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor );
 bool crX11DestroyWindow ( const crWindowHandle WindowHandle );
-bool crX11UpdateWindows ( const bool Wait );
+bool crX11UpdateWindows ( void );
 bool crX11SetWindowPosition ( const crWindowHandle WindowHandle, const ivec2 Position );
 bool crX11GetWindowPosition ( const crWindowHandle WindowHandle, ivec2 *Position );
 bool crX11SetWindowDimensions ( const crWindowHandle WindowHandle, const uvec2 Dimensions );

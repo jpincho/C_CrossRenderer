@@ -1,4 +1,5 @@
 #include <CrossRenderer.h>
+#include <Platform/Platform.h>
 #include <Platform/Logger.h>
 #include "../CommonLoaders.h"
 
@@ -22,7 +23,7 @@ void WindowClosed_Callback ( const crWindowHandle Handle )
 int main ( void )
 	{
 	crRendererConfiguration Configuration;
-	crSetConfigurationToDefault(&Configuration);
+	crSetConfigurationToDefault ( &Configuration );
 	Configuration.InitialWindowDescriptor.Title = "CrossRenderer - textured quad test";
 	if ( crInitialize ( Configuration ) == false )
 		return -1;
@@ -149,7 +150,7 @@ int main ( void )
 			}*/
 		crDisplayFramebuffer ( Framebuffer, crGetMainWindowHandle() );
 		crDisplayWindow ( crGetMainWindowHandle() );
-		crUpdateWindows ( true );
+		crUpdateWindows ();
 		}
 	return 0;
 	}
