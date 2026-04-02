@@ -52,6 +52,7 @@ typedef struct
 	crTextureFilterSettings FilterSettings;
 	crTextureWrapSettings WrapSettings;
 	bool Mipmapped;
+	char *TextureName;
 	} crTextureDescriptor;
 
 typedef struct
@@ -61,10 +62,7 @@ typedef struct
 	crTextureFilterSettings FilterSettings;
 	} crTextureBindSettings;
 
-inline void crDestroyTextureDescriptor ( crTextureDescriptor *Descriptor )
-	{
-	SAFE_DEL_C ( Descriptor->Data );
-	}
-
+void crDestroyTextureDescriptor ( crTextureDescriptor *Descriptor );
+void crCopyTextureDescriptor ( crTextureDescriptor *Output, const crTextureDescriptor *Input );
 extern const crTextureBindSettings crDefaultTextureBindSettings;
 END_C_DECLARATIONS

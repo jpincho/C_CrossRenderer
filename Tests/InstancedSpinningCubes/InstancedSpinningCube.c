@@ -1,4 +1,5 @@
 #include <CrossRenderer.h>
+#include <Platform/Platform.h>
 #include <Platform/Logger.h>
 #include <Platform/PlatformTime.h>
 #include "../CommonLoaders.h"
@@ -26,7 +27,7 @@ vec3 Rotations[100];
 int main ( void )
 	{
 	crRendererConfiguration Configuration;
-	crSetConfigurationToDefault(&Configuration);
+	crSetConfigurationToDefault ( &Configuration );
 	Configuration.InitialWindowDescriptor.Title = "CrossRenderer - instanced spinning cube test";
 	if ( crInitialize ( Configuration ) == false )
 		return -1;
@@ -123,7 +124,7 @@ int main ( void )
 		return -1;
 
 	crShaderBufferDescriptor MatrixSBDescriptor;
-	MatrixSBDescriptor.AccessType = crShaderBufferAccessType_Static;
+	MatrixSBDescriptor.AccessType = crShaderBufferAccessType_Dynamic;
 	MatrixSBDescriptor.BufferType = crShaderBufferType_Array;
 	MatrixSBDescriptor.Capacity = sizeof ( ModelMatrices );
 	MatrixSBDescriptor.Data = &ModelMatrices;
@@ -284,7 +285,7 @@ int main ( void )
 		crRunCommand ( RenderCommand );
 		crDisplayFramebuffer ( Framebuffer, crGetMainWindowHandle() );
 		crDisplayWindow ( crGetMainWindowHandle() );
-		crUpdateWindows ( false );
+		crUpdateWindows ();
 		}
 	return 0;
 	}

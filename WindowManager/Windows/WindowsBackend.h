@@ -5,7 +5,7 @@ BEGIN_C_DECLARATIONS
 bool crWindowsInitializeWindowBackend ( void );
 crWindowHandle crWindowsCreateNewWindow ( const crRenderWindowDescriptor Descriptor );
 bool crWindowsDestroyWindow ( const crWindowHandle WindowHandle );
-bool crWindowsUpdateWindows ( const bool Wait );
+bool crWindowsUpdateWindows ( void );
 bool crWindowsSetWindowPosition ( const crWindowHandle WindowHandle, const ivec2 Position );
 bool crWindowsGetWindowPosition ( const crWindowHandle WindowHandle, ivec2 *Position );
 bool crWindowsSetWindowDimensions ( const crWindowHandle WindowHandle, const uvec2 Dimensions );

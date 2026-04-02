@@ -3,9 +3,9 @@
 #include <glad/glad_wgl.h>
 
 struct InternalWGLContextData
-{
+	{
 	HGLRC Context;
-};
+	};
 
 crOpenGLContext crWGLCreateContext ( const crWindowHandle WindowHandle, const crRendererConfiguration NewConfiguration )
 	{
@@ -118,8 +118,8 @@ crOpenGLContext crWGLCreateContext ( const crWindowHandle WindowHandle, const cr
 	if ( GLContext == NULL )
 		goto OnError;
 
-	NewContextData = calloc(1, sizeof(struct InternalWGLContextData));
-	if (!NewContextData)
+	NewContextData = calloc ( 1, sizeof ( struct InternalWGLContextData ) );
+	if ( !NewContextData )
 		return NULL;
 	NewContextData->Context = GLContext;
 
@@ -141,11 +141,11 @@ crOpenGLContext crWGLCreateContext ( const crWindowHandle WindowHandle, const cr
 		}
 	return NewContextData;
 OnError:
-	if (NewContextData)
-	{
-		free(NewContextData);
+	if ( NewContextData )
+		{
+		free ( NewContextData );
 		NewContextData = NULL;
-	}
+		}
 	if ( GLContext )
 		{
 		wglMakeCurrent ( NULL, GLContext );
@@ -176,28 +176,28 @@ OnError:
 	return NULL;
 	}
 
-bool crWGLDeleteContext (const crOpenGLContext Context)
+bool crWGLDeleteContext ( const crOpenGLContext Context )
 	{
-	struct InternalWGLContextData *ContextData = (struct InternalWGLContextData *)Context;
+	struct InternalWGLContextData *ContextData = ( struct InternalWGLContextData * ) Context;
 
-	wglMakeCurrent ( NULL, ContextData->Context);
-	wglDeleteContext (ContextData->Context);
+	wglMakeCurrent ( NULL, ContextData->Context );
+	wglDeleteContext ( ContextData->Context );
 	ContextData->Context = NULL;
-	free(ContextData);
+	free ( ContextData );
 	return true;
 	}
 
-bool crWGLMakeContextActive (const crOpenGLContext Context, const crWindowHandle WindowHandle )
+bool crWGLMakeContextActive ( const crOpenGLContext Context, const crWindowHandle WindowHandle )
 	{
-	struct InternalWGLContextData *ContextData = (struct InternalWGLContextData *)Context;
+	struct InternalWGLContextData *ContextData = ( struct InternalWGLContextData * ) Context;
 	HDC WindowDC = GetWindowDC ( WindowHandle );
-	wglMakeCurrent ( WindowDC, ContextData->Context);
+	wglMakeCurrent ( WindowDC, ContextData->Context );
 	return true;
 	}
 
-bool crWGLSwapWindowBuffer (const crOpenGLContext Context, const crWindowHandle WindowHandle )
+bool crWGLSwapWindowBuffer ( const crOpenGLContext Context, const crWindowHandle WindowHandle )
 	{
-	UNUSED(Context);
+	UNUSED ( Context );
 	HDC WindowDC = GetWindowDC ( WindowHandle );
 	SwapBuffers ( WindowDC );
 	return true;

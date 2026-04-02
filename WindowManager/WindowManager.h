@@ -19,7 +19,7 @@ typedef struct
 typedef enum
 	{
 	WindowManagerBackend_Windows,
-    WindowManagerBackend_X11
+	WindowManagerBackend_X11
 	} crWindowManagerBackend;
 
 // Callbacks
@@ -49,17 +49,17 @@ typedef struct
 	} crWindowManagerCallbacks;
 
 // Function pointers
-extern crWindowHandle (*crCreateNewWindow) ( const crRenderWindowDescriptor Descriptor );
-extern bool (*crDestroyWindow) ( const crWindowHandle WindowHandle );
-extern bool (*crUpdateWindows) ( const bool Wait );
-extern bool (*crSetWindowPosition) ( const crWindowHandle WindowHandle, const ivec2 Position );
-extern bool (*crGetWindowPosition) ( const crWindowHandle WindowHandle, ivec2 *Position );
-extern bool (*crSetWindowDimensions) ( const crWindowHandle WindowHandle, const uvec2 Dimensions );
-extern bool (*crGetWindowDimensions) ( const crWindowHandle WindowHandle, uvec2 *Dimensions );
-extern bool (*crGetWindowClientAreaDimensions) ( const crWindowHandle WindowHandle, uvec2 *Dimensions );
-extern bool (*crSetWindowTitle) ( const crWindowHandle WindowHandle, const char *Title );
-extern const char *(*crGetWindowTitle) ( const crWindowHandle WindowHandle );
-extern bool (*crActivateWindow) ( const crWindowHandle WindowHandle );
+extern crWindowHandle ( *crCreateNewWindow ) ( const crRenderWindowDescriptor Descriptor );
+extern bool ( *crDestroyWindow ) ( const crWindowHandle WindowHandle );
+extern bool ( *crUpdateWindows ) ( void );
+extern bool ( *crSetWindowPosition ) ( const crWindowHandle WindowHandle, const ivec2 Position );
+extern bool ( *crGetWindowPosition ) ( const crWindowHandle WindowHandle, ivec2 *Position );
+extern bool ( *crSetWindowDimensions ) ( const crWindowHandle WindowHandle, const uvec2 Dimensions );
+extern bool ( *crGetWindowDimensions ) ( const crWindowHandle WindowHandle, uvec2 *Dimensions );
+extern bool ( *crGetWindowClientAreaDimensions ) ( const crWindowHandle WindowHandle, uvec2 *Dimensions );
+extern bool ( *crSetWindowTitle ) ( const crWindowHandle WindowHandle, const char *Title );
+extern const char * ( *crGetWindowTitle ) ( const crWindowHandle WindowHandle );
+extern bool ( *crActivateWindow ) ( const crWindowHandle WindowHandle );
 
 bool SetupWindowManagerFunctionPointers ( const crWindowManagerBackend Backend );
 END_C_DECLARATIONS

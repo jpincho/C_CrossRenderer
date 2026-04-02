@@ -1,4 +1,5 @@
 #pragma once
+#include <Platform/defines.h>
 
 BEGIN_C_DECLARATIONS
 typedef enum
@@ -11,4 +12,6 @@ typedef enum
 	crPixelFormat_RedGreenBlue565,
 	crPixelFormat_DepthComponent,
 	} crPixelFormat;
+
+int BytesPerPixel ( const crPixelFormat Format );
 END_C_DECLARATIONS

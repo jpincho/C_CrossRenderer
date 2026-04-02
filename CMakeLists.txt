@@ -1,9 +1,7 @@
 cmake_minimum_required ( VERSION 3.10 )
 
 project ( C_CrossRenderer )
-
-list ( APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/ExternalModules/CMakeUtils )
-include ( target_warning_options )
+include ( target_warning_options.cmake )
 
 include_directories(ExternalModules)
 
@@ -79,6 +77,7 @@ file ( GLOB COMMON_WINDOW_MANAGER_SOURCE_FILES "WindowManager/*.c" "WindowManage
 if ( PLATFORM_WINDOWS)
     message ( STATUS "${PROJECT_NAME} - Building Windows backend" )
     file(GLOB WINDOW_MANAGER_SOURCE_FILES "WindowManager/Windows/*" )
+    list(APPEND CROSS_RENDERER_LIBRARIES shlwapi )
 endif()
 if (PLATFORM_LINUX)
     message ( STATUS "${PROJECT_NAME} - Building X11 backend" )
@@ -94,8 +93,7 @@ add_library ( WindowManager ${WINDOW_MANAGER_SOURCE_FILES} )
 configure_file ( CrossRendererConfig.h.in ${CMAKE_CURRENT_LIST_DIR}/CrossRendererConfig.h )
 file ( GLOB SOURCES "*.c" "*.h" "Renderer/*.c" "Renderer/*.h" "Internal/*" CrossRendererConfig.h.in AstyleConfig.astylerc )
 list ( APPEND CROSS_RENDERER_SOURCE_FILES ${SOURCES} )
-add_library ( C_CrossRenderer ${CROSS_RENDERER_SOURCE_FILES}
-    WindowManager/X11/X11Internal.h )
+add_library ( C_CrossRenderer ${CROSS_RENDERER_SOURCE_FILES} )
 
 target_include_directories ( C_CrossRenderer PUBLIC ${CROSS_RENDERER_INCLUDE_DIRS} ExternalModules )
 target_link_libraries ( C_CrossRenderer PUBLIC ${CROSS_RENDERER_LIBRARIES} )

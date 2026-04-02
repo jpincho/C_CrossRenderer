@@ -1,4 +1,5 @@
 #include "CommonLoaders.h"
+#include <Platform/Platform.h>
 #include <Platform/Logger.h>
 #define STB_IMAGE_IMPLEMENTATION
 
@@ -8,11 +9,11 @@
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #include <stb/stb_image.h>
 #pragma GCC diagnostic pop
+#include <fnmatch.h>
 #elif defined (PLATFORM_COMPILER_MSVC)
 #include <stb/stb_image.h>
+#include <shlwapi.h>
 #endif
-
-#include <fnmatch.h>
 
 #include "../Shader.h"
 #include "../Texture.h"
@@ -122,6 +123,7 @@ bool crLoadTextureDescriptorFromFile ( const char *ImageFile, const bool Flip, c
 	if ( Descriptor->Data == NULL )
 		return false;
 	memcpy ( Descriptor->Data, Image, ImageSize.x * ImageSize.y * Channels );
+	Descriptor->TextureName = strdup ( ImageFile );
 	stbi_image_free ( Image );
 	return true;
 	}
@@ -255,14 +257,14 @@ bool crIsValidTextureFile ( const char *Filename )
 	                        "*.gif"
 	                      };
 
-        for ( unsigned index = 0; index < sizeof ( valid_masks ) / sizeof ( char * ); ++index )
+	for ( unsigned index = 0; index < sizeof ( valid_masks ) / sizeof ( char * ); ++index )
 		{
 #if defined (PLATFORM_COMPILER_MSVC)
-                if ( PathMatchSpecA ( Filename, valid_masks[index] ) == TRUE )
-                        return true;
+		if ( PathMatchSpecA ( Filename, valid_masks[index] ) == TRUE )
+			return true;
 #else
-                if ( fnmatch ( valid_masks[index], Filename, 0 ) )
-                        return true;
+		if ( fnmatch ( valid_masks[index], Filename, 0 ) )
+			return true;
 #endif
 		}
 	return false;

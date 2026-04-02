@@ -15,30 +15,30 @@ bool ( *crGL4SwapGLWindowBuffer ) ( const crOpenGLContext Context, const crWindo
 
 bool crGL4InitializeGLContextFunctions ( const crWindowManagerBackend Backend )
 	{
-        switch ( Backend )
-                {
+	switch ( Backend )
+		{
 #if defined PLATFORM_WINDOWS
-                case WindowManagerBackend_Windows:
-                        {
-                        crGL4CreateGLContext = crWGLCreateContext;
-                        crGL4DeleteGLContext = crWGLDeleteContext;
-                        crGL4MakeGLContextActive = crWGLMakeContextActive;
-                        crGL4SwapGLWindowBuffer = crWGLSwapWindowBuffer;
-                        break;
-                        }
+		case WindowManagerBackend_Windows:
+			{
+			crGL4CreateGLContext = crWGLCreateContext;
+			crGL4DeleteGLContext = crWGLDeleteContext;
+			crGL4MakeGLContextActive = crWGLMakeContextActive;
+			crGL4SwapGLWindowBuffer = crWGLSwapWindowBuffer;
+			break;
+			}
 #endif
 #if defined PLATFORM_LINUX
-                case WindowManagerBackend_X11:
-                        {
-                        crGL4CreateGLContext = crGLXCreateContext;
-                        crGL4DeleteGLContext = crGLXDeleteContext;
-                        crGL4MakeGLContextActive = crGLXMakeContextActive;
-                        crGL4SwapGLWindowBuffer = crGLXSwapWindowBuffer;
-                        break;
-                        }
+		case WindowManagerBackend_X11:
+			{
+			crGL4CreateGLContext = crGLXCreateContext;
+			crGL4DeleteGLContext = crGLXDeleteContext;
+			crGL4MakeGLContextActive = crGLXMakeContextActive;
+			crGL4SwapGLWindowBuffer = crGLXSwapWindowBuffer;
+			break;
+			}
 #endif
-                default:
-                        return false;
-                }
+		default:
+			return false;
+		}
 	return true;
 	}
