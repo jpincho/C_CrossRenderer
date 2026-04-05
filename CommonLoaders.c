@@ -3,7 +3,7 @@
 #include <Platform/Logger.h>
 #define STB_IMAGE_IMPLEMENTATION
 
-#if defined (PLATFORM_COMPILER_GCC)
+#if defined (PLATFORM_COMPILER_GNU)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wsign-compare"
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
@@ -24,7 +24,7 @@ static bool LoadFileContents ( const char *Filename, char **Contents )
 #if defined (PLATFORM_COMPILER_MSVC)
 	if ( fopen_s ( &FileHandle, Filename, "rt" ) != 0 )
 		return false;
-#elif defined (PLATFORM_COMPILER_GCC)
+#elif defined (PLATFORM_COMPILER_GNU)
 	FileHandle = fopen ( Filename, "rt" );
 #else
 #error "Unhandled compiler"

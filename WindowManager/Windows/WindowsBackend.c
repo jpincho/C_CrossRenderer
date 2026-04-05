@@ -357,12 +357,12 @@ crWindowHandle crWindowsCreateNewWindow ( const crRenderWindowDescriptor Descrip
 	Style |= WS_SIZEBOX;
 
 	HWND NewHWND = CreateWindowExA ( ExStyle, WindowClassName, Descriptor.Title, Style,
-	                                Descriptor.Position.x, Descriptor.Position.y,
-	                                Descriptor.Size.x, Descriptor.Size.y,
-	                                NULL,
-	                                NULL,
-	                                GetModuleHandle ( NULL ),
-	                                NULL );
+	                                 Descriptor.Position.x, Descriptor.Position.y,
+	                                 Descriptor.Size.x, Descriptor.Size.y,
+	                                 NULL,
+	                                 NULL,
+	                                 GetModuleHandle ( NULL ),
+	                                 NULL );
 	if ( NewHWND == NULL )
 		return NULL;
 	LOG_DEBUG ( "Finished creating window %dx%d with size %ux%u. Title '%s'",
