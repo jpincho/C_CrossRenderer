@@ -7,10 +7,10 @@ struct InternalX11WindowData
 	crWindowHandle WindowHandle;
 	uvec2 Dimensions;
 	ivec2 Position;
-	char *Title;
 	Display *DisplayHandle;
 	int ScreenID;
 	Window X11WindowHandle;
+	char *Title;
 	//GLXContext Context;
 	struct
 		{

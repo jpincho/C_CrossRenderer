@@ -88,6 +88,7 @@ endif()
 
 list ( APPEND WINDOW_MANAGER_SOURCE_FILES ${COMMON_WINDOW_MANAGER_SOURCE_FILES})
 add_library ( WindowManager ${WINDOW_MANAGER_SOURCE_FILES} )
+target_link_libraries ( WindowManager PUBLIC Platform )
 
 # Main library
 configure_file ( CrossRendererConfig.h.in ${CMAKE_CURRENT_LIST_DIR}/CrossRendererConfig.h )

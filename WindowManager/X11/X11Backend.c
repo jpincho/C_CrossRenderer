@@ -1,6 +1,8 @@
 #include "X11Backend.h"
 #include "X11Internal.h"
 #include <X11/keysym.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
 #include "../Internal/WindowManagerInternal.h"
 #include <Platform/Logger.h>
 #include <C_Utils/PointerList.h>
@@ -194,7 +196,7 @@ crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor 
 	int AttributeValueMask = CWBackPixel | CWEventMask;
 	XSetWindowAttributes WindowAttributes = {0};
 	WindowAttributes.background_pixel = 0;
-	WindowAttributes.event_mask = ExposureMask | StructureNotifyMask | KeyPressMask | ButtonPressMask;
+	WindowAttributes.event_mask = ExposureMask | StructureNotifyMask | KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | PointerMotionMask;
 	WindowAttributes.border_pixel = 0;
 
 	Window NewX11WindowHandle = XCreateWindow ( CurrentDisplay,
@@ -207,6 +209,18 @@ crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor 
 	                            WindowVisual,
 	                            AttributeValueMask,
 	                            &WindowAttributes );
+
+	/*XSizeHints *wind_size_hints = XAllocSizeHints();
+
+	wind_size_hints->min_width = min_width;
+	wind_size_hints->min_height = min_height;
+	wind_size_hints->width = width;
+	wind_size_hints->height = height;
+	wind_size_hints->max_width = max_width;
+	wind_size_hints->max_height = max_height;
+
+	XSetWMNormalHints ( disp, wind, wind_size_hints );
+	XFree ( wind_size_hints );*/
 
 	struct InternalX11WindowData *NewWindowData = calloc ( 1, sizeof ( struct InternalX11WindowData ) );
 	NewWindowData->WindowHandle = NewWindowData;
@@ -229,6 +243,7 @@ crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor 
 	XFlush ( NewWindowData->DisplayHandle );
 	XSync ( NewWindowData->DisplayHandle, false );
 	XUngrabServer ( NewWindowData->DisplayHandle );
+	XStoreName ( NewWindowData->DisplayHandle, NewWindowData->X11WindowHandle, Descriptor.Title );
 
 	NewWindowData->Atoms.WM_DELETE_WINDOW = XInternAtom ( NewWindowData->DisplayHandle, "WM_DELETE_WINDOW", False );
 	if ( !XSetWMProtocols ( NewWindowData->DisplayHandle, NewWindowData->X11WindowHandle, &NewWindowData->Atoms.WM_DELETE_WINDOW, 1 ) )
@@ -239,7 +254,6 @@ crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor 
 		}
 
 	PointerList_AddAtEnd ( &WindowList, ( void * ) NewWindowData );
-	crSetWindowTitle ( NewWindowData, Descriptor.Title );
 
 	return ( crWindowHandle ) NewWindowData;
 	}
@@ -313,6 +327,12 @@ static void ProcessXEvent ( const XEvent Event )
 				{
 				if ( WindowManagerCallbacks.WindowClosed )
 					WindowManagerCallbacks.WindowClosed ( WindowData->WindowHandle );
+
+				if ( WindowData->Title != NULL )
+					{
+					XFree ( WindowData->Title );
+					WindowData->Title = NULL;
+					}
 
 				XDestroyWindow ( WindowData->DisplayHandle, WindowData->X11WindowHandle );
 				PointerList_DestroyNode ( &WindowList, Node );
@@ -402,11 +422,18 @@ bool crX11SetWindowTitle ( const crWindowHandle WindowHandle, const char *Title 
 	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
 	if ( WindowData == NULL )
 		return false;
-	void *TempPointer = realloc ( WindowData->Title, strlen ( Title ) + 1 );
-	if ( !TempPointer )
-		return false;
-	WindowData->Title = TempPointer;
-	strcpy ( WindowData->Title, Title );
+
+	// Two different ways to set the window title.
+#if 1
+	XTextProperty WindowTitleProperty = {0};
+	WindowTitleProperty.value = ( unsigned char * ) Title;
+	WindowTitleProperty.encoding = XA_STRING;
+	WindowTitleProperty.format = 8;
+	WindowTitleProperty.nitems = strlen ( Title );
+	XSetWMName ( WindowData->DisplayHandle, WindowData->X11WindowHandle, &WindowTitleProperty );
+#else
+	//XStoreName ( WindowData->DisplayHandle, WindowData->X11WindowHandle, Title );
+#endif
 	return true;
 	}
 
@@ -415,6 +442,13 @@ const char *crX11GetWindowTitle ( const crWindowHandle WindowHandle )
 	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
 	if ( WindowData == NULL )
 		return false;
+
+	if ( WindowData->Title != NULL )
+		{
+		XFree ( WindowData->Title );
+		WindowData->Title = NULL;
+		}
+	XFetchName ( WindowData->DisplayHandle, WindowData->X11WindowHandle, &WindowData->Title );
 	return WindowData->Title;
 	}
 
