@@ -289,7 +289,7 @@ void crGL4ConfigurePolygonMode ( const crPolygonModeSettings *NewSettings )
 	{
 	if ( CurrentState.PolygonMode.State != NewSettings->State )
 		{
-		glPolygonMode ( GL_FRONT_AND_BACK, crGL4TranslatePolygonMode ( CurrentState.PolygonMode.State ) );
+		glPolygonMode ( GL_FRONT_AND_BACK, crGL4TranslatePolygonMode ( NewSettings->State ) );
 		CurrentState.PolygonMode.State = NewSettings->State;
 		crGL4CheckError();
 		}
