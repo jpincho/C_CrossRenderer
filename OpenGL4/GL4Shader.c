@@ -9,6 +9,21 @@
 #define strdup _strdup
 #endif
 
+static bool ReallocAndClear ( void **Pointer, const unsigned CurrentSize, const unsigned NewSize )
+	{
+	if ( CurrentSize == NewSize )
+		return true;
+
+	void *NewPointer = realloc ( *Pointer, NewSize );
+	if ( NewPointer == NULL )
+		return false;
+	*Pointer = NewPointer;
+	// Clears the new area
+	if ( NewSize > CurrentSize )
+		memset ( ( char * ) * Pointer + CurrentSize, 0, NewSize - CurrentSize );
+	return true;
+	}
+
 static bool BuildShaderObject ( const char *Code, const GLenum GLShaderType, GLuint *OutputID )
 	{
 	GLuint ShaderObjectID = glCreateShader ( GLShaderType );
@@ -49,11 +64,6 @@ static void DestroycrGL4InternalShaderInfo ( crGL4InternalShaderInfo *ShaderInfo
 		SAFE_DEL_C ( ShaderInfo->Uniforms[UniformIndex].Name );
 		}
 	SAFE_DEL_C ( ShaderInfo->Uniforms );
-	for ( unsigned UniformIndex = 0; UniformIndex < ShaderInfo->UniformBlockCount; ++UniformIndex )
-		{
-		SAFE_DEL_C ( ShaderInfo->UniformBlocks[UniformIndex].Name );
-		}
-	SAFE_DEL_C ( ShaderInfo->UniformBlocks );
 	}
 
 static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
@@ -81,12 +91,12 @@ static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
 		return false;
 
 
-	unsigned UniformCapacity = 0;
-	ShaderInfo->UniformBlockCount = 0;
+	unsigned NeededUniformCapacity = UniformBlockCount + UniformCount;
+	ShaderInfo->UniformCount = 0;
 	if ( UniformBlockCount != 0 )
 		{
-		ARRAY_RESIZE ( ShaderInfo->UniformBlocks, ShaderInfo->UniformBlockCount, UniformCapacity, UniformBlockCount );
-		if ( ShaderInfo->UniformBlocks == NULL )
+		ShaderInfo->Uniforms = calloc ( NeededUniformCapacity, sizeof ( crGL4InternalUniformInfo ) );
+		if ( ShaderInfo->Uniforms == NULL )
 			goto OnError;
 		}
 
@@ -109,24 +119,13 @@ static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
 			goto OnError;
 			}
 
-		ShaderInfo->UniformBlocks[ShaderInfo->UniformBlockCount].Name = strdup ( Name );
-		ShaderInfo->UniformBlocks[ShaderInfo->UniformBlockCount].OpenGLID = Location;
-		ShaderInfo->UniformBlocks[ShaderInfo->UniformBlockCount].Type = crShaderUniformType_Block;
-		++ShaderInfo->UniformBlockCount;
+		ShaderInfo->Uniforms[ShaderInfo->UniformCount].Name = strdup ( Name );
+		ShaderInfo->Uniforms[ShaderInfo->UniformCount].OpenGLID = Location;
+		ShaderInfo->Uniforms[ShaderInfo->UniformCount].Type = crShaderUniformType_Block;
+		++ShaderInfo->UniformCount;
 		}
 
-	// Some uniforms may have been skipped due to being part of a block, so extra memory has been allocated. adjust here
-	if ( ShaderInfo->UniformBlockCount != UniformCapacity )
-		ARRAY_RESIZE ( ShaderInfo->UniformBlocks, ShaderInfo->UniformBlockCount, UniformCapacity, ShaderInfo->UniformBlockCount );
-
-	UniformCapacity = 0;
-	ShaderInfo->UniformCount = 0;
-	if ( UniformCount != 0 )
-		{
-		ARRAY_RESIZE ( ShaderInfo->Uniforms, ShaderInfo->UniformCount, UniformCapacity, UniformCount );
-		if ( ShaderInfo->Uniforms == NULL )
-			goto OnError;
-		}
+	unsigned FinalUniformBlockCount = ShaderInfo->UniformCount;
 	for ( int UniformIndex = 0; UniformIndex < UniformCount; ++UniformIndex )
 		{
 		GLenum GLType;
@@ -142,12 +141,13 @@ static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
 		Location = glGetUniformLocation ( ShaderInfo->OpenGLID, Name );
 		if ( !crGL4CheckError() )
 			goto OnError;
+		// If it returns -1, it could be a uniform inside a uniform block. Check if its name begins with a uniform block's name
 		if ( Location == -1 )
 			{
 			bool IsPartOfBlock = false;
-			for ( int BlockIterator = 0; BlockIterator < UniformBlockCount; ++BlockIterator )
+			for ( unsigned BlockIterator = 0; BlockIterator < FinalUniformBlockCount; ++BlockIterator )
 				{
-				if ( strncmp ( Name, ShaderInfo->UniformBlocks[BlockIterator].Name, strlen ( ShaderInfo->UniformBlocks[BlockIterator].Name ) ) == 0 )
+				if ( strncmp ( Name, ShaderInfo->Uniforms[BlockIterator].Name, strlen ( ShaderInfo->Uniforms[BlockIterator].Name ) ) == 0 )
 					{
 					IsPartOfBlock = true;
 					break;
@@ -163,8 +163,9 @@ static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
 		if ( UniformSize != 1 )
 			{
 			// First extend our array...
-			UniformCount += UniformSize - 1;
-			ARRAY_RESIZE ( ShaderInfo->Uniforms, ShaderInfo->UniformCount, UniformCapacity, UniformCount );
+			NeededUniformCapacity += UniformSize - 1;
+			if ( ReallocAndClear ( ( void ** ) &ShaderInfo->Uniforms, ShaderInfo->UniformCount * sizeof ( crGL4InternalUniformInfo ), NeededUniformCapacity * sizeof ( crGL4InternalUniformInfo ) ) == false )
+				goto OnError;
 
 			// Add all the elements to our shader info
 			char *BracketPos = strchr ( Name, '[' );
@@ -190,14 +191,16 @@ static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
 		}
 
 	// Some uniforms may have been skipped due to being part of a block, so extra memory has been allocated. adjust here
-	if ( ShaderInfo->UniformCount != UniformCapacity )
-		ARRAY_RESIZE ( ShaderInfo->Uniforms, ShaderInfo->UniformCount, UniformCapacity, ShaderInfo->UniformCount );
+	if ( ShaderInfo->UniformCount != NeededUniformCapacity )
+		{
+		if ( ReallocAndClear ( ( void ** ) &ShaderInfo->Uniforms, ShaderInfo->UniformCount * sizeof ( crGL4InternalUniformInfo ), NeededUniformCapacity * sizeof ( crGL4InternalUniformInfo ) ) == false )
+			goto OnError;
+		}
 
-	UniformCapacity = 0;
 	ShaderInfo->AttributeCount = 0;
 	if ( AttributeCount != 0 )
 		{
-		ARRAY_RESIZE ( ShaderInfo->Attributes, ShaderInfo->AttributeCount, UniformCapacity, AttributeCount );
+		ShaderInfo->Attributes = calloc ( AttributeCount, sizeof ( crGL4InternalAttributeInfo ) );
 		if ( ShaderInfo->Attributes == NULL )
 			goto OnError;
 		}
@@ -317,14 +320,6 @@ crShaderHandle crGL4CreateShader ( crShaderCode NewCode )
 		NewShader->GeneralInformation.Uniforms[Index].Handle = Index;
 		NewShader->GeneralInformation.Uniforms[Index].Name = NewShader->Uniforms[Index].Name;
 		NewShader->GeneralInformation.Uniforms[Index].Type = NewShader->Uniforms[Index].Type;
-		}
-	NewShader->GeneralInformation.UniformBlockCount = NewShader->UniformBlockCount;
-	NewShader->GeneralInformation.UniformBlocks = calloc ( NewShader->UniformBlockCount, sizeof ( crShaderUniformInformation ) );
-	for ( unsigned Index = 0; Index < NewShader->UniformBlockCount; ++Index )
-		{
-		NewShader->GeneralInformation.UniformBlocks[Index].Handle = Index;
-		NewShader->GeneralInformation.UniformBlocks[Index].Name = NewShader->UniformBlocks[Index].Name;
-		NewShader->GeneralInformation.UniformBlocks[Index].Type = NewShader->UniformBlocks[Index].Type;
 		}
 
 	NewNode = PointerList_AddAtEnd ( &crGL4Information.Shaders, NewShader );

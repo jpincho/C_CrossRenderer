@@ -78,8 +78,6 @@ typedef struct
 	GLuint OpenGLID;
 	crGL4InternalUniformInfo *Uniforms;
 	unsigned UniformCount;
-	crGL4InternalUniformInfo *UniformBlocks;
-	unsigned UniformBlockCount;
 	crGL4InternalAttributeInfo *Attributes;
 	unsigned AttributeCount;
 

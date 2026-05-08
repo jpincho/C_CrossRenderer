@@ -102,8 +102,8 @@ typedef struct
 
 typedef struct
 	{
-	crShaderUniformInformation *Uniforms, *UniformBlocks;
-	unsigned UniformCount, UniformBlockCount;
+	crShaderUniformInformation *Uniforms;
+	unsigned UniformCount;
 	crShaderAttributeInformation *Attributes;
 	unsigned AttributeCount;
 	crShaderHandle Handle;
@@ -145,7 +145,6 @@ inline void crDestroyShaderInformation ( crShaderInformation *Information )
 	{
 	SAFE_DEL_C ( Information->Attributes );
 	SAFE_DEL_C ( Information->Uniforms );
-	SAFE_DEL_C ( Information->UniformBlocks );
 	}
 
 crShaderUniformHandle crGetShaderUniformHandle ( const crShaderHandle ShaderHandle, const char *UniformName );
