@@ -569,11 +569,18 @@ bool crGL4RunCommand ( const crRenderCommand Command )
 	unsigned UniformBlockBindingIndex = 0;
 	for ( unsigned UniformIndex = 0; UniformIndex < Command.UniformValueCount; ++UniformIndex )
 		{
-		if ( ShaderUniformValueIsEqual ( ShaderInformation->Uniforms[UniformIndex].Type, &ShaderInformation->Uniforms[UniformIndex].CurrentValue, &Command.UniformValues[UniformIndex].UniformValue ) == true )
+		const unsigned CommandUniformHandle = Command.UniformValues[UniformIndex].UniformHandle;
+		crShaderUniformValue *CommandUniformValue = &Command.UniformValues[UniformIndex].UniformValue;
+		if ((ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_Sampler2D) ||
+			(ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_Sampler3D) ||
+			(ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_SamplerCube))
+			continue; // Texture samplers are set with the texture bindings, not as regular uniforms
+
+		if ( ShaderUniformValueIsEqual ( ShaderInformation->Uniforms[CommandUniformHandle].Type, &ShaderInformation->Uniforms[CommandUniformHandle].CurrentValue, CommandUniformValue ) == true )
 			continue;
-		if ( SetOpenGLShaderUniformValue ( ShaderInformation, Command.UniformValues[UniformIndex].UniformHandle, &Command.UniformValues[UniformIndex].UniformValue, &UniformBlockBindingIndex ) == false )
+		if ( SetOpenGLShaderUniformValue ( ShaderInformation, CommandUniformHandle, CommandUniformValue, &UniformBlockBindingIndex ) == false )
 			return false;
-		CopyShaderUniformValue ( ShaderInformation->Uniforms[UniformIndex].Type, &Command.UniformValues[UniformIndex].UniformValue, &ShaderInformation->Uniforms[UniformIndex].CurrentValue );
+		CopyShaderUniformValue ( ShaderInformation->Uniforms[CommandUniformHandle].Type, CommandUniformValue, &ShaderInformation->Uniforms[CommandUniformHandle].CurrentValue );
 		}
 
 	if ( crGL4CheckError() == false )

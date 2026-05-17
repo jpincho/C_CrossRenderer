@@ -11,6 +11,7 @@ struct InternalX11WindowData
 	int ScreenID;
 	Window X11WindowHandle;
 	char *Title;
+	ivec2 LastMousePosition;
 	//GLXContext Context;
 	struct
 		{

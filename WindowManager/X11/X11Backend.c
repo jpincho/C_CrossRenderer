@@ -244,7 +244,7 @@ crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor 
 	XSync ( NewWindowData->DisplayHandle, false );
 	XUngrabServer ( NewWindowData->DisplayHandle );
 	XStoreName ( NewWindowData->DisplayHandle, NewWindowData->X11WindowHandle, Descriptor.Title );
-
+	XFetchName ( NewWindowData->DisplayHandle, NewWindowData->X11WindowHandle, &NewWindowData->Title );
 	NewWindowData->Atoms.WM_DELETE_WINDOW = XInternAtom ( NewWindowData->DisplayHandle, "WM_DELETE_WINDOW", False );
 	if ( !XSetWMProtocols ( NewWindowData->DisplayHandle, NewWindowData->X11WindowHandle, &NewWindowData->Atoms.WM_DELETE_WINDOW, 1 ) )
 		{
@@ -252,7 +252,9 @@ crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor 
 		free ( NewWindowData );
 		return NULL;
 		}
-
+	// Initialize mouse cursor position with invalid values, so I can recognize a first movement
+	NewWindowData->LastMousePosition.x = -1;
+	NewWindowData->LastMousePosition.y = -1;
 	PointerList_AddAtEnd ( &WindowList, ( void * ) NewWindowData );
 
 	return ( crWindowHandle ) NewWindowData;
@@ -281,6 +283,34 @@ static void ProcessXEvent ( const XEvent Event )
 
 	switch ( Event.type )
 		{
+		case EnterNotify:
+		case LeaveNotify:
+		case FocusIn:
+		case FocusOut:
+		case KeymapNotify:
+		case Expose:
+		case GraphicsExpose:
+		case NoExpose:
+		case VisibilityNotify:
+		case CreateNotify:
+		case DestroyNotify:
+		case UnmapNotify:
+		case MapNotify:
+		case MapRequest:
+		case ReparentNotify:
+		case ConfigureRequest:
+		case GravityNotify:
+		case ResizeRequest:
+		case CirculateNotify:
+		case CirculateRequest:
+		case PropertyNotify:
+		case SelectionClear:
+		case SelectionRequest:
+		case SelectionNotify:
+		case ColormapNotify:
+		case MappingNotify:
+		case GenericEvent:
+			break;
 		case ConfigureNotify:
 			{
 			if ( ( ( unsigned ) Event.xconfigure.width != WindowData->Dimensions.x ) || ( ( unsigned ) Event.xconfigure.height != WindowData->Dimensions.y ) )
@@ -316,7 +346,37 @@ static void ProcessXEvent ( const XEvent Event )
 				}
 			break;
 			}
-
+		case ButtonPress:
+		case ButtonRelease:
+			{
+			XButtonPressedEvent *ButtonEvent = ( XButtonPressedEvent* ) &Event;
+			if ( WindowManagerCallbacks.MouseButtonStateChanged )
+				{
+				bool State = ( ButtonEvent->type == ButtonPress );
+				unsigned Button = ButtonEvent->button;
+				WindowManagerCallbacks.MouseButtonStateChanged ( WindowData->WindowHandle, Button, State );
+				}
+			break;
+			}
+		case MotionNotify:
+			{
+			XMotionEvent *MotionEvent = ( XMotionEvent* ) &Event;
+			ivec2 NewMousePosition = { MotionEvent->x, MotionEvent->y };
+			if ( WindowData->LastMousePosition.x == -1 )
+				{
+				math_ivec2_copy ( &WindowData->LastMousePosition, NewMousePosition );
+				break;
+				}
+			ivec2 Delta;
+			LOG_DEBUG ( "Mouse moved in window '%s' to position %d, %d", WindowData->Title, NewMousePosition.x, NewMousePosition.y );
+			math_ivec2_subtract ( &Delta, NewMousePosition, WindowData->LastMousePosition );
+			WindowData->LastMousePosition = NewMousePosition;
+			if ( WindowManagerCallbacks.MouseMoved )
+				{
+				WindowManagerCallbacks.MouseMoved ( WindowData->WindowHandle, Delta, NewMousePosition );
+				}
+			break;
+			}
 		case ClientMessage:
 			{
 			XClientMessageEvent *ClientMessageEvent = ( XClientMessageEvent * ) &Event;

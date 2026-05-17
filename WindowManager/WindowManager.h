@@ -29,7 +29,7 @@ typedef void ( *crWindowResizedCallback ) ( const crWindowHandle Handle, const u
 typedef void ( *crEndWindowResizedCallback ) ( const crWindowHandle Handle, const uvec2 NewSize );
 typedef void ( *crWindowFocusChangedCallback ) ( const crWindowHandle Handle, const bool HasFocus );
 
-typedef void ( *crMouseButtonCallback ) ( const crWindowHandle, const unsigned Button, const bool Clicked );
+typedef void ( *crMouseButtonStateChangedCallback ) ( const crWindowHandle, const unsigned Button, const bool Clicked );
 typedef void ( *crMouseMovedCallback ) ( const crWindowHandle, const ivec2 Delta, const ivec2 NewPosition );
 typedef void ( *crMouseWheelCallback ) ( const crWindowHandle, const int Delta );
 
@@ -43,7 +43,7 @@ typedef struct
 	crEndWindowResizedCallback EndWindowResized;
 	crWindowFocusChangedCallback WindowFocusChanged;
 	crKeyStateChangedCallback KeyStateChanged;
-	crMouseButtonCallback MouseButton;
+	crMouseButtonStateChangedCallback MouseButtonStateChanged;
 	crMouseMovedCallback MouseMoved;
 	crMouseWheelCallback MouseWheel;
 	} crWindowManagerCallbacks;

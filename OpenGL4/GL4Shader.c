@@ -9,21 +9,6 @@
 #define strdup _strdup
 #endif
 
-static bool ReallocAndClear ( void **Pointer, const unsigned CurrentSize, const unsigned NewSize )
-	{
-	if ( CurrentSize == NewSize )
-		return true;
-
-	void *NewPointer = realloc ( *Pointer, NewSize );
-	if ( NewPointer == NULL )
-		return false;
-	*Pointer = NewPointer;
-	// Clears the new area
-	if ( NewSize > CurrentSize )
-		memset ( ( char * ) * Pointer + CurrentSize, 0, NewSize - CurrentSize );
-	return true;
-	}
-
 static bool BuildShaderObject ( const char *Code, const GLenum GLShaderType, GLuint *OutputID )
 	{
 	GLuint ShaderObjectID = glCreateShader ( GLShaderType );
@@ -93,7 +78,7 @@ static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
 
 	unsigned NeededUniformCapacity = UniformBlockCount + UniformCount;
 	ShaderInfo->UniformCount = 0;
-	if ( UniformBlockCount != 0 )
+	if ( NeededUniformCapacity != 0 )
 		{
 		ShaderInfo->Uniforms = calloc ( NeededUniformCapacity, sizeof ( crGL4InternalUniformInfo ) );
 		if ( ShaderInfo->Uniforms == NULL )
@@ -164,7 +149,7 @@ static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
 			{
 			// First extend our array...
 			NeededUniformCapacity += UniformSize - 1;
-			if ( ReallocAndClear ( ( void ** ) &ShaderInfo->Uniforms, ShaderInfo->UniformCount * sizeof ( crGL4InternalUniformInfo ), NeededUniformCapacity * sizeof ( crGL4InternalUniformInfo ) ) == false )
+			if ( Memory_ReallocAndClear ( ( void ** ) &ShaderInfo->Uniforms, ShaderInfo->UniformCount * sizeof ( crGL4InternalUniformInfo ), NeededUniformCapacity * sizeof ( crGL4InternalUniformInfo ) ) == false )
 				goto OnError;
 
 			// Add all the elements to our shader info
@@ -193,7 +178,7 @@ static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
 	// Some uniforms may have been skipped due to being part of a block, so extra memory has been allocated. adjust here
 	if ( ShaderInfo->UniformCount != NeededUniformCapacity )
 		{
-		if ( ReallocAndClear ( ( void ** ) &ShaderInfo->Uniforms, ShaderInfo->UniformCount * sizeof ( crGL4InternalUniformInfo ), NeededUniformCapacity * sizeof ( crGL4InternalUniformInfo ) ) == false )
+		if ( Memory_ReallocAndClear ( ( void ** ) &ShaderInfo->Uniforms, ShaderInfo->UniformCount * sizeof ( crGL4InternalUniformInfo ), NeededUniformCapacity * sizeof ( crGL4InternalUniformInfo ) ) == false )
 			goto OnError;
 		}
 

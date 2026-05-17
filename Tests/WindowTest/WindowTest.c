@@ -62,7 +62,7 @@ int main ( void )
 	Callbacks.EndWindowResized = WindowResized_Callback;
 	Callbacks.WindowClosed = WindowClosed_Callback;
 	Callbacks.WindowMoved = WindowMoved_Callback;
-	Callbacks.MouseButton = MouseClicked_Callback;
+	Callbacks.MouseButtonStateChanged = MouseClicked_Callback;
 	Callbacks.MouseWheel = MouseWheel_Callback;
 	Callbacks.MouseMoved = MouseMoved_Callback;
 	Callbacks.WindowFocusChanged = WindowFocusChanged_Callback;

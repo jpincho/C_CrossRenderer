@@ -13,11 +13,19 @@ void crSetRenderCommandShader ( crRenderCommand *Command, const crShaderHandle N
 	Command->Shader = NewShader;
 	const crShaderInformation *ShaderInformation = crGetShaderInformation ( NewShader );
 	Command->UniformValues = calloc ( ShaderInformation->UniformCount, sizeof ( crShaderUniformValuePair ) );
-	Command->UniformValueCount = 0;// ShaderInformation->UniformCount;
+	Command->UniformValueCount = ShaderInformation->UniformCount;
+	for ( unsigned UniformIndex = 0; UniformIndex < ShaderInformation->UniformCount; ++UniformIndex )
+		{
+		Command->UniformValues[UniformIndex].UniformHandle = UniformIndex;
+		}
 	Command->ShaderBufferBindings = calloc ( ShaderInformation->AttributeCount, sizeof ( crShaderBufferBindPair ) );
-	Command->ShaderBufferBindingCount = 0;// ShaderInformation->AttributeCount;
+	Command->ShaderBufferBindingCount = ShaderInformation->AttributeCount;
+	for ( unsigned AttributeIndex = 0; AttributeIndex < ShaderInformation->AttributeCount; ++AttributeIndex )
+		{
+		Command->ShaderBufferBindings[AttributeIndex].AttributeHandle = AttributeIndex;
+		}
 	Command->ShaderTextureBindings = calloc ( ShaderInformation->UniformCount, sizeof ( crShaderTextureBindPair ) );
-	Command->ShaderTextureBindingCount = 0;// ShaderInformation->AttributeCount;
+	Command->ShaderTextureBindingCount = 0;
 	}
 
 bool crSetRenderCommandIndexShaderBufferBinding ( crRenderCommand *Command, const crShaderBufferDataStream Stream )
@@ -77,7 +85,7 @@ bool crSetRenderCommandTextureBinding ( crRenderCommand *Command, const crShader
 	Command->ShaderTextureBindings[IndexToUse].BindSettings = Binding;
 	return true;
 	}
-
+/*
 static inline int FindUniformInRenderCommand ( crRenderCommand *Command, const crShaderUniformHandle UniformHandle )
 	{
 	for ( unsigned ValueIndex = 0; ValueIndex < Command->UniformValueCount; ++ValueIndex )
@@ -90,14 +98,14 @@ static inline int FindUniformInRenderCommand ( crRenderCommand *Command, const c
 
 	return Command->UniformValueCount++;
 	}
-
+*/
 #define IMPLEMENT_crSetRenderCommandUniformValue(VAR_TYPE,VALUE_TYPE) \
 bool crSetRenderCommandUniform##VALUE_TYPE##Value(crRenderCommand *Command, const crShaderUniformHandle UniformHandle, const VAR_TYPE Value)\
 	{\
-	if (UniformHandle == -1)\
+	if ((UniformHandle == -1) || ((unsigned)UniformHandle >= Command->UniformValueCount))\
 		return false;\
 \
-	int IndexToUse = FindUniformInRenderCommand(Command, UniformHandle);\
+	int IndexToUse = UniformHandle;\
 \
 	Command->UniformValues[IndexToUse].UniformHandle = UniformHandle;\
 	Command->UniformValues[IndexToUse].UniformValue.VALUE_TYPE##Value = Value;\
@@ -114,10 +122,10 @@ IMPLEMENT_crSetRenderCommandUniformValue ( crShaderBufferHandle, Block )
 #define IMPLEMENT_crSetRenderCommandUniformValue(VAR_TYPE,VALUE_TYPE) \
 bool crSetRenderCommandUniform##VALUE_TYPE##Value(crRenderCommand *Command, const crShaderUniformHandle UniformHandle, const VAR_TYPE Value)\
 	{\
-	if (UniformHandle == -1)\
+	if ((UniformHandle == -1) || ((unsigned)UniformHandle >= Command->UniformValueCount))\
 		return false;\
 \
-	int IndexToUse = FindUniformInRenderCommand(Command, UniformHandle);\
+	int IndexToUse = UniformHandle;\
 \
 	Command->UniformValues[IndexToUse].UniformHandle = UniformHandle;\
 	math_##VAR_TYPE##_copy(&Command->UniformValues[IndexToUse].UniformValue.VALUE_TYPE##Value, Value);\

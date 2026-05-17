@@ -237,6 +237,7 @@ int main ( void )
 	RenderCommand.State.Culling.Winding = crCullingFaceWinding_CounterClockwise;
 	RenderCommand.State.DepthTest.Enabled = true;
 	RenderCommand.State.DepthTest.Mode = crDepthTestMode_Less;
+	RenderCommand.State.PolygonMode.State = crPolygonMode_Fill;
 
 	double LastEndFrameSeconds = Platform_GetPerformanceCurrentTime();
 	double TotalDelta = 0.0;
