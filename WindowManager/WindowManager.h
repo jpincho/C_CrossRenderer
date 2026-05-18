@@ -30,7 +30,7 @@ typedef void ( *crEndWindowResizedCallback ) ( const crWindowHandle Handle, cons
 typedef void ( *crWindowFocusChangedCallback ) ( const crWindowHandle Handle, const bool HasFocus );
 
 typedef void ( *crMouseButtonStateChangedCallback ) ( const crWindowHandle, const unsigned Button, const bool Clicked );
-typedef void ( *crMouseMovedCallback ) ( const crWindowHandle, const ivec2 Delta, const ivec2 NewPosition );
+typedef void ( *crMouseMovedCallback ) ( const crWindowHandle, const ivec2 NewPosition );
 typedef void ( *crMouseWheelCallback ) ( const crWindowHandle, const int Delta );
 
 typedef void ( *crKeyStateChangedCallback ) ( const crWindowHandle, const crKeyCode Key, const bool State );
@@ -60,6 +60,8 @@ extern bool ( *crGetWindowClientAreaDimensions ) ( const crWindowHandle WindowHa
 extern bool ( *crSetWindowTitle ) ( const crWindowHandle WindowHandle, const char *Title );
 extern const char * ( *crGetWindowTitle ) ( const crWindowHandle WindowHandle );
 extern bool ( *crActivateWindow ) ( const crWindowHandle WindowHandle );
+extern bool ( *crSetMousePosition ) ( const crWindowHandle WindowHandle, const ivec2 Position );
+extern bool ( *crGetMousePosition ) ( const crWindowHandle WindowHandle, ivec2 *Position );
 
 bool SetupWindowManagerFunctionPointers ( const crWindowManagerBackend Backend );
 END_C_DECLARATIONS

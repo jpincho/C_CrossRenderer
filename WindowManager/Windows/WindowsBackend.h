@@ -14,4 +14,7 @@ bool crWindowsGetWindowClientAreaDimensions ( const crWindowHandle WindowHandle,
 bool crWindowsSetWindowTitle ( const crWindowHandle WindowHandle, const char *Title );
 const char *crWindowsGetWindowTitle ( const crWindowHandle WindowHandle );
 bool crWindowsActivateWindow ( const crWindowHandle WindowHandle );
+bool crWindowsSetMousePosition ( const crWindowHandle WindowHandle, const ivec2 Position );
+bool crWindowsGetMousePosition ( const crWindowHandle WindowHandle, ivec2 *Position );
+
 END_C_DECLARATIONS

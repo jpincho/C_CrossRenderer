@@ -210,17 +210,12 @@ static LRESULT WindowProcedure ( HWND WindowHandle, UINT Message, WPARAM wParam,
 		case WM_MOUSEMOVE:
 			{
 			assert ( WindowData != NULL );
-			ivec2 Delta;
-			Delta.x = GET_X_LPARAM ( lParam );
-			Delta.y = GET_Y_LPARAM ( lParam );
-			Delta.x -= WindowData->LastMouseCursorPosition.x;
-			Delta.y -= WindowData->LastMouseCursorPosition.y;
 			WindowData->LastMouseCursorPosition.x = GET_X_LPARAM ( lParam );
 			WindowData->LastMouseCursorPosition.y = GET_Y_LPARAM ( lParam );
-			if ( ( WindowManagerCallbacks.MouseMoved ) &&
-			        ( ( Delta.x != 0 ) || ( Delta.y != 0 ) ) )
+			LOG_DEBUG ( "Mouse moved in window '%s' to position %d, %d", WindowData->Title, WindowData->LastMouseCursorPosition.x, WindowData->LastMouseCursorPosition.y );
+			if ( WindowManagerCallbacks.MouseMoved )
 				{
-				WindowManagerCallbacks.MouseMoved ( WindowHandle, Delta, WindowData->LastMouseCursorPosition );
+				WindowManagerCallbacks.MouseMoved ( WindowHandle, WindowData->LastMouseCursorPosition );
 				}
 			break;
 			}
@@ -494,5 +489,24 @@ bool crWindowsActivateWindow ( const crWindowHandle WindowHandle )
 	{
 	UNUSED ( WindowHandle );
 	//HDC WindowDC = GetWindowDC(WindowHandle);
+	return true;
+	}
+
+bool crWindowsSetMousePosition ( const crWindowHandle WindowHandle, const ivec2 Position )
+	{
+	struct InternalWindowData *WindowData = ( struct InternalWindowData * ) GetWindowLongPtr ( WindowHandle, GWLP_USERDATA );
+	if ( WindowData == NULL )
+		return false;
+	SetCursorPos(Position.x, Position.y);
+	WindowData->LastMouseCursorPosition = Position;
+	return true;
+	}
+
+bool crWindowsGetMousePosition ( const crWindowHandle WindowHandle, ivec2 *Position )
+	{
+	struct InternalWindowData *WindowData = ( struct InternalWindowData * ) GetWindowLongPtr ( WindowHandle, GWLP_USERDATA );
+	if ( WindowData == NULL )
+		return false;
+	*Position = WindowData->LastMouseCursorPosition;
 	return true;
 	}

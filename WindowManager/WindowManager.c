@@ -19,6 +19,8 @@ bool ( *crGetWindowClientAreaDimensions ) ( const crWindowHandle WindowHandle, u
 bool ( *crSetWindowTitle ) ( const crWindowHandle WindowHandle, const char *Title ) = NULL;
 const char * ( *crGetWindowTitle ) ( const crWindowHandle WindowHandle ) = NULL;
 bool ( *crActivateWindow ) ( const crWindowHandle WindowHandle ) = NULL;
+bool ( *crSetMousePosition ) ( const crWindowHandle WindowHandle, const ivec2 Position ) = NULL;
+bool ( *crGetMousePosition ) ( const crWindowHandle WindowHandle, ivec2 *Position ) = NULL;
 
 bool SetupWindowManagerFunctionPointers ( const crWindowManagerBackend Backend )
 	{
@@ -39,6 +41,8 @@ bool SetupWindowManagerFunctionPointers ( const crWindowManagerBackend Backend )
 			ASSIGN_POINTER ( SetWindowTitle );
 			ASSIGN_POINTER ( GetWindowTitle );
 			ASSIGN_POINTER ( ActivateWindow );
+			ASSIGN_POINTER ( SetMousePosition );
+			ASSIGN_POINTER ( GetMousePosition );
 #undef ASSIGN_POINTER
 			break;
 			}
@@ -59,6 +63,8 @@ bool SetupWindowManagerFunctionPointers ( const crWindowManagerBackend Backend )
 			ASSIGN_POINTER ( SetWindowTitle );
 			ASSIGN_POINTER ( GetWindowTitle );
 			ASSIGN_POINTER ( ActivateWindow );
+			ASSIGN_POINTER ( SetMousePosition );
+			ASSIGN_POINTER ( GetMousePosition );
 #undef ASSIGN_POINTER
 			break;
 			}

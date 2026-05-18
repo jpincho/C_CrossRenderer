@@ -252,9 +252,6 @@ crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor 
 		free ( NewWindowData );
 		return NULL;
 		}
-	// Initialize mouse cursor position with invalid values, so I can recognize a first movement
-	NewWindowData->LastMousePosition.x = -1;
-	NewWindowData->LastMousePosition.y = -1;
 	PointerList_AddAtEnd ( &WindowList, ( void * ) NewWindowData );
 
 	return ( crWindowHandle ) NewWindowData;
@@ -361,19 +358,12 @@ static void ProcessXEvent ( const XEvent Event )
 		case MotionNotify:
 			{
 			XMotionEvent *MotionEvent = ( XMotionEvent* ) &Event;
-			ivec2 NewMousePosition = { MotionEvent->x, MotionEvent->y };
-			if ( WindowData->LastMousePosition.x == -1 )
-				{
-				math_ivec2_copy ( &WindowData->LastMousePosition, NewMousePosition );
-				break;
-				}
-			ivec2 Delta;
-			LOG_DEBUG ( "Mouse moved in window '%s' to position %d, %d", WindowData->Title, NewMousePosition.x, NewMousePosition.y );
-			math_ivec2_subtract ( &Delta, NewMousePosition, WindowData->LastMousePosition );
-			WindowData->LastMousePosition = NewMousePosition;
+			WindowData->LastMouseCursorPosition.x = MotionEvent->x;
+			WindowData->LastMouseCursorPosition.y = MotionEvent->y;
+			LOG_DEBUG ( "Mouse moved in window '%s' to position %d, %d", WindowData->Title, WindowData->LastMouseCursorPosition.x, WindowData->LastMouseCursorPosition.y );
 			if ( WindowManagerCallbacks.MouseMoved )
 				{
-				WindowManagerCallbacks.MouseMoved ( WindowData->WindowHandle, Delta, NewMousePosition );
+				WindowManagerCallbacks.MouseMoved ( WindowData->WindowHandle, WindowData->LastMouseCursorPosition );
 				}
 			break;
 			}
@@ -518,5 +508,30 @@ bool crX11ActivateWindow ( const crWindowHandle WindowHandle )
 	if ( WindowData == NULL )
 		return false;
 	XMapWindow ( WindowData->DisplayHandle, WindowData->X11WindowHandle );
+	return true;
+	}
+
+bool crX11SetMousePosition ( const crWindowHandle WindowHandle, const ivec2 Position )
+	{
+	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
+	if ( WindowData == NULL )
+		return false;
+	XWarpPointer ( WindowData->DisplayHandle, None, WindowData->X11WindowHandle, 0, 0, 0, 0, Position.x, Position.y );
+	return true;
+	}
+
+bool crX11GetMousePosition ( const crWindowHandle WindowHandle, ivec2 *Position )
+	{
+	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
+	if ( WindowData == NULL )
+		return false;
+
+	Window ChildWindow, RootWindow;
+	int ChildX, ChildY, RootX, RootY;
+	unsigned MaskReturn;
+	if ( XQueryPointer ( WindowData->DisplayHandle, WindowData->X11WindowHandle, &ChildWindow, &RootWindow, &RootX, &RootY, &ChildX, &ChildY, &MaskReturn ) == false )
+		return false;
+	if ( RootWindow != WindowData->X11WindowHandle )
+		return false;
 	return true;
 	}

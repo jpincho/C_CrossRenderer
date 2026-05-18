@@ -14,5 +14,7 @@ bool crX11GetWindowClientAreaDimensions ( const crWindowHandle WindowHandle, uve
 bool crX11SetWindowTitle ( const crWindowHandle WindowHandle, const char *Title );
 const char *crX11GetWindowTitle ( const crWindowHandle WindowHandle );
 bool crX11ActivateWindow ( const crWindowHandle WindowHandle );
+bool crX11SetMousePosition ( const crWindowHandle WindowHandle, const ivec2 Position );
+bool crX11GetMousePosition ( const crWindowHandle WindowHandle, ivec2 *Position );
 
 END_C_DECLARATIONS
