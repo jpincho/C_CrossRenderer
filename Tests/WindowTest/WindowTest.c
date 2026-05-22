@@ -32,10 +32,10 @@ void MouseWheel_Callback ( const crWindowHandle Handle, const int Delta )
 	LOG_DEBUG ( "Mouse wheel %d", Delta );
 	}
 
-void MouseMoved_Callback ( const crWindowHandle Handle, const ivec2 Delta, const ivec2 NewPosition )
+void MouseMoved_Callback ( const crWindowHandle Handle, const ivec2 NewPosition )
 	{
 	UNUSED ( Handle );
-	LOG_DEBUG ( "Mouse moved %d %d %d %d", Delta.x, Delta.y, NewPosition.x, NewPosition.y );
+	LOG_DEBUG ( "Mouse moved %d %d", NewPosition.x, NewPosition.y );
 	}
 
 void WindowFocusChanged_Callback ( const crWindowHandle Handle, const bool HasFocus )

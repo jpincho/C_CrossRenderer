@@ -3,6 +3,7 @@
 #include <X11/keysym.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
+#include <X11/XKBlib.h>
 #include "../Internal/WindowManagerInternal.h"
 #include <Platform/Logger.h>
 #include <C_Utils/PointerList.h>
@@ -75,110 +76,121 @@ static int X11ErrorHandler ( Display *dpy, XErrorEvent *e )
 	// exit ( 1 );
 	return -1;
 	}
+typedef struct
+	{
+	crKeyCode Key;
+	bool State;
+	} KeyState;
+
+static KeyState KeyStates[512] = { 0 };
 
 crKeyCode crX11TranslateKeyCodeTocrKeyCode ( const unsigned X11KeyCode )
 	{
-	static short KeyCodes[512] = { 0 };
+	//static short KeyCodes[512] = { 0 };
 	static bool KeyCodesInitialized = false;
 
 	if ( KeyCodesInitialized == false )
 		{
 		Display *MainDisplay = XOpenDisplay ( 0 );
-		memset ( KeyCodes, -1, sizeof ( KeyCodes ) );
+		for ( unsigned KeyCode = 0; KeyCode < 512; ++KeyCode )
+			{
+			KeyStates[KeyCode].Key = -1;
+			KeyStates[KeyCode].State = false;
+			}
 
 		for ( unsigned KeyCode = 0; KeyCode < 10; ++KeyCode )
-			KeyCodes[XKeysymToKeycode ( MainDisplay, KeyCode + XK_0 )] = KeyCode + crKeyCode_0;
+			KeyStates[XKeysymToKeycode ( MainDisplay, KeyCode + XK_0 )].Key = KeyCode + crKeyCode_0;
 
 		for ( unsigned KeyCode = 0; KeyCode < 26; ++KeyCode )
-			KeyCodes[XKeysymToKeycode ( MainDisplay, KeyCode + XK_A )] = KeyCode + crKeyCode_A;
+			KeyStates[XKeysymToKeycode ( MainDisplay, KeyCode + XK_A )].Key = KeyCode + crKeyCode_A;
 
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_apostrophe )] = crKeyCode_Apostrophe;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_backslash )] = crKeyCode_Backslash;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_comma )] = crKeyCode_Comma;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_equal )] = crKeyCode_Equal;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_grave )] = crKeyCode_GraveAccent;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_bracketleft )] = crKeyCode_LeftBracket;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_minus )] = crKeyCode_Minus;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_period )] = crKeyCode_Period;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_bracketright )] = crKeyCode_RightBracket;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_semicolon )] = crKeyCode_Semicolon;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_slash )] = crKeyCode_Slash;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_apostrophe )].Key = crKeyCode_Apostrophe;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_backslash )].Key = crKeyCode_Backslash;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_comma )].Key = crKeyCode_Comma;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_equal )].Key = crKeyCode_Equal;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_grave )].Key = crKeyCode_GraveAccent;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_bracketleft )].Key = crKeyCode_LeftBracket;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_minus )].Key = crKeyCode_Minus;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_period )].Key = crKeyCode_Period;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_bracketright )].Key = crKeyCode_RightBracket;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_semicolon )].Key = crKeyCode_Semicolon;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_slash )].Key = crKeyCode_Slash;
 
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_BackSpace )] = crKeyCode_Backspace;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Delete )] = crKeyCode_Delete;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_End )] = crKeyCode_End;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Return )] = crKeyCode_Enter;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Escape )] = crKeyCode_Escape;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Home )] = crKeyCode_Home;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Insert )] = crKeyCode_Insert;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Menu )] = crKeyCode_Menu;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Page_Down )] = crKeyCode_PageDown;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Page_Up )] = crKeyCode_PageUp;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Pause )] = crKeyCode_Pause;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_space )] = crKeyCode_Space;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Tab )] = crKeyCode_Tab;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Caps_Lock )] = crKeyCode_CapsLock;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Num_Lock )] = crKeyCode_NumLock;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Scroll_Lock )] = crKeyCode_ScrollLock;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F1 )] = crKeyCode_F1;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F2 )] = crKeyCode_F2;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F3 )] = crKeyCode_F3;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F4 )] = crKeyCode_F4;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F5 )] = crKeyCode_F5;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F6 )] = crKeyCode_F6;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F7 )] = crKeyCode_F7;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F8 )] = crKeyCode_F8;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F9 )] = crKeyCode_F9;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F10 )] = crKeyCode_F10;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F11 )] = crKeyCode_F11;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F12 )] = crKeyCode_F12;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F13 )] = crKeyCode_F13;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F14 )] = crKeyCode_F14;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F15 )] = crKeyCode_F15;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F16 )] = crKeyCode_F16;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F17 )] = crKeyCode_F17;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F18 )] = crKeyCode_F18;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F19 )] = crKeyCode_F19;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F20 )] = crKeyCode_F20;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F21 )] = crKeyCode_F21;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F22 )] = crKeyCode_F22;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F23 )] = crKeyCode_F23;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_F24 )] = crKeyCode_F24;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Alt_L )] = crKeyCode_LeftAlt;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Control_L )] = crKeyCode_LeftControl;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Shift_L )] = crKeyCode_LeftShift;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Super_L )] = crKeyCode_LeftSuper;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Print )] = crKeyCode_PrintScreen;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Alt_R )] = crKeyCode_RightAlt;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Control_R )] = crKeyCode_RightControl;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Shift_R )] = crKeyCode_RightShift;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Super_R )] = crKeyCode_RightSuper;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Down )] = crKeyCode_Down;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Left )] = crKeyCode_Left;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Right )] = crKeyCode_Right;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_Up )] = crKeyCode_Up;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_BackSpace )].Key = crKeyCode_Backspace;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Delete )].Key = crKeyCode_Delete;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_End )].Key = crKeyCode_End;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Return )].Key = crKeyCode_Enter;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Escape )].Key = crKeyCode_Escape;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Home )].Key = crKeyCode_Home;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Insert )].Key = crKeyCode_Insert;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Menu )].Key = crKeyCode_Menu;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Page_Down )].Key = crKeyCode_PageDown;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Page_Up )].Key = crKeyCode_PageUp;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Pause )].Key = crKeyCode_Pause;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_space )].Key = crKeyCode_Space;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Tab )].Key = crKeyCode_Tab;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Caps_Lock )].Key = crKeyCode_CapsLock;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Num_Lock )].Key = crKeyCode_NumLock;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Scroll_Lock )].Key = crKeyCode_ScrollLock;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F1 )].Key = crKeyCode_F1;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F2 )].Key = crKeyCode_F2;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F3 )].Key = crKeyCode_F3;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F4 )].Key = crKeyCode_F4;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F5 )].Key = crKeyCode_F5;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F6 )].Key = crKeyCode_F6;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F7 )].Key = crKeyCode_F7;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F8 )].Key = crKeyCode_F8;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F9 )].Key = crKeyCode_F9;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F10 )].Key = crKeyCode_F10;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F11 )].Key = crKeyCode_F11;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F12 )].Key = crKeyCode_F12;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F13 )].Key = crKeyCode_F13;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F14 )].Key = crKeyCode_F14;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F15 )].Key = crKeyCode_F15;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F16 )].Key = crKeyCode_F16;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F17 )].Key = crKeyCode_F17;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F18 )].Key = crKeyCode_F18;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F19 )].Key = crKeyCode_F19;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F20 )].Key = crKeyCode_F20;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F21 )].Key = crKeyCode_F21;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F22 )].Key = crKeyCode_F22;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F23 )].Key = crKeyCode_F23;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_F24 )].Key = crKeyCode_F24;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Alt_L )].Key = crKeyCode_LeftAlt;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Control_L )].Key = crKeyCode_LeftControl;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Shift_L )].Key = crKeyCode_LeftShift;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Super_L )].Key = crKeyCode_LeftSuper;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Print )].Key = crKeyCode_PrintScreen;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Alt_R )].Key = crKeyCode_RightAlt;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Control_R )].Key = crKeyCode_RightControl;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Shift_R )].Key = crKeyCode_RightShift;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Super_R )].Key = crKeyCode_RightSuper;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Down )].Key = crKeyCode_Down;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Left )].Key = crKeyCode_Left;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Right )].Key = crKeyCode_Right;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_Up )].Key = crKeyCode_Up;
 
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_0 )] = crKeyCode_KeyPad_0;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_1 )] = crKeyCode_KeyPad_1;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_2 )] = crKeyCode_KeyPad_2;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_3 )] = crKeyCode_KeyPad_3;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_4 )] = crKeyCode_KeyPad_4;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_5 )] = crKeyCode_KeyPad_5;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_6 )] = crKeyCode_KeyPad_6;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_7 )] = crKeyCode_KeyPad_7;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_8 )] = crKeyCode_KeyPad_8;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_9 )] = crKeyCode_KeyPad_9;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_Add )] = crKeyCode_KeyPad_Add;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_Decimal )] = crKeyCode_KeyPad_Decimal;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_Divide )] = crKeyCode_KeyPad_Divide;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_Enter )] = crKeyCode_KeyPad_Enter;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_Equal )] = crKeyCode_KeyPad_Equal;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_Multiply )] = crKeyCode_KeyPad_Multiply;
-		KeyCodes[XKeysymToKeycode ( MainDisplay, XK_KP_Subtract )] = crKeyCode_KeyPad_Subtract;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_0 )].Key = crKeyCode_KeyPad_0;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_1 )].Key = crKeyCode_KeyPad_1;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_2 )].Key = crKeyCode_KeyPad_2;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_3 )].Key = crKeyCode_KeyPad_3;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_4 )].Key = crKeyCode_KeyPad_4;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_5 )].Key = crKeyCode_KeyPad_5;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_6 )].Key = crKeyCode_KeyPad_6;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_7 )].Key = crKeyCode_KeyPad_7;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_8 )].Key = crKeyCode_KeyPad_8;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_9 )].Key = crKeyCode_KeyPad_9;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_Add )].Key = crKeyCode_KeyPad_Add;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_Decimal )].Key = crKeyCode_KeyPad_Decimal;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_Divide )].Key = crKeyCode_KeyPad_Divide;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_Enter )].Key = crKeyCode_KeyPad_Enter;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_Equal )].Key = crKeyCode_KeyPad_Equal;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_Multiply )].Key = crKeyCode_KeyPad_Multiply;
+		KeyStates[XKeysymToKeycode ( MainDisplay, XK_KP_Subtract )].Key = crKeyCode_KeyPad_Subtract;
 		KeyCodesInitialized = true;
 		}
 
-	return KeyCodes[X11KeyCode];
+	return KeyStates[X11KeyCode].Key;
 	}
 
 crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor )
@@ -240,6 +252,13 @@ crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor 
 	            Descriptor.Title );
 
 	XMapWindow ( NewWindowData->DisplayHandle, NewWindowData->X11WindowHandle );
+	int IsSupported;
+	bool Result = XkbSetDetectableAutoRepeat ( NewWindowData->DisplayHandle, true, &IsSupported );
+	if ( ( Result != true ) || ( IsSupported == false ) )
+		{
+		LOG_ERROR ( "Failed to set detectable auto repeat for keyboard. Key release events will not be detected when a key is held down." );
+		return false;
+		}
 	XFlush ( NewWindowData->DisplayHandle );
 	XSync ( NewWindowData->DisplayHandle, false );
 	XUngrabServer ( NewWindowData->DisplayHandle );
@@ -252,6 +271,7 @@ crWindowHandle crX11CreateNewWindow ( const crRenderWindowDescriptor Descriptor 
 		free ( NewWindowData );
 		return NULL;
 		}
+
 	PointerList_AddAtEnd ( &WindowList, ( void * ) NewWindowData );
 
 	return ( crWindowHandle ) NewWindowData;
@@ -335,12 +355,14 @@ static void ProcessXEvent ( const XEvent Event )
 		case KeyRelease:
 			{
 			XKeyPressedEvent *KeyEvent = ( XKeyPressedEvent* ) &Event;
-			if ( WindowManagerCallbacks.KeyStateChanged )
+			bool State = ( KeyEvent->type == KeyPress );
+
+			if ( ( WindowManagerCallbacks.KeyStateChanged ) && ( State != KeyStates[KeyEvent->keycode].State ) )
 				{
-				bool State = ( KeyEvent->type == KeyPress );
 				crKeyCode KeyCode = crX11TranslateKeyCodeTocrKeyCode ( KeyEvent->keycode );
 				WindowManagerCallbacks.KeyStateChanged ( WindowData->WindowHandle, KeyCode, State );
 				}
+			KeyStates[KeyEvent->keycode].State = State;
 			break;
 			}
 		case ButtonPress:
@@ -427,7 +449,7 @@ bool crX11SetWindowPosition ( const crWindowHandle WindowHandle, const ivec2 Pos
 	return true;
 	}
 
-bool crX11GetWindowPosition ( const crWindowHandle WindowHandle, ivec2 *Position )
+bool crX11GetWindowPosition ( const crWindowHandle WindowHandle, ivec2 * Position )
 	{
 	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
 	if ( WindowData == NULL )
@@ -453,7 +475,7 @@ bool crX11SetWindowDimensions ( const crWindowHandle WindowHandle, const uvec2 D
 	return true;
 	}
 
-bool crX11GetWindowDimensions ( const crWindowHandle WindowHandle, uvec2 *Dimensions )
+bool crX11GetWindowDimensions ( const crWindowHandle WindowHandle, uvec2 * Dimensions )
 	{
 	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
 	if ( WindowData == NULL )
@@ -462,7 +484,7 @@ bool crX11GetWindowDimensions ( const crWindowHandle WindowHandle, uvec2 *Dimens
 	return true;
 	}
 
-bool crX11GetWindowClientAreaDimensions ( const crWindowHandle WindowHandle, uvec2 *Dimensions )
+bool crX11GetWindowClientAreaDimensions ( const crWindowHandle WindowHandle, uvec2 * Dimensions )
 	{
 	return crGetWindowDimensions ( WindowHandle, Dimensions );
 	}
@@ -520,7 +542,7 @@ bool crX11SetMousePosition ( const crWindowHandle WindowHandle, const ivec2 Posi
 	return true;
 	}
 
-bool crX11GetMousePosition ( const crWindowHandle WindowHandle, ivec2 *Position )
+bool crX11GetMousePosition ( const crWindowHandle WindowHandle, ivec2 * Position )
 	{
 	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
 	if ( WindowData == NULL )
