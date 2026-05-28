@@ -18,7 +18,10 @@ crShaderBufferHandle crGL4CreateShaderBuffer ( const crShaderBufferDescriptor De
 		glCreateBuffers ( 1, &NewShaderBuffer->OpenGLID );
 		if ( crGL4CheckError() == false )
 			goto OnError;
-		glNamedBufferData ( NewShaderBuffer->OpenGLID, NewShaderBuffer->DataSize, Descriptor.Data, NewShaderBuffer->GLAccessType );
+		if ( ( Descriptor.Data ) && ( Descriptor.DataSize ) )
+			glNamedBufferData ( NewShaderBuffer->OpenGLID, NewShaderBuffer->DataSize, Descriptor.Data, NewShaderBuffer->GLAccessType );
+		else
+			glNamedBufferData ( NewShaderBuffer->OpenGLID, NewShaderBuffer->Capacity, NULL, NewShaderBuffer->GLAccessType );
 		if ( crGL4CheckError() == false )
 			goto OnError;
 		}
@@ -29,7 +32,11 @@ crShaderBufferHandle crGL4CreateShaderBuffer ( const crShaderBufferDescriptor De
 			goto OnError;
 
 		glBindBuffer ( NewShaderBuffer->GLBufferType, NewShaderBuffer->OpenGLID );
-		glBufferData ( NewShaderBuffer->GLBufferType, NewShaderBuffer->DataSize, Descriptor.Data, NewShaderBuffer->GLAccessType );
+		if ( ( Descriptor.Data ) && ( Descriptor.DataSize ) )
+			glBufferData ( NewShaderBuffer->GLBufferType, NewShaderBuffer->DataSize, Descriptor.Data, NewShaderBuffer->GLAccessType );
+		else
+			glBufferData ( NewShaderBuffer->GLBufferType, NewShaderBuffer->Capacity, NULL, NewShaderBuffer->GLAccessType );
+
 		if ( crGL4CheckError() == false )
 			goto OnError;
 		}
