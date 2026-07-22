@@ -212,7 +212,7 @@ static LRESULT WindowProcedure ( HWND WindowHandle, UINT Message, WPARAM wParam,
 			assert ( WindowData != NULL );
 			WindowData->LastMouseCursorPosition.x = GET_X_LPARAM ( lParam );
 			WindowData->LastMouseCursorPosition.y = GET_Y_LPARAM ( lParam );
-			LOG_DEBUG ( "Mouse moved in window '%s' to position %d, %d", WindowData->Title, WindowData->LastMouseCursorPosition.x, WindowData->LastMouseCursorPosition.y );
+			LOG_DEBUG ( "Mouse moved to position %d, %d", WindowData->LastMouseCursorPosition.x, WindowData->LastMouseCursorPosition.y );
 			if ( WindowManagerCallbacks.MouseMoved )
 				{
 				WindowManagerCallbacks.MouseMoved ( WindowHandle, WindowData->LastMouseCursorPosition );
@@ -269,9 +269,9 @@ static LRESULT WindowProcedure ( HWND WindowHandle, UINT Message, WPARAM wParam,
 				}
 			WindowData->LastMouseCursorPosition.x = GET_X_LPARAM ( lParam );
 			WindowData->LastMouseCursorPosition.y = GET_Y_LPARAM ( lParam );
-			if ( WindowManagerCallbacks.MouseButton )
+			if ( WindowManagerCallbacks.MouseButtonStateChanged )
 				{
-				WindowManagerCallbacks.MouseButton ( WindowHandle, Button, Click );
+				WindowManagerCallbacks.MouseButtonStateChanged ( WindowHandle, Button, Click );
 				}
 			break;
 			}
@@ -382,7 +382,7 @@ bool crWindowsDestroyWindow ( const crWindowHandle WindowHandle )
 	return false;
 	}
 
-bool crWindowsUpdateWindows ( const bool Wait )
+bool crWindowsUpdateWindows ( void )
 	{
 	MSG Message;
 	// Process all pending messages
@@ -392,15 +392,6 @@ bool crWindowsUpdateWindows ( const bool Wait )
 		TranslateMessage ( &Message );
 		DispatchMessage ( &Message );
 		Result = PeekMessage ( &Message, NULL, 0, 0, PM_REMOVE );
-		}
-
-	if ( Wait )
-		{
-		Result = GetMessage ( &Message, NULL, 0, 0 );
-		if ( Result <= 0 )
-			return false;
-		TranslateMessage ( &Message );
-		DispatchMessage ( &Message );
 		}
 	return true;
 	}
@@ -497,7 +488,7 @@ bool crWindowsSetMousePosition ( const crWindowHandle WindowHandle, const ivec2 
 	struct InternalWindowData *WindowData = ( struct InternalWindowData * ) GetWindowLongPtr ( WindowHandle, GWLP_USERDATA );
 	if ( WindowData == NULL )
 		return false;
-	SetCursorPos(Position.x, Position.y);
+	SetCursorPos ( Position.x, Position.y );
 	WindowData->LastMouseCursorPosition = Position;
 	return true;
 	}

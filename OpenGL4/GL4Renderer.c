@@ -571,9 +571,9 @@ bool crGL4RunCommand ( const crRenderCommand Command )
 		{
 		const unsigned CommandUniformHandle = Command.UniformValues[UniformIndex].UniformHandle;
 		crShaderUniformValue *CommandUniformValue = &Command.UniformValues[UniformIndex].UniformValue;
-		if ((ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_Sampler2D) ||
-			(ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_Sampler3D) ||
-			(ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_SamplerCube))
+		if ( ( ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_Sampler2D ) ||
+		        ( ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_Sampler3D ) ||
+		        ( ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_SamplerCube ) )
 			continue; // Texture samplers are set with the texture bindings, not as regular uniforms
 
 		if ( ShaderUniformValueIsEqual ( ShaderInformation->Uniforms[CommandUniformHandle].Type, &ShaderInformation->Uniforms[CommandUniformHandle].CurrentValue, CommandUniformValue ) == true )

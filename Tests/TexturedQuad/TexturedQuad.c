@@ -137,7 +137,7 @@ int main ( void )
 	RenderCommand.InstanceCount = 1;
 	RenderCommand.State.Culling.Enabled = true;
 	RenderCommand.State.PolygonMode.State = crPolygonMode_Fill;
-	
+
 	while ( ShouldQuit == false )
 		{
 		crStartRenderToWindow ( crGetMainWindowHandle() );

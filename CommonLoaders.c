@@ -118,8 +118,14 @@ bool crLoadTextureDescriptorFromFile ( const char *ImageFile, const bool Flip, c
 	Descriptor->Format = ImageFormat;
 	Descriptor->Mipmapped = true;
 	Descriptor->Data = calloc ( ImageSize.x * ImageSize.y, Channels );
-	Descriptor->FilterSettings = ( crTextureFilterSettings ) { crTextureFilter_Linear, crTextureFilter_Linear};
-	Descriptor->WrapSettings = ( crTextureWrapSettings ) { crTextureWrapMode_Repeat, crTextureWrapMode_Repeat };
+	Descriptor->FilterSettings = ( crTextureFilterSettings )
+		{
+		crTextureFilter_Linear, crTextureFilter_Linear
+		};
+	Descriptor->WrapSettings = ( crTextureWrapSettings )
+		{
+		crTextureWrapMode_Repeat, crTextureWrapMode_Repeat
+		};
 	if ( Descriptor->Data == NULL )
 		return false;
 	memcpy ( Descriptor->Data, Image, ImageSize.x * ImageSize.y * Channels );
@@ -166,8 +172,14 @@ bool crLoadTextureDescriptorFromMemory ( const void *Pointer, const unsigned Len
 	Descriptor->Format = ImageFormat;
 	Descriptor->Mipmapped = true;
 	Descriptor->Data = calloc ( ImageSize.x * ImageSize.y, Channels );
-	Descriptor->FilterSettings = ( crTextureFilterSettings ) { crTextureFilter_Linear, crTextureFilter_Linear };
-	Descriptor->WrapSettings = ( crTextureWrapSettings ) { crTextureWrapMode_Repeat, crTextureWrapMode_Repeat };
+	Descriptor->FilterSettings = ( crTextureFilterSettings )
+		{
+		crTextureFilter_Linear, crTextureFilter_Linear
+		};
+	Descriptor->WrapSettings = ( crTextureWrapSettings )
+		{
+		crTextureWrapMode_Repeat, crTextureWrapMode_Repeat
+		};
 	if ( Descriptor->Data == NULL )
 		return false;
 	memcpy ( Descriptor->Data, Image, ImageSize.x * ImageSize.y * Channels );
