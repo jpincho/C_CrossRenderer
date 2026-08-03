@@ -5,14 +5,6 @@ include ( target_warning_options.cmake )
 
 include_directories(ExternalModules)
 
-set ( DEPENDENCY_PROJECTS Platform C_Utils Math )
-
-foreach ( DEPENDENCY IN LISTS DEPENDENCY_PROJECTS )
-    if ( NOT TARGET ${DEPENDENCY} )
-        add_subdirectory ( ExternalModules/${DEPENDENCY} )
-    endif()
-endforeach()
-
 # OpenGL backend
 set ( OpenGL_GL_PREFERENCE GLVND )
 find_package ( OpenGL QUIET )
