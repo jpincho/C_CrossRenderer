@@ -187,6 +187,26 @@ bool crGL4InitializeRenderer ( const crRendererConfiguration NewConfiguration )
 
 	LOG_DEBUG ( "Max Texture Units - %u", crGL4Information.MaxTextureUnits );
 
+	if ( crGL4IsExtensionAvailable ( "GL_ATI_meminfo" ) )
+		{
+		GLint Values[3] = {0};
+		glGetIntegerv ( GL_VBO_FREE_MEMORY_ATI, &Values[0] );
+		glGetIntegerv ( GL_TEXTURE_FREE_MEMORY_ATI, &Values[1] );
+		glGetIntegerv ( GL_RENDERBUFFER_FREE_MEMORY_ATI, &Values[2] );
+		LOG_DEBUG ( "Results for GL_ATI_meminfo %u %u %u", Values[0], Values[1], Values[2] );
+		}
+
+	if ( crGL4IsExtensionAvailable ( "GL_NVX_gpu_memory_info" ) )
+		{
+		GLint Values[5] = {0};
+		glGetIntegerv ( GL_GPU_MEMORY_INFO_DEDICATED_VIDMEM_NVX, &Values[0] );
+		glGetIntegerv ( GL_GPU_MEMORY_INFO_TOTAL_AVAILABLE_MEMORY_NVX, &Values[1] );
+		glGetIntegerv ( GL_GPU_MEMORY_INFO_CURRENT_AVAILABLE_VIDMEM_NVX, &Values[2] );
+		glGetIntegerv ( GL_GPU_MEMORY_INFO_EVICTION_COUNT_NVX, &Values[3] );
+		glGetIntegerv ( GL_GPU_MEMORY_INFO_EVICTED_MEMORY_NVX, &Values[4] );
+		LOG_DEBUG ( "Results for GL_NVX_gpu_memory_info %u %u %u %u %u", Values[0], Values[1], Values[2], Values[3], Values[4] );
+		}
+
 	glEnable ( GL_DEBUG_OUTPUT );
 	glDebugMessageCallback ( OpenGLMessageCallback, NULL );
 
