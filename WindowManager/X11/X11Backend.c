@@ -6,7 +6,7 @@
 #include <X11/XKBlib.h>
 #include "../Internal/WindowManagerInternal.h"
 #include <Platform/Logger.h>
-#include <C_Utils/PointerList.h>
+#include <Platform/PointerList.h>
 #include <string.h>
 
 static PointerListNode *GetPointerListNodeFromcrWindowHandle ( const crWindowHandle WindowHandle )

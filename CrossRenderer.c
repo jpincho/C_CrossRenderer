@@ -71,7 +71,7 @@ bool crInitialize ( const crRendererConfiguration NewConfiguration )
 		return false;
 	if ( crInitializeRenderer ( NewConfiguration ) == false )
 		return false;
-	MainWindowHandle = ( crWindowHandle ) PointerList_GetNodeData ( WindowList.first );
+	MainWindowHandle = ( crWindowHandle ) PointerList_GetNodeData ( WindowList.First );
 	return true;
 	}
 

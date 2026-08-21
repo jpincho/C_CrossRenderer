@@ -3,7 +3,7 @@
 #include <string.h>
 #include <assert.h>
 #include <malloc.h>
-#include <C_Utils/ArrayUtils.h>
+#include <Platform/ArrayUtils.h>
 
 #if defined (PLATFORM_COMPILER_MSVC)
 #define strdup _strdup
