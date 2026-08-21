@@ -9,7 +9,7 @@ struct InternalGLXContextData
 	Display *DisplayHandle;
 	};
 
-crOpenGLContext crGLXCreateContext ( const crWindowHandle WindowHandle, const crRendererConfiguration NewConfiguration )
+crOpenGLContext crGLXCreateSharedContext ( const crWindowHandle WindowHandle, const crRendererConfiguration NewConfiguration, const crOpenGLContext OriginalContext )
 	{
 	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
 	if ( WindowData == NULL )
@@ -50,7 +50,14 @@ crOpenGLContext crGLXCreateContext ( const crWindowHandle WindowHandle, const cr
 		None
 		};
 
-	NewGLXContext = glXCreateContextAttribsARB ( WindowData->DisplayHandle, FramebufferConfigs[0], NULL, true, ContextAttributes );
+	GLXContext OriginalGLXContext = NULL;
+	if ( OriginalContext != NULL )
+		{
+		struct InternalGLXContextData *OriginalContextData = ( struct InternalGLXContextData * ) OriginalContext;
+		OriginalGLXContext = OriginalContextData->Context;
+		}
+
+	NewGLXContext = glXCreateContextAttribsARB ( WindowData->DisplayHandle, FramebufferConfigs[0], OriginalGLXContext, true, ContextAttributes );
 	if ( !NewGLXContext )
 		{
 		LOG_ERROR ( "glXCreateContextAttribsARB failed" );
@@ -72,6 +79,11 @@ OnError:
 		glXDestroyContext ( WindowData->DisplayHandle, NewGLXContext );
 
 	return NULL;
+	}
+
+crOpenGLContext crGLXCreateContext ( const crWindowHandle WindowHandle, const crRendererConfiguration NewConfiguration )
+	{
+	return crGLXCreateSharedContext ( WindowHandle, NewConfiguration, NULL );
 	}
 
 bool crGLXDeleteContext ( const crOpenGLContext Context )
