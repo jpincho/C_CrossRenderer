@@ -110,17 +110,33 @@ static bool DetectOpenGLInformation ( void )
 			{
 			unsigned Length = ( unsigned ) strlen ( ExtensionString );
 			unsigned ExtensionIndex = 0;
-			for ( Begin = ExtensionString; Begin < ExtensionString + Length; Begin = End + 1 )
+			for ( Begin = ExtensionString; Begin < ExtensionString + Length; )
 				{
 				End = strchr ( Begin, ' ' );
-				if ( End == NULL ) End = ExtensionString + Length;
+				if ( End == NULL )
+					End = ExtensionString + Length;
+				if ( End > Begin )
+					++crGL4Information.ExtensionCount;
+				Begin = End + 1;
+				}
+			crGL4Information.Extensions = calloc ( crGL4Information.ExtensionCount, sizeof ( char * ) );
+			for ( Begin = ExtensionString; Begin < ExtensionString + Length; )
+				{
+				End = strchr ( Begin, ' ' );
+				if ( End == NULL )
+					End = ExtensionString + Length;
+				if ( End > Begin )
+					{
 #if defined ( PLATFORM_STRNDUP_EXISTS )
-				crGL4Information.Extensions[ExtensionIndex] = strndup ( Begin, End - Begin + 1 );
+					crGL4Information.Extensions[ExtensionIndex] = strndup ( Begin, End - Begin );
 #else
-				crGL4Information.Extensions[ExtensionIndex] = malloc ( End - Begin + 1 );
-				strncpy ( crGL4Information.Extensions[ExtensionIndex], Begin, End - Begin );
+					crGL4Information.Extensions[ExtensionIndex] = malloc ( ( size_t ) ( End - Begin ) + 1 );
+					memcpy ( crGL4Information.Extensions[ExtensionIndex], Begin, ( size_t ) ( End - Begin ) );
+					crGL4Information.Extensions[ExtensionIndex][End - Begin] = 0;
 #endif
-				++ExtensionIndex;
+					++ExtensionIndex;
+					}
+				Begin = End + 1;
 				}
 			}
 		}
@@ -313,11 +329,10 @@ bool crGL4DisplayFramebuffer ( const crFramebufferHandle FramebufferHandle, cons
 		glBindFramebuffer ( GL_READ_FRAMEBUFFER, FramebufferInformation->OpenGLID );
 		glBindFramebuffer ( GL_DRAW_FRAMEBUFFER, 0 );
 		glBlitFramebuffer (
-		    0, 0, FramebufferInformation->Dimensions.x, FramebufferInformation->Dimensions.y,
-		    0, 0, FramebufferInformation->Dimensions.x, FramebufferInformation->Dimensions.y,
+		    0, 0, ( GLint ) FramebufferInformation->Dimensions.x, ( GLint ) FramebufferInformation->Dimensions.y,
+		    0, 0, ( GLint ) WindowDimensions.x, ( GLint ) WindowDimensions.y,
 		    GL_COLOR_BUFFER_BIT, GL_NEAREST );
-		// Restore old framebuffer binding
-		glBindFramebuffer ( GL_DRAW_FRAMEBUFFER, FramebufferInformation->OpenGLID );
+		crGL4ConfigureFramebuffer ( 0 );
 		}
 
 	return true;

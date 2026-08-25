@@ -31,6 +31,7 @@ static bool BuildShaderObject ( const char *Code, const GLenum GLShaderType, GLu
 			glGetShaderInfoLog ( ShaderObjectID, InfoLogLength, NULL, Infolog );
 			}
 		LOG_ERROR ( "OpenGL error during shader object compilation. '%s'", Infolog );
+		glDeleteShader ( ShaderObjectID );
 		return false;
 		}
 	*OutputID = ShaderObjectID;
@@ -154,16 +155,18 @@ static bool DetectUniformsAndAttributes ( crGL4InternalShaderInfo *ShaderInfo )
 
 			// Add all the elements to our shader info
 			char *BracketPos = strchr ( Name, '[' );
-			*BracketPos = 0;
-			for ( int Index = 0; Index < UniformSize; ++Index )
+			if ( BracketPos != NULL )
 				{
-				int NecessarySpace = snprintf ( NULL, 0, "%s[%u]", Name, Index );
-				ShaderInfo->Uniforms[ShaderInfo->UniformCount].Name = malloc ( NecessarySpace + 1 );
-				snprintf ( ShaderInfo->Uniforms[ShaderInfo->UniformCount].Name, NecessarySpace + 1, "%s[%u]", Name, Index );
-				ShaderInfo->Uniforms[ShaderInfo->UniformCount].Type = crGL4TranslateOpenGLUniformType ( GLType );
-				ShaderInfo->Uniforms[ShaderInfo->UniformCount].OpenGLID = Location + Index;
-				++ShaderInfo->UniformCount;
-				++UniformIndex;
+				*BracketPos = 0;
+				for ( int Index = 0; Index < UniformSize; ++Index )
+					{
+					int NecessarySpace = snprintf ( NULL, 0, "%s[%u]", Name, Index );
+					ShaderInfo->Uniforms[ShaderInfo->UniformCount].Name = malloc ( NecessarySpace + 1 );
+					snprintf ( ShaderInfo->Uniforms[ShaderInfo->UniformCount].Name, NecessarySpace + 1, "%s[%u]", Name, Index );
+					ShaderInfo->Uniforms[ShaderInfo->UniformCount].Type = crGL4TranslateOpenGLUniformType ( GLType );
+					ShaderInfo->Uniforms[ShaderInfo->UniformCount].OpenGLID = Location + Index;
+					++ShaderInfo->UniformCount;
+					}
 				}
 			}
 		else
@@ -339,6 +342,8 @@ bool crGL4DeleteShader ( const crShaderHandle Handle )
 		SAFE_DEL_C ( ShaderInformation->Uniforms[Index].Name );
 		}
 	SAFE_DEL_C ( ShaderInformation->Uniforms );
+	SAFE_DEL_C ( ShaderInformation->GeneralInformation.Attributes );
+	SAFE_DEL_C ( ShaderInformation->GeneralInformation.Uniforms );
 	SAFE_DEL_C ( ShaderInformation );
 	PointerList_DestroyNode ( &crGL4Information.Shaders, Handle );
 	return true;

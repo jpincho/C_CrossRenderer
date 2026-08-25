@@ -86,6 +86,26 @@ crTextureHandle crGL4CreateTexture ( const crTextureDescriptor Descriptor )
 		glBindTexture ( GL_TEXTURE_2D, 0 );
 		}
 
+	if ( Descriptor.Format == crPixelFormat_AlphaRedGreenBlue8888 )
+		{
+		if ( crGL4Information.DirectStateAccessEnabled )
+			{
+			glTextureParameteri ( NewTexture->OpenGLID, GL_TEXTURE_SWIZZLE_R, GL_GREEN );
+			glTextureParameteri ( NewTexture->OpenGLID, GL_TEXTURE_SWIZZLE_G, GL_BLUE );
+			glTextureParameteri ( NewTexture->OpenGLID, GL_TEXTURE_SWIZZLE_B, GL_ALPHA );
+			glTextureParameteri ( NewTexture->OpenGLID, GL_TEXTURE_SWIZZLE_A, GL_RED );
+			}
+		else
+			{
+			glBindTexture ( NewTexture->GLTextureType, NewTexture->OpenGLID );
+			glTexParameteri ( NewTexture->GLTextureType, GL_TEXTURE_SWIZZLE_R, GL_GREEN );
+			glTexParameteri ( NewTexture->GLTextureType, GL_TEXTURE_SWIZZLE_G, GL_BLUE );
+			glTexParameteri ( NewTexture->GLTextureType, GL_TEXTURE_SWIZZLE_B, GL_ALPHA );
+			glTexParameteri ( NewTexture->GLTextureType, GL_TEXTURE_SWIZZLE_A, GL_RED );
+			glBindTexture ( NewTexture->GLTextureType, 0 );
+			}
+		}
+
 	if ( crGL4CheckError() == false )
 		goto OnError;
 
@@ -94,14 +114,18 @@ crTextureHandle crGL4CreateTexture ( const crTextureDescriptor Descriptor )
 		{
 		if ( crGL4Load2DTextureData ( NewNode, Descriptor.Format, Descriptor.Data ) == false )
 			{
-			glDeleteTextures ( 1, &NewTexture->OpenGLID );
 			goto OnError;
 			}
 		}
 	return NewNode;
 
 OnError:
-	SAFE_DEL_C ( NewTexture );
+	if ( NewTexture != NULL )
+		{
+		if ( NewTexture->OpenGLID != 0 )
+			glDeleteTextures ( 1, &NewTexture->OpenGLID );
+		SAFE_DEL_C ( NewTexture );
+		}
 	if ( NewNode )
 		PointerList_DestroyNode ( &crGL4Information.Textures, NewNode );
 	return crTextureHandle_Invalid;

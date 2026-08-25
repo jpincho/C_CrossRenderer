@@ -1,6 +1,7 @@
 #include "GL4Framebuffer.h"
 #include "GL4Texture.h"
 #include "GL4Internals.h"
+#include "GL4StateCache.h"
 #include <assert.h>
 #include <malloc.h>
 
@@ -68,6 +69,10 @@ crFramebufferHandle crGL4CreateFramebuffer ( const crFramebufferDescriptor Descr
 				Attachments[Index] = GL_COLOR_ATTACHMENT0 + Index;
 			glNamedFramebufferDrawBuffers ( NewFramebuffer->OpenGLID, Descriptor.ColorAttachments, Attachments );
 			}
+		else
+			{
+			glNamedFramebufferDrawBuffers ( NewFramebuffer->OpenGLID, 0, NULL );
+			}
 		}
 	else
 		{
@@ -100,6 +105,11 @@ crFramebufferHandle crGL4CreateFramebuffer ( const crFramebufferDescriptor Descr
 				Attachments[Index] = GL_COLOR_ATTACHMENT0 + Index;
 			glDrawBuffers ( Descriptor.ColorAttachments, Attachments );
 			}
+		else
+			{
+			glDrawBuffer ( GL_NONE );
+			}
+		crGL4ConfigureFramebuffer ( 0 ); // Invalidate state cache
 		}
 
 	NewNode = PointerList_AddAtEnd ( &crGL4Information.Framebuffers, NewFramebuffer );
@@ -108,14 +118,17 @@ crFramebufferHandle crGL4CreateFramebuffer ( const crFramebufferDescriptor Descr
 OnError:
 	if ( crGL4Information.DirectStateAccessEnabled == false )
 		{
-		glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
+		crGL4ConfigureFramebuffer ( 0 );
 		}
 	//CurrentBoundFramebuffer = FramebufferHandle::Invalid;
 
 	if ( NewFramebuffer->DepthTexture )
 		crGL4DeleteTexture ( NewFramebuffer->DepthTexture );
 	for ( size_t cont = 0; cont < NewFramebuffer->ColorTextureCount; ++cont )
-		crGL4DeleteTexture ( NewFramebuffer->ColorTextures[cont] );
+		{
+		if ( NewFramebuffer->ColorTextures[cont] )
+			crGL4DeleteTexture ( NewFramebuffer->ColorTextures[cont] );
+		}
 	SAFE_DEL_C ( NewFramebuffer->ColorTextures );
 	glDeleteFramebuffers ( 1, &NewFramebuffer->OpenGLID );
 	SAFE_DEL_C ( NewFramebuffer );
@@ -129,9 +142,7 @@ bool crGL4DeleteFramebuffer ( const crFramebufferHandle Handle )
 	crGL4InternalFramebufferInfo *FramebufferInformation = ( crGL4InternalFramebufferInfo * ) PointerList_GetNodeData ( Handle );
 
 	if ( crGL4Information.DirectStateAccessEnabled == false )
-		{
-		glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
-		}
+		crGL4ConfigureFramebuffer ( 0 );
 	if ( FramebufferInformation->DepthTexture )
 		crGL4DeleteTexture ( FramebufferInformation->DepthTexture );
 	for ( size_t cont = 0; cont < FramebufferInformation->ColorTextureCount; ++cont )
@@ -158,8 +169,13 @@ void crGL4SetFramebufferClearDepth ( const crFramebufferHandle Handle, const flo
 
 void crGL4BindDrawFramebuffer ( const crFramebufferHandle Handle )
 	{
-	UNUSED ( Handle );
-	//StateCache::ConfigureFramebuffer(Handle);
+	if ( Handle == NULL )
+		{
+		crGL4ConfigureFramebuffer ( 0 );
+		return;
+		}
+	crGL4InternalFramebufferInfo *FramebufferInformation = ( crGL4InternalFramebufferInfo * ) PointerList_GetNodeData ( Handle );
+	crGL4ConfigureFramebuffer ( FramebufferInformation->OpenGLID );
 	}
 void crGL4ClearFramebuffer ( const crFramebufferHandle Handle, const bool ShouldClearColorBuffer, const vec4 Color, const bool ShouldClearDepthBuffer, const float DepthClearValue, const bool ShouldClearStencilBuffer, const int StencilClearValue, const int StencilMask )
 	{
@@ -183,16 +199,14 @@ void crGL4ClearFramebuffer ( const crFramebufferHandle Handle, const bool Should
 		}
 	if ( BitMask )
 		{
-		/*if (CurrentBoundFramebuffer != Handle)
-			{
-			glBindFramebuffer(GL_FRAMEBUFFER, FramebufferInformation->OpenGLID);
-			CurrentBoundFramebuffer = Handle;
-			}
+		crGL4ConfigureFramebuffer ( FramebufferInformation->OpenGLID );
 
-		StateCache::SetDefaultViewportSize(FramebufferInformation->Dimensions);
-		StateCache::ConfigureScissor(ScissorSettings());
-		StateCache::ConfigureViewport(ViewportSettings());
-		StateCache::ConfigureStencil(StencilBufferSettings());*/
+		static crScissorSettings DefaultScissorSettings = { 0 };
+		static crViewportSettings DefaultViewportSettings = { 0 };
+		static crStencilBufferSettings DefaultStencilSettings = { 0 };
+		crGL4ConfigureScissor ( &DefaultScissorSettings );
+		crGL4ConfigureViewport ( &DefaultViewportSettings );
+		crGL4ConfigureStencil ( &DefaultStencilSettings );
 		glClear ( BitMask );
 		}
 	crGL4CheckError();

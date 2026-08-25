@@ -11,56 +11,44 @@
 
 static PointerListNode *GetPointerListNodeFromcrWindowHandle ( const crWindowHandle WindowHandle )
 	{
-	PointerListNode *Node = PointerList_GetFirst ( &WindowList );
-	while ( Node != NULL )
+	for ( PointerListNode *Node = PointerList_GetFirst ( &WindowList ); Node != NULL; Node = PointerList_GetNextNode ( Node ) )
 		{
 		struct InternalX11WindowData *NodeData = ( struct InternalX11WindowData * ) PointerList_GetNodeData ( Node );
 		if ( NodeData->WindowHandle == WindowHandle )
-			{
 			return Node;
-			}
 		}
 	return NULL;
 	}
 
 static PointerListNode *GetPointerListNodeFromX11WindowHandle ( const Window WindowHandle )
 	{
-	PointerListNode *Node = PointerList_GetFirst ( &WindowList );
-	while ( Node != NULL )
+	for ( PointerListNode *Node = PointerList_GetFirst ( &WindowList ); Node != NULL; Node = PointerList_GetNextNode ( Node ) )
 		{
 		struct InternalX11WindowData *NodeData = ( struct InternalX11WindowData * ) PointerList_GetNodeData ( Node );
 		if ( NodeData->X11WindowHandle == WindowHandle )
-			{
 			return Node;
-			}
 		}
 	return NULL;
 	}
 
 struct InternalX11WindowData *GetInternalX11WindowDataFromX11WindowHandle ( const Window WindowHandle )
 	{
-	PointerListNode *Node = PointerList_GetFirst ( &WindowList );
-	while ( Node != NULL )
+	for ( PointerListNode *Node = PointerList_GetFirst ( &WindowList ); Node != NULL; Node = PointerList_GetNextNode ( Node ) )
 		{
 		struct InternalX11WindowData *NodeData = ( struct InternalX11WindowData * ) PointerList_GetNodeData ( Node );
 		if ( NodeData->X11WindowHandle == WindowHandle )
-			{
 			return NodeData;
-			}
 		}
 	return NULL;
 	}
 
 struct InternalX11WindowData *GetInternalX11WindowDataFromcrWindowHandle ( const crWindowHandle WindowHandle )
 	{
-	PointerListNode *Node = PointerList_GetFirst ( &WindowList );
-	while ( Node != NULL )
+	for ( PointerListNode *Node = PointerList_GetFirst ( &WindowList ); Node != NULL; Node = PointerList_GetNextNode ( Node ) )
 		{
 		struct InternalX11WindowData *NodeData = ( struct InternalX11WindowData * ) PointerList_GetNodeData ( Node );
 		if ( NodeData->WindowHandle == WindowHandle )
-			{
 			return NodeData;
-			}
 		}
 	return NULL;
 	}
@@ -551,9 +539,9 @@ bool crX11GetMousePosition ( const crWindowHandle WindowHandle, ivec2 * Position
 	Window ChildWindow, RootWindow;
 	int ChildX, ChildY, RootX, RootY;
 	unsigned MaskReturn;
-	if ( XQueryPointer ( WindowData->DisplayHandle, WindowData->X11WindowHandle, &ChildWindow, &RootWindow, &RootX, &RootY, &ChildX, &ChildY, &MaskReturn ) == false )
+	if ( XQueryPointer ( WindowData->DisplayHandle, WindowData->X11WindowHandle, &RootWindow, &ChildWindow, &RootX, &RootY, &ChildX, &ChildY, &MaskReturn ) == false )
 		return false;
-	if ( RootWindow != WindowData->X11WindowHandle )
-		return false;
+	Position->x = ChildX;
+	Position->y = ChildY;
 	return true;
 	}

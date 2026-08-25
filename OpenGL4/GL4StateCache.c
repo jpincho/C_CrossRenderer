@@ -4,7 +4,7 @@
 static bool Enabled = true;
 static uvec2 DefaultViewportSize;
 static crRenderState CurrentState;
-static crFramebufferHandle CurrentBoundFramebuffer = 0;
+static GLuint CurrentBoundFramebuffer = 0;
 
 void crGL4SetDefaultViewportSize ( const uvec2 NewSize )
 	{
@@ -165,7 +165,7 @@ void crGL4ConfigureStencil ( const crStencilBufferSettings *NewSettings )
 
 	if ( NewSettings->Mask != CurrentState.Stencil.Mask )
 		{
-		glStencilMask ( NewSettings->FunctionMask );
+		glStencilMask ( NewSettings->Mask );
 		CurrentState.Stencil.Mask = NewSettings->Mask;
 		}
 
@@ -270,18 +270,12 @@ void crGL4ConfigureDepthTest ( const crDepthTestSettings *NewSettings )
 	crGL4CheckError();
 	}
 
-void crGL4ConfigureFramebuffer ( const crFramebufferHandle NewFramebuffer )
+void crGL4ConfigureFramebuffer ( const unsigned OpenGLID )
 	{
-	if ( NewFramebuffer == CurrentBoundFramebuffer )
+	if ( OpenGLID == CurrentBoundFramebuffer )
 		return;
-	if ( !NewFramebuffer )
-		glBindFramebuffer ( GL_FRAMEBUFFER, 0 );
-	else
-		{
-		crGL4InternalFramebufferInfo *FramebufferInformation = ( crGL4InternalFramebufferInfo * ) PointerList_GetNodeData ( NewFramebuffer );
-		glBindFramebuffer ( GL_FRAMEBUFFER, FramebufferInformation->OpenGLID );
-		}
-	CurrentBoundFramebuffer = NewFramebuffer;
+	glBindFramebuffer ( GL_FRAMEBUFFER, OpenGLID );
+	CurrentBoundFramebuffer = OpenGLID;
 	crGL4CheckError();
 	}
 

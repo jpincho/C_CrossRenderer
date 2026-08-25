@@ -14,6 +14,6 @@ void crGL4ConfigureStencil ( const crStencilBufferSettings *NewSettings );
 void crGL4ConfigureScissor ( const crScissorSettings *NewSettings );
 void crGL4ConfigureViewport ( const crViewportSettings *NewSettings );
 void crGL4ConfigureDepthTest ( const crDepthTestSettings *NewSettings );
-void crGL4ConfigureFramebuffer ( const crFramebufferHandle NewFramebuffer );
+void crGL4ConfigureFramebuffer ( const unsigned OpenGLID );
 void crGL4ConfigurePolygonMode ( const crPolygonModeSettings *NewSettings );
 END_C_DECLARATIONS

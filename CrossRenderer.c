@@ -87,6 +87,8 @@ bool crShutdown ( void )
 		crDestroyWindow ( MainWindowHandle );
 		MainWindowHandle = NULL;
 		}
+	if ( crShutdownRenderer )
+		crShutdownRenderer ();
 	return true;
 	}
 

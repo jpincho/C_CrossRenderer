@@ -371,15 +371,14 @@ crWindowHandle crWindowsCreateNewWindow ( const crRenderWindowDescriptor Descrip
 
 bool crWindowsDestroyWindow ( const crWindowHandle WindowHandle )
 	{
-	if ( IsWindow ( WindowHandle ) )
-		{
-		DestroyWindow ( WindowHandle );
-		return true;
-		}
-	PointerListNode *node = PointerList_Find ( &WindowList, PointerList_GetFirst ( &WindowList ), WindowHandle );
-	if ( node )
-		PointerList_DestroyNode ( &WindowList, node );
-	return false;
+	if ( IsWindow ( WindowHandle ) == false )
+		return false;
+
+	DestroyWindow ( WindowHandle );
+	PointerListNode *Node = PointerList_Find ( &WindowList, PointerList_GetFirst ( &WindowList ), WindowHandle );
+	if ( Node )
+		PointerList_DestroyNode ( &WindowList, Node );
+	return true;
 	}
 
 bool crWindowsUpdateWindows ( void )

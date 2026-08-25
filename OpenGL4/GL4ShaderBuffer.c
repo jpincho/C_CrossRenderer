@@ -65,7 +65,7 @@ bool crGL4ChangeShaderBufferContents ( const crShaderBufferHandle Handle, const 
 	{
 	crGL4InternalShaderBufferInfo *ShaderBufferInformation = ( crGL4InternalShaderBufferInfo * ) PointerList_GetNodeData ( Handle );
 
-	if ( DataSize > ShaderBufferInformation->DataSize )
+	if ( Offset + DataSize > ShaderBufferInformation->Capacity )
 		return false;
 
 	if ( crGL4Information.DirectStateAccessEnabled )
@@ -89,6 +89,11 @@ void *crGL4MapShaderBuffer ( const crShaderBufferHandle Handle, const crShaderBu
 
 	if ( ( ShaderBufferInformation->MappedPointer ) && ( ShaderBufferInformation->GLMappedAccessType == GLAccessType ) )
 		return ShaderBufferInformation->MappedPointer;
+	if ( ShaderBufferInformation->MappedPointer != NULL )
+		{
+		if ( crGL4UnmapShaderBuffer ( Handle ) == false )
+			return NULL;
+		}
 
 	if ( crGL4Information.DirectStateAccessEnabled )
 		{
