@@ -1,13 +1,68 @@
 #include "GLXContext.h"
 #include "../../WindowManager/X11/X11Internal.h"
 #include <glad/glad_glx.h>
+#include <Platform/Platform.h>
 #include <Platform/Logger.h>
+#include <string.h>
+#include <stdlib.h>
 
 struct InternalGLXContextData
 	{
 	GLXContext Context;
 	Display *DisplayHandle;
+	char **Extensions;
+	unsigned ExtensionCount;
 	};
+
+static bool crGLXDetectExtensions ( struct InternalGLXContextData *Context, struct InternalX11WindowData *WindowData )
+	{
+	const char *ExtensionString, *Begin, *End;
+	ExtensionString = ( const char * ) glXQueryExtensionsString ( Context->DisplayHandle, WindowData->ScreenID );
+	if ( ExtensionString == NULL )
+		return false;
+
+	unsigned Length = ( unsigned ) strlen ( ExtensionString );
+	unsigned ExtensionIndex = 0;
+	for ( Begin = ExtensionString; Begin < ExtensionString + Length; )
+		{
+		End = strchr ( Begin, ' ' );
+		if ( End == NULL )
+			End = ExtensionString + Length;
+		if ( End > Begin )
+			++Context->ExtensionCount;
+		Begin = End + 1;
+		}
+	Context->Extensions = calloc ( Context->ExtensionCount, sizeof ( char * ) );
+	for ( Begin = ExtensionString; Begin < ExtensionString + Length; )
+		{
+		End = strchr ( Begin, ' ' );
+		if ( End == NULL )
+			End = ExtensionString + Length;
+		if ( End > Begin )
+			{
+#if defined ( PLATFORM_STRNDUP_EXISTS )
+			Context->Extensions[ExtensionIndex] = strndup ( Begin, End - Begin );
+#else
+			Context->Extensions[ExtensionIndex] = malloc ( ( size_t ) ( End - Begin ) + 1 );
+			memcpy ( Context->Extensions[ExtensionIndex], Begin, ( size_t ) ( End - Begin ) );
+			Context->Extensions[ExtensionIndex][End - Begin] = 0;
+#endif
+			++ExtensionIndex;
+			}
+		Begin = End + 1;
+		}
+	return true;
+	}
+
+static bool crGLXIsExtensionAvailable ( const struct InternalGLXContextData *Context, const char *Extension )
+	{
+	for ( unsigned Index = 0; Index < Context->ExtensionCount; ++Index )
+		{
+		if ( strcmp ( Extension, Context->Extensions[Index] ) == 0 )
+			return true;
+		}
+	return false;
+	}
 
 crOpenGLContext crGLXCreateContext ( const crWindowHandle WindowHandle, const crRendererConfiguration NewConfiguration )
 	{
@@ -59,11 +114,37 @@ crOpenGLContext crGLXCreateContext ( const crWindowHandle WindowHandle, const cr
 
 	struct InternalGLXContextData *NewContextData = calloc ( 1, sizeof ( struct InternalGLXContextData ) );
 	if ( !NewContextData )
-		return NULL;
+		goto OnError;
+
 	NewContextData->Context = NewGLXContext;
 	NewContextData->DisplayHandle = WindowData->DisplayHandle;
 
 	glXMakeContextCurrent ( NewContextData->DisplayHandle, WindowData->X11WindowHandle, WindowData->X11WindowHandle, NewContextData->Context );
+	crGLXDetectExtensions ( NewContextData, WindowData );
+	LOG_DEBUG ( "Detected GLX extensions: %lu", NewContextData->ExtensionCount );
+	for ( unsigned Index = 0; Index < NewContextData->ExtensionCount; ++Index )
+		LOG_DEBUG ( "%s", NewContextData->Extensions[Index] );
+
+	if ( NewConfiguration.VSyncEnabled )
+		{
+		if ( ( crGLXIsExtensionAvailable ( NewContextData, "GLX_EXT_swap_control" ) ) && ( glXSwapIntervalEXT != NULL ) )
+			{
+			LOG_DEBUG ( "VSync available through GLX_EXT_swap_control" );
+			glXSwapIntervalEXT ( NewContextData->DisplayHandle, WindowData->X11WindowHandle, 1 );
+			}
+		else if ( ( crGLXIsExtensionAvailable ( NewContextData, "GLAD_GLX_MESA_swap_control" ) ) && ( glXSwapIntervalMESA != NULL ) )
+			{
+			LOG_DEBUG ( "VSync available through GLAD_GLX_MESA_swap_control" );
+			glXSwapIntervalMESA ( 1 );
+			}
+		else if ( ( crGLXIsExtensionAvailable ( NewContextData, "GLAD_GLX_SGI_swap_control" ) ) && ( glXSwapIntervalSGI != NULL ) )
+			{
+			LOG_DEBUG ( "VSync available through GLAD_GLX_SGI_swap_control" );
+			glXSwapIntervalSGI ( 1 );
+			}
+		}
+
+	XFree ( FramebufferConfigs );
 	return NewContextData;
 OnError:
 	if ( FramebufferConfigs )
