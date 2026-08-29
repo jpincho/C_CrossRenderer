@@ -21,4 +21,5 @@ crWindowManagerCallbacks crGetWindowManagerCallbacks ( void );
 crWindowHandle crGetMainWindowHandle ( void );
 
 void crSetRenderStateToDefault ( crRenderState *State );
+const char *crStringifycrKeyCode ( const crKeyCode KeyCode );
 END_C_DECLARATIONS

@@ -7,179 +7,179 @@
 #include <stdlib.h>
 
 struct InternalGLXContextData
-	{
-	GLXContext Context;
-	Display *DisplayHandle;
-	char **Extensions;
-	unsigned ExtensionCount;
-	};
+    {
+    GLXContext Context;
+    Display *DisplayHandle;
+    char **Extensions;
+    unsigned ExtensionCount;
+    };
 
 static bool crGLXDetectExtensions ( struct InternalGLXContextData *Context, struct InternalX11WindowData *WindowData )
-	{
-	const char *ExtensionString, *Begin, *End;
-	ExtensionString = ( const char * ) glXQueryExtensionsString ( Context->DisplayHandle, WindowData->ScreenID );
-	if ( ExtensionString == NULL )
-		return false;
+    {
+    const char *ExtensionString, *Begin, *End;
+    ExtensionString = ( const char * ) glXQueryExtensionsString ( Context->DisplayHandle, WindowData->ScreenID );
+    if ( ExtensionString == NULL )
+        return false;
 
-	unsigned Length = ( unsigned ) strlen ( ExtensionString );
-	unsigned ExtensionIndex = 0;
-	for ( Begin = ExtensionString; Begin < ExtensionString + Length; )
-		{
-		End = strchr ( Begin, ' ' );
-		if ( End == NULL )
-			End = ExtensionString + Length;
-		if ( End > Begin )
-			++Context->ExtensionCount;
-		Begin = End + 1;
-		}
-	Context->Extensions = calloc ( Context->ExtensionCount, sizeof ( char * ) );
-	for ( Begin = ExtensionString; Begin < ExtensionString + Length; )
-		{
-		End = strchr ( Begin, ' ' );
-		if ( End == NULL )
-			End = ExtensionString + Length;
-		if ( End > Begin )
-			{
+    unsigned Length = ( unsigned ) strlen ( ExtensionString );
+    unsigned ExtensionIndex = 0;
+    for ( Begin = ExtensionString; Begin < ExtensionString + Length; )
+        {
+        End = strchr ( Begin, ' ' );
+        if ( End == NULL )
+            End = ExtensionString + Length;
+        if ( End > Begin )
+            ++Context->ExtensionCount;
+        Begin = End + 1;
+        }
+    Context->Extensions = calloc ( Context->ExtensionCount, sizeof ( char * ) );
+    for ( Begin = ExtensionString; Begin < ExtensionString + Length; )
+        {
+        End = strchr ( Begin, ' ' );
+        if ( End == NULL )
+            End = ExtensionString + Length;
+        if ( End > Begin )
+            {
 #if defined ( PLATFORM_STRNDUP_EXISTS )
-			Context->Extensions[ExtensionIndex] = strndup ( Begin, End - Begin );
+            Context->Extensions[ExtensionIndex] = strndup ( Begin, End - Begin );
 #else
-			Context->Extensions[ExtensionIndex] = malloc ( ( size_t ) ( End - Begin ) + 1 );
-			memcpy ( Context->Extensions[ExtensionIndex], Begin, ( size_t ) ( End - Begin ) );
-			Context->Extensions[ExtensionIndex][End - Begin] = 0;
+            Context->Extensions[ExtensionIndex] = malloc ( ( size_t ) ( End - Begin ) + 1 );
+            memcpy ( Context->Extensions[ExtensionIndex], Begin, ( size_t ) ( End - Begin ) );
+            Context->Extensions[ExtensionIndex][End - Begin] = 0;
 #endif
-			++ExtensionIndex;
-			}
-		Begin = End + 1;
-		}
-	return true;
-	}
+            ++ExtensionIndex;
+            }
+        Begin = End + 1;
+        }
+    return true;
+    }
 
 static bool crGLXIsExtensionAvailable ( const struct InternalGLXContextData *Context, const char *Extension )
-	{
-	for ( unsigned Index = 0; Index < Context->ExtensionCount; ++Index )
-		{
-		if ( strcmp ( Extension, Context->Extensions[Index] ) == 0 )
-			return true;
-		}
-	return false;
-	}
+    {
+    for ( unsigned Index = 0; Index < Context->ExtensionCount; ++Index )
+        {
+        if ( strcmp ( Extension, Context->Extensions[Index] ) == 0 )
+            return true;
+        }
+    return false;
+    }
 
 crOpenGLContext crGLXCreateContext ( const crWindowHandle WindowHandle, const crRendererConfiguration NewConfiguration )
-	{
-	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
-	if ( WindowData == NULL )
-		return NULL;
+    {
+    struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
+    if ( WindowData == NULL )
+        return NULL;
 
-	GLXContext NewGLXContext = NULL;
-	if ( !gladLoadGLX ( WindowData->DisplayHandle, WindowData->ScreenID ) )
-		return NULL;
+    GLXContext NewGLXContext = NULL;
+    if ( !gladLoadGLX ( WindowData->DisplayHandle, WindowData->ScreenID ) )
+        return NULL;
 
-	// Create the context
-	int Attributes[] =
-		{
-		GLX_RENDER_TYPE, GLX_RGBA_BIT,
-		GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
-		GLX_DOUBLEBUFFER, true,
-		GLX_RED_SIZE, NewConfiguration.RedBits,
-		GLX_GREEN_SIZE, NewConfiguration.GreenBits,
-		GLX_BLUE_SIZE, NewConfiguration.BlueBits,
-		None
-		};
+    // Create the context
+    int Attributes[] =
+        {
+        GLX_RENDER_TYPE, GLX_RGBA_BIT,
+        GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
+        GLX_DOUBLEBUFFER, true,
+        GLX_RED_SIZE, NewConfiguration.RedBits,
+        GLX_GREEN_SIZE, NewConfiguration.GreenBits,
+        GLX_BLUE_SIZE, NewConfiguration.BlueBits,
+        None
+        };
 
-	int FramebufferConfigCount = 0;
-	GLXFBConfig *FramebufferConfigs = glXChooseFBConfig ( WindowData->DisplayHandle,
-	                                  WindowData->ScreenID,
-	                                  Attributes,
-	                                  &FramebufferConfigCount );
-	if ( FramebufferConfigs == NULL )
-		{
-		LOG_ERROR ( "glXChooseFBConfig failed" );
-		goto OnError;
-		}
+    int FramebufferConfigCount = 0;
+    GLXFBConfig *FramebufferConfigs = glXChooseFBConfig ( WindowData->DisplayHandle,
+        WindowData->ScreenID,
+        Attributes,
+        &FramebufferConfigCount );
+    if ( FramebufferConfigs == NULL )
+        {
+        LOG_ERROR ( "glXChooseFBConfig failed" );
+        goto OnError;
+        }
 
-	static int ContextAttributes[] =
-		{
-		GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
-		GLX_CONTEXT_MINOR_VERSION_ARB, 2,
-		GLX_CONTEXT_PROFILE_MASK_ARB,  GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
-		None
-		};
+    static int ContextAttributes[] =
+        {
+        GLX_CONTEXT_MAJOR_VERSION_ARB, 4,
+        GLX_CONTEXT_MINOR_VERSION_ARB, 2,
+        GLX_CONTEXT_PROFILE_MASK_ARB,  GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+        None
+        };
 
-	NewGLXContext = glXCreateContextAttribsARB ( WindowData->DisplayHandle, FramebufferConfigs[0], NULL, true, ContextAttributes );
-	if ( !NewGLXContext )
-		{
-		LOG_ERROR ( "glXCreateContextAttribsARB failed" );
-		goto OnError;
-		}
+    NewGLXContext = glXCreateContextAttribsARB ( WindowData->DisplayHandle, FramebufferConfigs[0], NULL, true, ContextAttributes );
+    if ( !NewGLXContext )
+        {
+        LOG_ERROR ( "glXCreateContextAttribsARB failed" );
+        goto OnError;
+        }
 
-	struct InternalGLXContextData *NewContextData = calloc ( 1, sizeof ( struct InternalGLXContextData ) );
-	if ( !NewContextData )
-		goto OnError;
+    struct InternalGLXContextData *NewContextData = calloc ( 1, sizeof ( struct InternalGLXContextData ) );
+    if ( !NewContextData )
+        goto OnError;
 
-	NewContextData->Context = NewGLXContext;
-	NewContextData->DisplayHandle = WindowData->DisplayHandle;
+    NewContextData->Context = NewGLXContext;
+    NewContextData->DisplayHandle = WindowData->DisplayHandle;
 
-	glXMakeContextCurrent ( NewContextData->DisplayHandle, WindowData->X11WindowHandle, WindowData->X11WindowHandle, NewContextData->Context );
-	crGLXDetectExtensions ( NewContextData, WindowData );
-	LOG_DEBUG ( "Detected GLX extensions: %lu", NewContextData->ExtensionCount );
-	for ( unsigned Index = 0; Index < NewContextData->ExtensionCount; ++Index )
-		LOG_DEBUG ( "%s", NewContextData->Extensions[Index] );
+    glXMakeContextCurrent ( NewContextData->DisplayHandle, WindowData->X11WindowHandle, WindowData->X11WindowHandle, NewContextData->Context );
+    crGLXDetectExtensions ( NewContextData, WindowData );
+    LOG_DEBUG ( "Detected GLX extensions: %lu", NewContextData->ExtensionCount );
+    for ( unsigned Index = 0; Index < NewContextData->ExtensionCount; ++Index )
+        LOG_DEBUG ( "%s", NewContextData->Extensions[Index] );
 
-	if ( NewConfiguration.VSyncEnabled )
-		{
-		if ( ( crGLXIsExtensionAvailable ( NewContextData, "GLX_EXT_swap_control" ) ) && ( glXSwapIntervalEXT != NULL ) )
-			{
-			LOG_DEBUG ( "VSync available through GLX_EXT_swap_control" );
-			glXSwapIntervalEXT ( NewContextData->DisplayHandle, WindowData->X11WindowHandle, 1 );
-			}
-		else if ( ( crGLXIsExtensionAvailable ( NewContextData, "GLAD_GLX_MESA_swap_control" ) ) && ( glXSwapIntervalMESA != NULL ) )
-			{
-			LOG_DEBUG ( "VSync available through GLAD_GLX_MESA_swap_control" );
-			glXSwapIntervalMESA ( 1 );
-			}
-		else if ( ( crGLXIsExtensionAvailable ( NewContextData, "GLAD_GLX_SGI_swap_control" ) ) && ( glXSwapIntervalSGI != NULL ) )
-			{
-			LOG_DEBUG ( "VSync available through GLAD_GLX_SGI_swap_control" );
-			glXSwapIntervalSGI ( 1 );
-			}
-		}
+    if ( NewConfiguration.VSyncEnabled )
+        {
+        if ( ( crGLXIsExtensionAvailable ( NewContextData, "GLX_EXT_swap_control" ) ) && ( glXSwapIntervalEXT != NULL ) )
+            {
+            LOG_DEBUG ( "VSync available through GLX_EXT_swap_control" );
+            glXSwapIntervalEXT ( NewContextData->DisplayHandle, WindowData->X11WindowHandle, 1 );
+            }
+        else if ( ( crGLXIsExtensionAvailable ( NewContextData, "GLAD_GLX_MESA_swap_control" ) ) && ( glXSwapIntervalMESA != NULL ) )
+            {
+            LOG_DEBUG ( "VSync available through GLAD_GLX_MESA_swap_control" );
+            glXSwapIntervalMESA ( 1 );
+            }
+        else if ( ( crGLXIsExtensionAvailable ( NewContextData, "GLAD_GLX_SGI_swap_control" ) ) && ( glXSwapIntervalSGI != NULL ) )
+            {
+            LOG_DEBUG ( "VSync available through GLAD_GLX_SGI_swap_control" );
+            glXSwapIntervalSGI ( 1 );
+            }
+        }
 
-	XFree ( FramebufferConfigs );
-	return NewContextData;
+    XFree ( FramebufferConfigs );
+    return NewContextData;
 OnError:
-	if ( FramebufferConfigs )
-		XFree ( FramebufferConfigs );
-	if ( NewGLXContext )
-		glXDestroyContext ( WindowData->DisplayHandle, NewGLXContext );
+    if ( FramebufferConfigs )
+        XFree ( FramebufferConfigs );
+    if ( NewGLXContext )
+        glXDestroyContext ( WindowData->DisplayHandle, NewGLXContext );
 
-	return NULL;
-	}
+    return NULL;
+    }
 
 bool crGLXDeleteContext ( const crOpenGLContext Context )
-	{
-	struct InternalGLXContextData *ContextData = ( struct InternalGLXContextData* ) Context;
-	glXDestroyContext ( ContextData->DisplayHandle, ContextData->Context );
-	free ( ContextData );
-	return true;
-	}
+    {
+    struct InternalGLXContextData *ContextData = ( struct InternalGLXContextData* ) Context;
+    glXDestroyContext ( ContextData->DisplayHandle, ContextData->Context );
+    free ( ContextData );
+    return true;
+    }
 
 bool crGLXMakeContextActive ( const crOpenGLContext Context, const crWindowHandle WindowHandle )
-	{
-	struct InternalGLXContextData *ContextData = ( struct InternalGLXContextData* ) Context;
-	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
-	if ( WindowData == NULL )
-		return false;
-	glXMakeContextCurrent ( ContextData->DisplayHandle, WindowData->X11WindowHandle, WindowData->X11WindowHandle, ContextData->Context );
+    {
+    struct InternalGLXContextData *ContextData = ( struct InternalGLXContextData* ) Context;
+    struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
+    if ( WindowData == NULL )
+        return false;
+    glXMakeContextCurrent ( ContextData->DisplayHandle, WindowData->X11WindowHandle, WindowData->X11WindowHandle, ContextData->Context );
 
-	return true;
-	}
+    return true;
+    }
 
 bool crGLXSwapWindowBuffer ( const crOpenGLContext Context, const crWindowHandle WindowHandle )
-	{
-	struct InternalGLXContextData *ContextData = ( struct InternalGLXContextData* ) Context;
-	struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
-	if ( WindowData == NULL )
-		return false;
-	glXSwapBuffers ( ContextData->DisplayHandle, WindowData->X11WindowHandle );
-	return true;
-	}
+    {
+    struct InternalGLXContextData *ContextData = ( struct InternalGLXContextData* ) Context;
+    struct InternalX11WindowData *WindowData = GetInternalX11WindowDataFromcrWindowHandle ( WindowHandle );
+    if ( WindowData == NULL )
+        return false;
+    glXSwapBuffers ( ContextData->DisplayHandle, WindowData->X11WindowHandle );
+    return true;
+    }

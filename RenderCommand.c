@@ -6,85 +6,85 @@
 #include <string.h>
 
 void crSetRenderCommandShader ( crRenderCommand *Command, const crShaderHandle NewShader )
-	{
-	SAFE_DEL_C ( Command->UniformValues );
-	SAFE_DEL_C ( Command->ShaderBufferBindings );
-	SAFE_DEL_C ( Command->ShaderTextureBindings );
-	Command->Shader = NewShader;
-	const crShaderInformation *ShaderInformation = crGetShaderInformation ( NewShader );
-	Command->UniformValues = calloc ( ShaderInformation->UniformCount, sizeof ( crShaderUniformValuePair ) );
-	Command->UniformValueCount = ShaderInformation->UniformCount;
-	for ( unsigned UniformIndex = 0; UniformIndex < ShaderInformation->UniformCount; ++UniformIndex )
-		{
-		Command->UniformValues[UniformIndex].UniformHandle = UniformIndex;
-		}
-	Command->ShaderBufferBindings = calloc ( ShaderInformation->AttributeCount, sizeof ( crShaderBufferBindPair ) );
-	Command->ShaderBufferBindingCount = ShaderInformation->AttributeCount;
-	for ( unsigned AttributeIndex = 0; AttributeIndex < ShaderInformation->AttributeCount; ++AttributeIndex )
-		{
-		Command->ShaderBufferBindings[AttributeIndex].AttributeHandle = AttributeIndex;
-		}
-	Command->ShaderTextureBindings = calloc ( ShaderInformation->UniformCount, sizeof ( crShaderTextureBindPair ) );
-	Command->ShaderTextureBindingCount = 0;
-	}
+    {
+    SAFE_DEL_C ( Command->UniformValues );
+    SAFE_DEL_C ( Command->ShaderBufferBindings );
+    SAFE_DEL_C ( Command->ShaderTextureBindings );
+    Command->Shader = NewShader;
+    const crShaderInformation *ShaderInformation = crGetShaderInformation ( NewShader );
+    Command->UniformValues = calloc ( ShaderInformation->UniformCount, sizeof ( crShaderUniformValuePair ) );
+    Command->UniformValueCount = ShaderInformation->UniformCount;
+    for ( unsigned UniformIndex = 0; UniformIndex < ShaderInformation->UniformCount; ++UniformIndex )
+        {
+        Command->UniformValues[UniformIndex].UniformHandle = UniformIndex;
+        }
+    Command->ShaderBufferBindings = calloc ( ShaderInformation->AttributeCount, sizeof ( crShaderBufferBindPair ) );
+    Command->ShaderBufferBindingCount = ShaderInformation->AttributeCount;
+    for ( unsigned AttributeIndex = 0; AttributeIndex < ShaderInformation->AttributeCount; ++AttributeIndex )
+        {
+        Command->ShaderBufferBindings[AttributeIndex].AttributeHandle = AttributeIndex;
+        }
+    Command->ShaderTextureBindings = calloc ( ShaderInformation->UniformCount, sizeof ( crShaderTextureBindPair ) );
+    Command->ShaderTextureBindingCount = 0;
+    }
 
 bool crSetRenderCommandIndexShaderBufferBinding ( crRenderCommand *Command, const crShaderBufferDataStream Stream )
-	{
-	Command->IndexBufferStream = Stream;
-	return true;
-	}
+    {
+    Command->IndexBufferStream = Stream;
+    return true;
+    }
 
 bool crSetRenderCommandShaderBufferBinding ( crRenderCommand *Command, const crShaderAttributeHandle AttributeHandle, const crShaderBufferDataStream Stream )
-	{
-	if ( AttributeHandle == -1 )
-		return false;
+    {
+    if ( AttributeHandle == -1 )
+        return false;
 
-	// Check if a binding is already present. If so, replace it
-	int IndexToUse = -1;
-	for ( unsigned BindingIndex = 0; BindingIndex < Command->ShaderBufferBindingCount; ++BindingIndex )
-		{
-		if ( Command->ShaderBufferBindings[BindingIndex].AttributeHandle == AttributeHandle )
-			{
-			IndexToUse = BindingIndex;
-			break;
-			}
-		}
+    // Check if a binding is already present. If so, replace it
+    int IndexToUse = -1;
+    for ( unsigned BindingIndex = 0; BindingIndex < Command->ShaderBufferBindingCount; ++BindingIndex )
+        {
+        if ( Command->ShaderBufferBindings[BindingIndex].AttributeHandle == AttributeHandle )
+            {
+            IndexToUse = BindingIndex;
+            break;
+            }
+        }
 
-	if ( IndexToUse == -1 ) // Not found. Add this to the array
-		{
-		IndexToUse = Command->ShaderBufferBindingCount;
-		++Command->ShaderBufferBindingCount;
-		}
+    if ( IndexToUse == -1 ) // Not found. Add this to the array
+        {
+        IndexToUse = Command->ShaderBufferBindingCount;
+        ++Command->ShaderBufferBindingCount;
+        }
 
-	Command->ShaderBufferBindings[IndexToUse].AttributeHandle = AttributeHandle;
-	Command->ShaderBufferBindings[IndexToUse].DataStream = Stream;
-	return true;
-	}
+    Command->ShaderBufferBindings[IndexToUse].AttributeHandle = AttributeHandle;
+    Command->ShaderBufferBindings[IndexToUse].DataStream = Stream;
+    return true;
+    }
 
 bool crSetRenderCommandTextureBinding ( crRenderCommand *Command, const crShaderUniformHandle UniformHandle, const crTextureBindSettings Binding )
-	{
-	if ( UniformHandle == -1 )
-		return false;
+    {
+    if ( UniformHandle == -1 )
+        return false;
 
-	int IndexToUse = -1;
-	for ( unsigned ValueIndex = 0; ValueIndex < Command->ShaderTextureBindingCount; ++ValueIndex )
-		{
-		if ( Command->ShaderTextureBindings[ValueIndex].UniformHandle == UniformHandle )
-			{
-			IndexToUse = ValueIndex;
-			break;
-			}
-		}
+    int IndexToUse = -1;
+    for ( unsigned ValueIndex = 0; ValueIndex < Command->ShaderTextureBindingCount; ++ValueIndex )
+        {
+        if ( Command->ShaderTextureBindings[ValueIndex].UniformHandle == UniformHandle )
+            {
+            IndexToUse = ValueIndex;
+            break;
+            }
+        }
 
-	if ( IndexToUse == -1 )
-		{
-		IndexToUse = Command->ShaderTextureBindingCount;
-		++Command->ShaderTextureBindingCount;
-		}
-	Command->ShaderTextureBindings[IndexToUse].UniformHandle = UniformHandle;
-	Command->ShaderTextureBindings[IndexToUse].BindSettings = Binding;
-	return true;
-	}
+    if ( IndexToUse == -1 )
+        {
+        IndexToUse = Command->ShaderTextureBindingCount;
+        ++Command->ShaderTextureBindingCount;
+        }
+    Command->ShaderTextureBindings[IndexToUse].UniformHandle = UniformHandle;
+    Command->ShaderTextureBindings[IndexToUse].BindSettings = Binding;
+    return true;
+    }
 /*
 static inline int FindUniformInRenderCommand ( crRenderCommand *Command, const crShaderUniformHandle UniformHandle )
 	{
@@ -150,9 +150,9 @@ IMPLEMENT_crSetRenderCommandUniformValue ( mat4, Matrix4 )
 #undef IMPLEMENT_crSetRenderCommandUniformValue
 
 void crDestroyRenderCommand ( crRenderCommand *Command )
-	{
-	SAFE_DEL_C ( Command->UniformValues );
-	SAFE_DEL_C ( Command->ShaderBufferBindings );
-	SAFE_DEL_C ( Command->ShaderTextureBindings );
-	memset ( Command, 0, sizeof ( crRenderCommand ) );
-	}
+    {
+    SAFE_DEL_C ( Command->UniformValues );
+    SAFE_DEL_C ( Command->ShaderBufferBindings );
+    SAFE_DEL_C ( Command->ShaderTextureBindings );
+    memset ( Command, 0, sizeof ( crRenderCommand ) );
+    }
