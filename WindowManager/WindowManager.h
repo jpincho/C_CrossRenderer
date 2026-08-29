@@ -8,19 +8,19 @@ BEGIN_C_DECLARATIONS
 typedef void *crWindowHandle;
 
 typedef struct
-    {
-    ivec2 Size;
-    ivec2 Position;
-    bool Resizable, Fullscreen;
-    bool SupportOpenGL;
-    const char *Title;
-    } crRenderWindowDescriptor;
+	{
+	ivec2 Size;
+	ivec2 Position;
+	bool Resizable, Fullscreen;
+	bool SupportOpenGL;
+	const char *Title;
+	} crRenderWindowDescriptor;
 
 typedef enum
-    {
-    WindowManagerBackend_Windows,
-    WindowManagerBackend_X11
-    } crWindowManagerBackend;
+	{
+	WindowManagerBackend_Windows,
+	WindowManagerBackend_X11
+	} crWindowManagerBackend;
 
 // Callbacks
 typedef void ( *crWindowClosedCallback ) ( const crWindowHandle Handle );
@@ -36,17 +36,17 @@ typedef void ( *crMouseWheelCallback ) ( const crWindowHandle, const int Delta )
 typedef void ( *crKeyStateChangedCallback ) ( const crWindowHandle, const crKeyCode Key, const bool State );
 
 typedef struct
-    {
-    crWindowClosedCallback WindowClosed;
-    crWindowMovedCallback WindowMoved;
-    crWindowResizedCallback WindowResized;
-    crEndWindowResizedCallback EndWindowResized;
-    crWindowFocusChangedCallback WindowFocusChanged;
-    crKeyStateChangedCallback KeyStateChanged;
-    crMouseButtonStateChangedCallback MouseButtonStateChanged;
-    crMouseMovedCallback MouseMoved;
-    crMouseWheelCallback MouseWheel;
-    } crWindowManagerCallbacks;
+	{
+	crWindowClosedCallback WindowClosed;
+	crWindowMovedCallback WindowMoved;
+	crWindowResizedCallback WindowResized;
+	crEndWindowResizedCallback EndWindowResized;
+	crWindowFocusChangedCallback WindowFocusChanged;
+	crKeyStateChangedCallback KeyStateChanged;
+	crMouseButtonStateChangedCallback MouseButtonStateChanged;
+	crMouseMovedCallback MouseMoved;
+	crMouseWheelCallback MouseWheel;
+	} crWindowManagerCallbacks;
 
 // Function pointers
 extern crWindowHandle ( *crCreateNewWindow ) ( const crRenderWindowDescriptor Descriptor );
