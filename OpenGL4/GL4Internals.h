@@ -1,6 +1,6 @@
 #pragma once
 #include <Platform/Platform.h>
-#include <Platform/defines.h>
+#include <Platform/Platform.h>
 #include <Platform/Version.h>
 #include <Platform/Logger.h>
 #include <Platform/PointerList.h>

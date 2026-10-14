@@ -1,7 +1,5 @@
 #pragma once
-#include <Platform/defines.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include "PlatformIncludes.h"
 
 BEGIN_C_DECLARATIONS
 typedef void *crShaderBufferHandle;

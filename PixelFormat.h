@@ -1,5 +1,5 @@
 #pragma once
-#include <Platform/defines.h>
+#include "PlatformIncludes.h"
 
 BEGIN_C_DECLARATIONS
 typedef enum

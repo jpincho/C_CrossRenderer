@@ -1,9 +1,7 @@
 #pragma once
 #include <Math/mathlib.h>
-#include <Platform/defines.h>
+#include "PlatformIncludes.h"
 #include "PixelFormat.h"
-#include <stdint.h>
-#include <stdbool.h>
 
 BEGIN_C_DECLARATIONS
 typedef void *crTextureHandle;

@@ -1,6 +1,6 @@
 #pragma once
 #include <Math/mathlib.h>
-#include <stdbool.h>
+#include "PlatformIncludes.h"
 #include "Framebuffer.h"
 
 BEGIN_C_DECLARATIONS

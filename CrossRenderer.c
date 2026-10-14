@@ -2,8 +2,7 @@
 #include "CrossRendererConfig.h"
 #include "WindowManager/Internal/WindowManagerInternal.h"
 #include "Internal/CrossRendererFunctionPointers.h"
-#include <memory.h>
-#include <Platform/Platform.h>
+#include "PlatformIncludes.h"
 #include <Platform/Logger.h>
 
 // Interface creation

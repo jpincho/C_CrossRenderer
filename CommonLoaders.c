@@ -1,5 +1,5 @@
 #include "CommonLoaders.h"
-#include <Platform/Platform.h>
+#include "PlatformIncludes.h"
 #include <Platform/Logger.h>
 #define STB_IMAGE_IMPLEMENTATION
 

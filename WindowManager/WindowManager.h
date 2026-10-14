@@ -1,6 +1,6 @@
 #pragma once
 #include <stdbool.h>
-#include <Platform/defines.h>
+#include <Platform/Platform.h>
 #include <Math/mathlib.h>
 #include "KeyDefinitions.h"
 

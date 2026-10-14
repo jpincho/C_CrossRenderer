@@ -1,5 +1,5 @@
 #pragma once
-#include <Platform/defines.h>
+#include "PlatformIncludes.h"
 #include "WindowManager/WindowManager.h"
 #include "Framebuffer.h"
 #include "RenderStateDefinitions.h"

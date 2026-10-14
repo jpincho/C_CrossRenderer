@@ -1,8 +1,6 @@
 #pragma once
 #include <Math/mathlib.h>
-#include <Platform/defines.h>
-#include <stdint.h>
-#include <stdbool.h>
+#include "PlatformIncludes.h"
 #include "PixelFormat.h"
 
 BEGIN_C_DECLARATIONS

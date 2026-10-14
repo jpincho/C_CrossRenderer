@@ -1,6 +1,6 @@
 #include "Shader.h"
 #include "Internal/CrossRendererFunctionPointers.h"
-#include <string.h>
+#include "PlatformIncludes.h"
 
 crShaderUniformHandle crGetShaderUniformHandle ( const crShaderHandle ShaderHandle, const char *UniformName )
 	{

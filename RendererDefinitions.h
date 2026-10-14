@@ -1,6 +1,5 @@
 #pragma once
-#include <stdbool.h>
-#include <stdint.h>
+#include "PlatformIncludes.h"
 #include "WindowManager/WindowManager.h"
 
 BEGIN_C_DECLARATIONS

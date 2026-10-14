@@ -1,5 +1,5 @@
 #pragma once
-#include <Platform/defines.h>
+#include "PlatformIncludes.h"
 #include "Shader.h"
 #include "ShaderBuffer.h"
 #include "RenderStateDefinitions.h"
