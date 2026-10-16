@@ -7,6 +7,7 @@
 #include <glad/glad.h>
 
 #include "../CrossRenderer.h"
+#include "GL4Context.h"
 
 BEGIN_C_DECLARATIONS
 typedef struct
@@ -21,6 +22,10 @@ typedef struct
 	PointerList Textures;
 	PointerList ShaderBuffers;
 	PointerList Shaders;
+
+	unsigned GeneralVAO;
+	crShaderHandle ActiveShader;
+	crOpenGLContext OpenGLContext;
 	} OpenGLInformationStruct;
 
 extern OpenGLInformationStruct crGL4Information;

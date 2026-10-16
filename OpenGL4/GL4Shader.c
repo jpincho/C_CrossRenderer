@@ -346,6 +346,8 @@ bool crGL4DeleteShader ( const crShaderHandle Handle )
 	SAFE_DEL_C ( ShaderInformation->GeneralInformation.Uniforms );
 	SAFE_DEL_C ( ShaderInformation );
 	PointerList_DestroyNode ( &crGL4Information.Shaders, Handle );
+	if ( crGL4Information.ActiveShader == Handle )
+		crGL4Information.ActiveShader = NULL;
 	return true;
 	}
 

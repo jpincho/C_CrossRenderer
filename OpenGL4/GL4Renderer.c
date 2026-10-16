@@ -8,10 +8,6 @@
 #pragma warning(disable:4996)
 #endif
 
-unsigned GeneralVAO;
-static crShaderHandle ActiveShader = NULL;
-static crOpenGLContext OpenGLContext = NULL;
-
 static bool DetectOpenGLInformation ( void )
 	{
 	// MAJOR & MINOR only introduced in GL {,ES} 3.0
@@ -164,8 +160,8 @@ bool crGL4InitializeRenderer ( const crRendererConfiguration NewConfiguration )
 	if ( !NewWindowHandle )
 		return false;
 
-	OpenGLContext = crGL4CreateGLContext ( NewWindowHandle, NewConfiguration );
-	if ( OpenGLContext == NULL )
+	crGL4Information.OpenGLContext = crGL4CreateGLContext ( NewWindowHandle, NewConfiguration );
+	if ( crGL4Information.OpenGLContext == NULL )
 		goto OnError;
 
 	gladLoadGL();
@@ -178,8 +174,8 @@ bool crGL4InitializeRenderer ( const crRendererConfiguration NewConfiguration )
 		}
 
 	// If necessary, create a VAO
-	glGenVertexArrays ( 1, &GeneralVAO );
-	glBindVertexArray ( GeneralVAO );
+	glGenVertexArrays ( 1, &crGL4Information.GeneralVAO );
+	glBindVertexArray ( crGL4Information.GeneralVAO );
 
 	glClearColor ( 0, 0, 0, 0 );
 	glClearDepth ( 1.0 );
@@ -233,10 +229,10 @@ bool crGL4InitializeRenderer ( const crRendererConfiguration NewConfiguration )
 	crGL4Invalidate();
 	return true;
 OnError:
-	if ( GeneralVAO != 0 )
+	if ( crGL4Information.GeneralVAO != 0 )
 		{
-		glDeleteVertexArrays ( 1, &GeneralVAO );
-		GeneralVAO = 0;
+		glDeleteVertexArrays ( 1, &crGL4Information.GeneralVAO );
+		crGL4Information.GeneralVAO = 0;
 		}
 	if ( NewWindowHandle )
 		crDestroyWindow ( NewWindowHandle );
@@ -245,13 +241,46 @@ OnError:
 
 bool crGL4ShutdownRenderer ( void )
 	{
-	if ( GeneralVAO != 0 )
+	if ( crGL4Information.GeneralVAO != 0 )
 		{
-		glDeleteVertexArrays ( 1, &GeneralVAO );
-		GeneralVAO = 0;
+		glDeleteVertexArrays ( 1, &crGL4Information.GeneralVAO );
+		crGL4Information.GeneralVAO = 0;
 		}
-	crGL4DeleteGLContext ( OpenGLContext );
-	OpenGLContext = NULL;
+
+	PointerListNode *NextNode = NULL;
+	for ( PointerListNode *ListNode = PointerList_GetFirst ( &crGL4Information.Framebuffers ); ListNode != NULL; ListNode = NextNode )
+		{
+		NextNode = PointerList_GetNextNode ( ListNode );
+		crDeleteFramebuffer ( ListNode );
+		}
+	assert ( crGL4Information.Framebuffers.Count == 0 );
+	for ( PointerListNode *ListNode = PointerList_GetFirst ( &crGL4Information.Textures ); ListNode != NULL; ListNode = NextNode )
+		{
+		NextNode = PointerList_GetNextNode ( ListNode );
+		crDeleteTexture ( ListNode );
+		}
+	assert ( crGL4Information.Textures.Count == 0 );
+	for ( PointerListNode *ListNode = PointerList_GetFirst ( &crGL4Information.ShaderBuffers ); ListNode != NULL; ListNode = NextNode )
+		{
+		NextNode = PointerList_GetNextNode ( ListNode );
+		crDeleteShaderBuffer ( ListNode );
+		}
+	assert ( crGL4Information.ShaderBuffers.Count == 0 );
+	for ( PointerListNode *ListNode = PointerList_GetFirst ( &crGL4Information.Shaders ); ListNode != NULL; ListNode = NextNode )
+		{
+		NextNode = PointerList_GetNextNode ( ListNode );
+		crDeleteShader ( ListNode );
+		}
+
+	for ( unsigned Index = 0; Index < crGL4Information.ExtensionCount; ++Index )
+		{
+		free ( crGL4Information.Extensions[Index] );
+		}
+	free ( crGL4Information.Extensions );
+
+	assert ( crGL4Information.Shaders.Count == 0 );
+	crGL4DeleteGLContext ( crGL4Information.OpenGLContext );
+	memset ( &crGL4Information, 0, sizeof ( crGL4Information ) );
 	return true;
 	}
 
@@ -289,7 +318,7 @@ bool crGL4IsDirectStateAccessEnabled ( void )
 bool crGL4StartRenderToWindow ( const crWindowHandle WindowHandle )
 	{
 	crActivateWindow ( WindowHandle );
-	crGL4MakeGLContextActive ( OpenGLContext, WindowHandle );
+	crGL4MakeGLContextActive ( crGL4Information.OpenGLContext, WindowHandle );
 
 	uvec2 WindowDimensions;
 	crGetWindowClientAreaDimensions ( WindowHandle, &WindowDimensions );
@@ -309,7 +338,7 @@ bool crGL4StartRenderToWindow ( const crWindowHandle WindowHandle )
 bool crGL4DisplayFramebuffer ( const crFramebufferHandle FramebufferHandle, const crWindowHandle WindowHandle )
 	{
 	crActivateWindow ( WindowHandle );
-	crGL4MakeGLContextActive ( OpenGLContext, WindowHandle );
+	crGL4MakeGLContextActive ( crGL4Information.OpenGLContext, WindowHandle );
 
 	uvec2 WindowDimensions;
 	// Reset scissor, viewport and stencil to the full window
@@ -321,7 +350,7 @@ bool crGL4DisplayFramebuffer ( const crFramebufferHandle FramebufferHandle, cons
 	crGL4ConfigureScissor ( &DefaultScissorSettings );
 	crGL4ConfigureViewport ( &DefaultViewportSettings );
 	crGL4ConfigureStencil ( &DefaultStencilSettings );
-	crGL4MakeGLContextActive ( OpenGLContext, WindowHandle );
+	crGL4MakeGLContextActive ( crGL4Information.OpenGLContext, WindowHandle );
 
 	crGL4InternalFramebufferInfo *FramebufferInformation = ( crGL4InternalFramebufferInfo * ) PointerList_GetNodeData ( FramebufferHandle );
 	if ( FramebufferInformation->OpenGLID != 0 )
@@ -351,7 +380,7 @@ bool crGL4DisplayWindow ( const crWindowHandle WindowHandle )
 	crGL4ConfigureScissor ( &DefaultScissorSettings );
 	crGL4ConfigureViewport ( &DefaultViewportSettings );
 	crGL4ConfigureStencil ( &DefaultStencilSettings );
-	crGL4SwapGLWindowBuffer ( OpenGLContext, WindowHandle );
+	crGL4SwapGLWindowBuffer ( crGL4Information.OpenGLContext, WindowHandle );
 	return crGL4CheckError();
 	}
 
@@ -564,9 +593,9 @@ bool crGL4RunCommand ( const crRenderCommand Command )
 		return false;
 
 	// Deactivate previous shader's attributes
-	if ( ( ActiveShader ) && ( ActiveShader != Command.Shader ) )
+	if ( ( crGL4Information.ActiveShader ) && ( crGL4Information.ActiveShader != Command.Shader ) )
 		{
-		crGL4InternalShaderInfo *OldShaderInformation = ( crGL4InternalShaderInfo * ) PointerList_GetNodeData ( ActiveShader );
+		crGL4InternalShaderInfo *OldShaderInformation = ( crGL4InternalShaderInfo * ) PointerList_GetNodeData ( crGL4Information.ActiveShader );
 		for ( unsigned AttributeIndex = 0; AttributeIndex < OldShaderInformation->AttributeCount; ++AttributeIndex )
 			{
 			if ( OldShaderInformation->Attributes[AttributeIndex].Enabled )
@@ -579,7 +608,7 @@ bool crGL4RunCommand ( const crRenderCommand Command )
 					glDisableVertexAttribArray ( OldShaderInformation->Attributes[AttributeIndex].OpenGLID + Row );
 				}
 			}
-		ActiveShader = NULL;
+		crGL4Information.ActiveShader = NULL;
 		}
 
 	// Activate new shader
@@ -589,10 +618,10 @@ bool crGL4RunCommand ( const crRenderCommand Command )
 	if (Command.UniformValueCount != ShaderInformation->UniformCount)
 		return false;*/
 
-	if ( ActiveShader != Command.Shader )
+	if ( crGL4Information.ActiveShader != Command.Shader )
 		{
 		glUseProgram ( ShaderInformation->OpenGLID );
-		ActiveShader = Command.Shader;
+		crGL4Information.ActiveShader = Command.Shader;
 		if ( crGL4CheckError() == false )
 			return false;
 		}

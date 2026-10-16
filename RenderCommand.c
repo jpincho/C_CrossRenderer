@@ -9,8 +9,16 @@ void crSetRenderCommandShader ( crRenderCommand *Command, const crShaderHandle N
 	SAFE_DEL_C ( Command->UniformValues );
 	SAFE_DEL_C ( Command->ShaderBufferBindings );
 	SAFE_DEL_C ( Command->ShaderTextureBindings );
-	Command->Shader = NewShader;
+	Command->UniformValueCount = Command->ShaderBufferBindingCount = Command->ShaderTextureBindingCount = 0;
+
+	Command->Shader = crShaderHandle_Invalid;
+	if ( NewShader == crShaderHandle_Invalid )
+		return;
+
 	const crShaderInformation *ShaderInformation = crGetShaderInformation ( NewShader );
+	if ( ShaderInformation == NULL )
+		return;
+	Command->Shader = NewShader;
 	Command->UniformValues = calloc ( ShaderInformation->UniformCount, sizeof ( crShaderUniformValuePair ) );
 	Command->UniformValueCount = ShaderInformation->UniformCount;
 	for ( unsigned UniformIndex = 0; UniformIndex < ShaderInformation->UniformCount; ++UniformIndex )
@@ -35,7 +43,13 @@ bool crSetRenderCommandIndexShaderBufferBinding ( crRenderCommand *Command, cons
 
 bool crSetRenderCommandShaderBufferBinding ( crRenderCommand *Command, const crShaderAttributeHandle AttributeHandle, const crShaderBufferDataStream Stream )
 	{
+	if ( Command == NULL )
+		return false;
+	if ( Command->Shader == crShaderHandle_Invalid )
+		return false;
 	if ( AttributeHandle == -1 )
+		return false;
+	if ( Stream.BufferHandle == crShaderBufferHandle_Invalid )
 		return false;
 
 	// Check if a binding is already present. If so, replace it

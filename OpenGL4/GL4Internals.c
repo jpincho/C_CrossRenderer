@@ -1,6 +1,6 @@
 #include "GL4Internals.h"
 
-OpenGLInformationStruct crGL4Information;
+OpenGLInformationStruct crGL4Information = {0};
 
 #define FATAL_ERROR(MSG) {printf("FATAL ERROR at line %u ( %s ) - %s\n", __LINE__, __FILE__, MSG);exit(-1);}
 
