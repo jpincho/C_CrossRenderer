@@ -311,6 +311,7 @@ crShaderHandle crGL4CreateShader ( crShaderCode NewCode )
 		}
 
 	NewNode = PointerList_AddAtEnd ( &crGL4Information.Shaders, NewShader );
+	NewShader->GeneralInformation.Handle = NewNode;
 	return NewNode;
 
 OnError:

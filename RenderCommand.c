@@ -169,3 +169,181 @@ void crDestroyRenderCommand ( crRenderCommand *Command )
 	SAFE_DEL_C ( Command->ShaderTextureBindings );
 	memset ( Command, 0, sizeof ( crRenderCommand ) );
 	}
+
+unsigned crSanityCheckShaderInformation ( const crShaderInformation *ShaderInformation )
+	{
+	unsigned ErrorCount = 0;
+	if ( ShaderInformation->Handle == crShaderHandle_Invalid )
+		{
+		LOG_ERROR ( "Invalid shader handle" );
+		++ErrorCount;
+		}
+
+	// Find invalid uniform handles
+	for ( unsigned UniformIndex = 0; UniformIndex < ShaderInformation->UniformCount; ++UniformIndex )
+		{
+		const crShaderUniformInformation *UniformInformation = ShaderInformation->Uniforms + UniformIndex;
+		if ( UniformInformation->Handle == crShaderUniformHandle_Invalid )
+			{
+			LOG_ERROR ( "Invalid uniform handle at position %u", UniformIndex );
+			++ErrorCount;
+			}
+		}
+
+	// Find invalid attribute handles
+	for ( unsigned AttributeIndex = 0; AttributeIndex < ShaderInformation->AttributeCount; ++AttributeIndex )
+		{
+		const crShaderAttributeInformation *AttributeInformation = ShaderInformation->Attributes + AttributeIndex;
+		if ( AttributeInformation->Handle == crShaderAttributeHandle_Invalid )
+			{
+			LOG_ERROR ( "Invalid attribute handle at position %u", AttributeIndex );
+			++ErrorCount;
+			}
+		}
+
+	return ErrorCount;
+	}
+
+unsigned crSanityCheckShaderBufferBindPair ( const crShaderBufferBindPair *Binding, const crShaderInformation *ShaderInformation )
+	{
+	unsigned ErrorCount = 0;
+
+	if ( Binding->AttributeHandle == crShaderAttributeHandle_Invalid )
+		{
+		LOG_ERROR ( "Invalid attribute handle in crShaderBufferBindPair" );
+		++ErrorCount;
+		}
+	bool AttributeFound = false;
+	for ( unsigned AttributeIndex = 0; AttributeIndex < ShaderInformation->AttributeCount; ++AttributeIndex )
+		{
+		if ( Binding->AttributeHandle == ShaderInformation->Attributes[AttributeIndex].Handle )
+			{
+			AttributeFound = true;
+			break;
+			}
+		}
+	if ( AttributeFound == false )
+		{
+		LOG_ERROR ( "Attribute handle does not belong to shader" );
+		++ErrorCount;
+		}
+
+	if ( Binding->DataStream.BufferHandle == crShaderBufferHandle_Invalid )
+		{
+		LOG_ERROR ( "Invalid shader buffer handle in crShaderBufferBindPair" );
+		++ErrorCount;
+		}
+	/*if ( crIsValidShaderBufferHandle(Binding->DataStream.BufferHandle) == false )
+		{
+		LOG_ERROR ( "Invalid shader buffer handle in crShaderBufferBindPair");
+		++ErrorCount;
+		}*/
+	if ( Binding->DataStream.ComponentsPerElement == 0 )
+		{
+		LOG_ERROR ( "Invalid component count per element in crShaderBufferBindPair" );
+		++ErrorCount;
+		}
+	/*if ( Binding->DataStream.ComponentType == 0 )
+		{
+		LOG_ERROR ( "Invalid component count per element in crShaderBufferBindPair");
+		++ErrorCount;
+		}*/
+	return ErrorCount;
+	}
+
+unsigned crSanityCheckShaderTextureBindPair ( const crShaderTextureBindPair *Binding, const crShaderInformation *ShaderInformation )
+	{
+	unsigned ErrorCount = 0;
+
+	if ( Binding->UniformHandle == crShaderUniformHandle_Invalid )
+		{
+		LOG_ERROR ( "Invalid uniform handle in crShaderTextureBindPair" );
+		++ErrorCount;
+		}
+	bool UniformFound = false;
+	for ( unsigned UniformIndex = 0; UniformIndex < ShaderInformation->UniformCount; ++UniformIndex )
+		{
+		if ( Binding->UniformHandle == ShaderInformation->Uniforms[UniformIndex].Handle )
+			{
+			UniformFound = true;
+			break;
+			}
+		}
+	if ( UniformFound == false )
+		{
+		LOG_ERROR ( "Uniform handle does not belong to shader" );
+		++ErrorCount;
+		}
+	if ( Binding->BindSettings.Handle == crTextureHandle_Invalid )
+		{
+		LOG_ERROR ( "Invalid texture handle in crShaderTextureBindPair" );
+		++ErrorCount;
+		}
+	return ErrorCount;
+	}
+
+unsigned crSanityCheckShaderUniformValuePair ( const crShaderUniformValuePair *Pair, const crShaderInformation *ShaderInformation )
+	{
+	unsigned ErrorCount = 0;
+	bool UniformFound = false;
+	for ( unsigned UniformIndex = 0; UniformIndex < ShaderInformation->UniformCount; ++UniformIndex )
+		{
+		if ( Pair->UniformHandle == ShaderInformation->Uniforms[UniformIndex].Handle )
+			{
+			UniformFound = true;
+			break;
+			}
+		}
+	if ( UniformFound == false )
+		{
+		LOG_ERROR ( "Uniform handle does not belong to shader" );
+		++ErrorCount;
+		}
+	return ErrorCount;
+	}
+
+unsigned crSanityCheckRenderCommand ( const crRenderCommand *Command )
+	{
+	unsigned ErrorCount = 0;
+	if ( Command->Shader == crShaderHandle_Invalid )
+		{
+		LOG_ERROR ( "Invalid shader handle" );
+		++ErrorCount;
+		return ErrorCount;
+		}
+	/*if ( crIsValidShaderHandle ( Command->Shader ) == false )
+	{
+		LOG_ERROR ( "Invalid shader handle" );
+		++ErrorCount;
+		return ErrorCount;
+	}*/
+	const crShaderInformation *ShaderInformation = crGetShaderInformation ( Command->Shader );
+	if ( ShaderInformation == NULL )
+		{
+		LOG_ERROR ( "Unable to get shader information" );
+		++ErrorCount;
+		return ErrorCount;
+		}
+	ErrorCount += crSanityCheckShaderInformation ( ShaderInformation );
+
+	for ( unsigned BindingIndex = 0; BindingIndex < Command->ShaderBufferBindingCount; ++BindingIndex )
+		{
+		ErrorCount += crSanityCheckShaderBufferBindPair ( Command->ShaderBufferBindings + BindingIndex, ShaderInformation );
+		}
+
+	for ( unsigned BindingIndex = 0; BindingIndex < Command->ShaderTextureBindingCount; ++BindingIndex )
+		{
+		ErrorCount += crSanityCheckShaderTextureBindPair ( Command->ShaderTextureBindings + BindingIndex, ShaderInformation );
+		}
+
+	for ( unsigned UniformValueIndex = 0; UniformValueIndex < Command->UniformValueCount; ++UniformValueIndex )
+		{
+		ErrorCount += crSanityCheckShaderUniformValuePair ( Command->UniformValues + UniformValueIndex, ShaderInformation );
+		}
+
+	if ( ErrorCount != 0 )
+		{
+		LOG_ERROR ( "Render command failed sanity check" );
+		}
+	return ErrorCount;
+	}

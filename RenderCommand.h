@@ -80,4 +80,5 @@ DEFINE_crSetRenderCommandUniformValue ( crShaderBufferHandle, Block );
 #undef DEFINE_crSetRenderCommandUniformValue
 
 void crDestroyRenderCommand ( crRenderCommand *Command );
+unsigned crSanityCheckRenderCommand ( const crRenderCommand *Command );
 END_C_DECLARATIONS

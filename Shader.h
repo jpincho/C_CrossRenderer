@@ -139,12 +139,6 @@ typedef struct
 		};
 	} crShaderUniformValue;
 
-inline void crDestroyShaderInformation ( crShaderInformation *Information )
-	{
-	SAFE_DEL_C ( Information->Attributes );
-	SAFE_DEL_C ( Information->Uniforms );
-	}
-
 crShaderUniformHandle crGetShaderUniformHandle ( const crShaderHandle ShaderHandle, const char *UniformName );
 crShaderAttributeHandle crGetShaderAttributeHandle ( const crShaderHandle ShaderHandle, const char *AttributeName );
 #define SAFE_DELETE_SHADER(SHADER) do{if((SHADER) != crShaderHandle_Invalid) {crDeleteShader((SHADER));(SHADER)=crShaderHandle_Invalid;}}while(0)
