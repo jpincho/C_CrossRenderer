@@ -585,6 +585,21 @@ static bool SetOpenGLShaderUniformValue ( const crGL4InternalShaderInfo *ShaderI
 	return true;
 	}
 
+static bool SetOpenGLShaderUniformValueIfDifferent ( const crGL4InternalShaderInfo *ShaderInformation, const crShaderUniformHandle UniformHandle, crShaderUniformValue *Value, unsigned *UniformBlockBindingIndex )
+	{
+	// Uniform block bindings are context-side state, not shader-side state, so we don't need to check for equality here.  We just set the binding every time.
+	if ( ShaderInformation->Uniforms[UniformHandle].Type == crShaderUniformType_Block )
+		return SetOpenGLShaderUniformValue ( ShaderInformation, UniformHandle, Value, UniformBlockBindingIndex );
+
+	if ( ShaderUniformValueIsEqual ( ShaderInformation->Uniforms[UniformHandle].Type, &ShaderInformation->Uniforms[UniformHandle].CurrentValue, Value ) == true )
+		return true;
+	if ( SetOpenGLShaderUniformValue ( ShaderInformation, UniformHandle, Value, UniformBlockBindingIndex ) == false )
+		return false;
+
+	CopyShaderUniformValue ( ShaderInformation->Uniforms[UniformHandle].Type, Value, &ShaderInformation->Uniforms[UniformHandle].CurrentValue );
+	return true;
+	}
+
 bool crGL4RunCommand ( const crRenderCommand Command )
 	{
 	if ( !Command.Shader )
@@ -640,11 +655,9 @@ bool crGL4RunCommand ( const crRenderCommand Command )
 		        ( ShaderInformation->Uniforms[CommandUniformHandle].Type == crShaderUniformType_SamplerCube ) )
 			continue; // Texture samplers are set with the texture bindings, not as regular uniforms
 
-		if ( ShaderUniformValueIsEqual ( ShaderInformation->Uniforms[CommandUniformHandle].Type, &ShaderInformation->Uniforms[CommandUniformHandle].CurrentValue, CommandUniformValue ) == true )
-			continue;
-		if ( SetOpenGLShaderUniformValue ( ShaderInformation, CommandUniformHandle, CommandUniformValue, &UniformBlockBindingIndex ) == false )
+		// Shader buffer binding is context-side state, not shader-side state, so we don't need to check for equality here.  We just set the binding every time.
+		if ( SetOpenGLShaderUniformValueIfDifferent ( ShaderInformation, CommandUniformHandle, CommandUniformValue, &UniformBlockBindingIndex ) == false )
 			return false;
-		CopyShaderUniformValue ( ShaderInformation->Uniforms[CommandUniformHandle].Type, CommandUniformValue, &ShaderInformation->Uniforms[CommandUniformHandle].CurrentValue );
 		}
 
 	if ( crGL4CheckError() == false )
