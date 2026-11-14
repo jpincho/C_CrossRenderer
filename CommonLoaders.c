@@ -174,6 +174,11 @@ bool crLoadTextureDescriptorFromMemory ( const void *Pointer, const unsigned Len
 	Descriptor->Format = ImageFormat;
 	Descriptor->Mipmapped = true;
 	Descriptor->Data = calloc ( ImageSize.x * ImageSize.y, Channels );
+	if ( Descriptor->Data == NULL )
+		{
+		stbi_image_free ( Image );
+		return false;
+		}
 	Descriptor->FilterSettings = ( crTextureFilterSettings )
 		{
 		crTextureFilter_Linear, crTextureFilter_Linear
@@ -182,8 +187,6 @@ bool crLoadTextureDescriptorFromMemory ( const void *Pointer, const unsigned Len
 		{
 		crTextureWrapMode_Repeat, crTextureWrapMode_Repeat
 		};
-	if ( Descriptor->Data == NULL )
-		return false;
 	memcpy ( Descriptor->Data, Image, ImageSize.x * ImageSize.y * Channels );
 	stbi_image_free ( Image );
 	return true;
