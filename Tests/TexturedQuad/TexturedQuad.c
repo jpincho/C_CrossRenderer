@@ -39,10 +39,10 @@ int main ( void )
 		};
 	struct Vertex Vertices[4] =
 		{
-			{{-1.0f, -1.0f, 0.0f}, {0.0f, 0.0f}},
-			{{ 1.0f, -1.0f, 0.0f}, {1.0f, 0.0f}},
-			{{-1.0f,  1.0f, 0.0f}, {0.0f, 1.0f}},
-			{{ 1.0f,  1.0f, 0.0f}, {1.0f, 1.0f}}
+			{{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
+			{{ 1.0f, -1.0f, 0.0f}, {1.0f, 1.0f}},
+			{{-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f}},
+			{{ 1.0f,  1.0f, 0.0f}, {1.0f, 0.0f}}
 		};
 
 	uvec2 WindowSize;
@@ -79,7 +79,7 @@ int main ( void )
 	if ( !ShaderHandle )
 		return -1;
 
-	crTextureHandle TextureHandle = crLoadTexture ( DATA_PATH "/batman.jpg", true );
+	crTextureHandle TextureHandle = crLoadTexture ( DATA_PATH "/batman.jpg" );
 	if ( !TextureHandle )
 		return -1;
 

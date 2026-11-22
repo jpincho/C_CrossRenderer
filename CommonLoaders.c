@@ -82,13 +82,12 @@ OnError:
 	return ShaderHandle;
 	}
 
-bool crLoadTextureDescriptorFromFile ( const char *ImageFile, const bool Flip, crTextureDescriptor *Descriptor )
+bool crLoadTextureDescriptorFromFile ( const char *ImageFile, crTextureDescriptor *Descriptor )
 	{
 	ivec2 ImageSize;
 	int Channels;
 	crPixelFormat ImageFormat;
 
-	stbi_set_flip_vertically_on_load ( Flip ? 1 : 0 );
 	stbi_uc *Image = stbi_load ( ImageFile, &ImageSize.x, &ImageSize.y, &Channels, 0 );
 	if ( !Image )
 		{
@@ -136,13 +135,12 @@ bool crLoadTextureDescriptorFromFile ( const char *ImageFile, const bool Flip, c
 	return true;
 	}
 
-bool crLoadTextureDescriptorFromMemory ( const void *Pointer, const unsigned Length, const bool Flip, crTextureDescriptor *Descriptor )
+bool crLoadTextureDescriptorFromMemory ( const void *Pointer, const unsigned Length, crTextureDescriptor *Descriptor )
 	{
 	ivec2 ImageSize;
 	int Channels;
 	crPixelFormat ImageFormat;
 
-	stbi_set_flip_vertically_on_load ( Flip ? 1 : 0 );
 	stbi_uc *Image = stbi_load_from_memory ( ( stbi_uc * ) Pointer, Length, &ImageSize.x, &ImageSize.y, &Channels, 0 );
 	if ( !Image )
 		{
@@ -192,10 +190,10 @@ bool crLoadTextureDescriptorFromMemory ( const void *Pointer, const unsigned Len
 	return true;
 	}
 
-crTextureHandle crLoadTexture ( const char *ImageFile, const bool Flip )
+crTextureHandle crLoadTexture ( const char *ImageFile )
 	{
 	crTextureDescriptor TextureDescriptor;
-	if ( crLoadTextureDescriptorFromFile ( ImageFile, Flip, &TextureDescriptor ) == false )
+	if ( crLoadTextureDescriptorFromFile ( ImageFile, &TextureDescriptor ) == false )
 		return crTextureHandle_Invalid;
 
 	crTextureHandle Texture = crCreateTexture ( TextureDescriptor );
@@ -203,13 +201,11 @@ crTextureHandle crLoadTexture ( const char *ImageFile, const bool Flip )
 	return Texture;
 	}
 
-crTextureHandle crLoadCubemapTexture ( const char *ImageFile[6], const bool Flip )
+crTextureHandle crLoadCubemapTexture ( const char *ImageFile[6] )
 	{
 	ivec2 ImageSize;
 	int Channels;
 	crPixelFormat ImageFormat;
-
-	stbi_set_flip_vertically_on_load ( Flip ? 1 : 0 );
 
 	stbi_uc *Images[6] = { 0 };
 	for ( unsigned Face = 0; Face < 6; ++Face )

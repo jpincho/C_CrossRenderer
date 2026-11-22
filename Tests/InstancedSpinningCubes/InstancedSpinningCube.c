@@ -44,35 +44,35 @@ int main ( void )
 
 	struct Vertex Vertices[24] =
 		{
-			{{-1.0f, -1.0f, 1.0f}, {0.0f, 0.0f}},
-			{{ 1.0f, -1.0f, 1.0f}, {1.0f, 0.0f}},
-			{{-1.0f,  1.0f, 1.0f}, {0.0f, 1.0f}},
-			{{ 1.0f,  1.0f, 1.0f}, {1.0f, 1.0f}},
-
-			{{ 1.0f, -1.0f, 1.0f}, {0.0f, 0.0f}},
-			{{ 1.0f, -1.0f, -1.0f}, {1.0f, 0.0f}},
-			{{ 1.0f,  1.0f, 1.0f}, {0.0f, 1.0f}},
-			{{ 1.0f,  1.0f, -1.0f}, {1.0f, 1.0f}},
-
-			{{ 1.0f, -1.0f, -1.0f}, {0.0f, 0.0f}},
-			{{-1.0f, -1.0f, -1.0f}, {1.0f, 0.0f}},
-			{{ 1.0f,  1.0f, -1.0f}, {0.0f, 1.0f}},
-			{{-1.0f,  1.0f, -1.0f}, {1.0f, 1.0f}},
-
-			{{-1.0f, -1.0f, -1.0f}, {0.0f, 0.0f}},
-			{{-1.0f, -1.0f, 1.0f}, {1.0f, 0.0f}},
-			{{-1.0f,  1.0f, -1.0f}, {0.0f, 1.0f}},
-			{{-1.0f,  1.0f, 1.0f}, {1.0f, 1.0f}},
-
-			{{-1.0f,  1.0f, 1.0f}, {0.0f, 0.0f}},
-			{{ 1.0f,  1.0f, 1.0f}, {1.0f, 0.0f}},
-			{{-1.0f,  1.0f, -1.0f}, {0.0f, 1.0f}},
-			{{ 1.0f,  1.0f, -1.0f}, {1.0f, 1.0f}},
-
-			{{-1.0f, -1.0f, -1.0f}, {0.0f, 0.0f}},
-			{{ 1.0f, -1.0f, -1.0f}, {1.0f, 0.0f}},
 			{{-1.0f, -1.0f, 1.0f}, {0.0f, 1.0f}},
 			{{ 1.0f, -1.0f, 1.0f}, {1.0f, 1.0f}},
+			{{-1.0f,  1.0f, 1.0f}, {0.0f, 0.0f}},
+			{{ 1.0f,  1.0f, 1.0f}, {1.0f, 0.0f}},
+
+			{{ 1.0f, -1.0f, 1.0f}, {0.0f, 1.0f}},
+			{{ 1.0f, -1.0f, -1.0f}, {1.0f, 1.0f}},
+			{{ 1.0f,  1.0f, 1.0f}, {0.0f, 0.0f}},
+			{{ 1.0f,  1.0f, -1.0f}, {1.0f, 0.0f}},
+
+			{{ 1.0f, -1.0f, -1.0f}, {0.0f, 1.0f}},
+			{{-1.0f, -1.0f, -1.0f}, {1.0f, 1.0f}},
+			{{ 1.0f,  1.0f, -1.0f}, {0.0f, 0.0f}},
+			{{-1.0f,  1.0f, -1.0f}, {1.0f, 0.0f}},
+
+			{{-1.0f, -1.0f, -1.0f}, {0.0f, 1.0f}},
+			{{-1.0f, -1.0f, 1.0f}, {1.0f, 1.0f}},
+			{{-1.0f,  1.0f, -1.0f}, {0.0f, 0.0f}},
+			{{-1.0f,  1.0f, 1.0f}, {1.0f, 0.0f}},
+
+			{{-1.0f,  1.0f, 1.0f}, {0.0f, 1.0f}},
+			{{ 1.0f,  1.0f, 1.0f}, {1.0f, 1.0f}},
+			{{-1.0f,  1.0f, -1.0f}, {0.0f, 0.0f}},
+			{{ 1.0f,  1.0f, -1.0f}, {1.0f, 0.0f}},
+
+			{{-1.0f, -1.0f, -1.0f}, {0.0f, 1.0f}},
+			{{ 1.0f, -1.0f, -1.0f}, {1.0f, 1.0f}},
+			{{-1.0f, -1.0f, 1.0f}, {0.0f, 0.0f}},
+			{{ 1.0f, -1.0f, 1.0f}, {1.0f, 0.0f}},
 		};
 	uint16_t Indices[] =
 		{
@@ -102,16 +102,7 @@ int main ( void )
 	mat4 ModelMatrix;
 	math_mat4_set_identity_matrix ( &ModelMatrix );
 	mat4 ViewMatrix;
-	math_mat4_set_view_matrix ( &ViewMatrix, ( vec3 )
-		{
-		0.0f, 0.0f, 2.0f
-		}, ( vec3 )
-		{
-		0.0f, 0.0f, 0.0f
-		}, ( vec3 )
-		{
-		0, 1.0f, 0
-		} );
+	math_mat4_set_view_matrix ( &ViewMatrix, MAKE_VEC3 (	0.0f, 0.0f, 2.0f ), MAKE_VEC3 ( 0.0f, 0.0f, 0.0f ), MAKE_VEC3 ( 0, 1.0f, 0 ) );
 
 	crShaderBufferDescriptor VertexSBDescriptor;
 	VertexSBDescriptor.AccessType = crShaderBufferAccessType_Static;
@@ -153,12 +144,12 @@ int main ( void )
 		return -1;
 
 	crShaderHandle ShaderHandle = crLoadShader ( DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.vert",
-	    NULL,
-	    DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.frag" );
+	                              NULL,
+	                              DATA_PATH "/Shaders/OpenGLCore/SpinningCubeTest.frag" );
 	if ( !ShaderHandle )
 		return -1;
 
-	crTextureHandle TextureHandle = crLoadTexture ( DATA_PATH "../TexturedQuad/batman.jpg", true );
+	crTextureHandle TextureHandle = crLoadTexture ( DATA_PATH "../TexturedQuad/batman.jpg" );
 	if ( !TextureHandle )
 		return -1;
 
