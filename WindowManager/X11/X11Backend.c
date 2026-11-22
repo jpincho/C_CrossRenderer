@@ -370,7 +370,7 @@ static void ProcessXEvent ( const XEvent Event )
 			XMotionEvent *MotionEvent = ( XMotionEvent * ) &Event;
 			WindowData->LastMouseCursorPosition.x = MotionEvent->x;
 			WindowData->LastMouseCursorPosition.y = MotionEvent->y;
-			LOG_DEBUG ( "Mouse moved in window '%s' to position %d, %d", WindowData->Title, WindowData->LastMouseCursorPosition.x, WindowData->LastMouseCursorPosition.y );
+			//LOG_DEBUG ( "Mouse moved in window '%s' to position %d, %d", WindowData->Title, WindowData->LastMouseCursorPosition.x, WindowData->LastMouseCursorPosition.y );
 			if ( WindowManagerCallbacks.MouseMoved )
 				{
 				WindowManagerCallbacks.MouseMoved ( WindowData->WindowHandle, WindowData->LastMouseCursorPosition );

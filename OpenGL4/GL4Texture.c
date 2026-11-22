@@ -23,15 +23,69 @@ struct StructPixelFormatData
 	GLint SizedFormat;
 	};
 
-static struct StructPixelFormatData PixelFormatData[] =
+static struct StructPixelFormatData PixelFormatData[crPixelFormat_Count] =
 	{
-		{GL_UNSIGNED_BYTE, GL_RED, GL_R8},// Red8
-		{GL_UNSIGNED_BYTE, GL_RG, GL_RG8},// RedGreen88
-		{GL_UNSIGNED_BYTE, GL_RGB, GL_RGB8},// RedGreenBlue888
-		{GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8},// RedGreenBlueAlpha8888
-		{GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8},// AlphaRedGreenBlue8888
-		{GL_UNSIGNED_SHORT, GL_RGB, GL_RGB565},// RedGreenBlue565
-		{GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT24}// DepthComponent
+		[crPixelFormat_Red8] = {GL_UNSIGNED_BYTE, GL_RED, GL_R8},
+		[crPixelFormat_RedGreen88] = {GL_UNSIGNED_BYTE, GL_RG, GL_RG8},
+		[crPixelFormat_RedGreenBlue888] = {GL_UNSIGNED_BYTE, GL_RGB, GL_RGB8},
+		[crPixelFormat_RedGreenBlueAlpha8888] = {GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8},
+		[crPixelFormat_AlphaRedGreenBlue8888] = {GL_UNSIGNED_BYTE, GL_RGBA, GL_RGBA8},
+		[crPixelFormat_RedGreenBlue565] = {GL_UNSIGNED_SHORT, GL_RGB, GL_RGB565},
+		[crPixelFormat_DepthComponent] = {GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT, GL_DEPTH_COMPONENT24},
+		[crPixelFormat_BC1_RGB] = {0, 0, GL_COMPRESSED_RGB_S3TC_DXT1_EXT},
+		[crPixelFormat_BC1_RGB_SRGB] = {0, 0, GL_COMPRESSED_SRGB_S3TC_DXT1_EXT},
+		[crPixelFormat_BC1_RGBA] = {0, 0, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT},
+		[crPixelFormat_BC1_RGBA_SRGB] = {0, 0, GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT1_EXT},
+		[crPixelFormat_BC2] = {0, 0, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT},
+		[crPixelFormat_BC2_SRGB] = {0, 0, GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT3_EXT},
+		[crPixelFormat_BC3] = {0, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT},
+		[crPixelFormat_BC3_SRGB] = {0, 0, GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT},
+		[crPixelFormat_BC4] = {0, 0, GL_COMPRESSED_RED_RGTC1},
+		[crPixelFormat_BC4_Signed] = {0, 0, GL_COMPRESSED_SIGNED_RED_RGTC1},
+		[crPixelFormat_BC5] = {0, 0, GL_COMPRESSED_RG_RGTC2},
+		[crPixelFormat_BC5_Signed] = {0, 0, GL_COMPRESSED_SIGNED_RG_RGTC2},
+		[crPixelFormat_BC6H] = {0, 0, GL_COMPRESSED_RGB_BPTC_UNSIGNED_FLOAT},
+		[crPixelFormat_BC6H_Signed] = {0, 0, GL_COMPRESSED_RGB_BPTC_SIGNED_FLOAT},
+		[crPixelFormat_BC7] = {0, 0, GL_COMPRESSED_RGBA_BPTC_UNORM},
+		[crPixelFormat_BC7_SRGB] = {0, 0, GL_COMPRESSED_SRGB_ALPHA_BPTC_UNORM},
+		[crPixelFormat_ETC2_RGB] = {0, 0, GL_COMPRESSED_RGB8_ETC2},
+		[crPixelFormat_ETC2_RGB_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ETC2},
+		[crPixelFormat_ETC2_RGBA1] = {0, 0, GL_COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2},
+		[crPixelFormat_ETC2_RGBA1_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2},
+		[crPixelFormat_ETC2_RGBA] = {0, 0, GL_COMPRESSED_RGBA8_ETC2_EAC},
+		[crPixelFormat_ETC2_RGBA_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ETC2_EAC},
+		[crPixelFormat_EAC_R11] = {0, 0, GL_COMPRESSED_R11_EAC},
+		[crPixelFormat_EAC_R11_Signed] = {0, 0, GL_COMPRESSED_SIGNED_R11_EAC},
+		[crPixelFormat_EAC_RG11] = {0, 0, GL_COMPRESSED_RG11_EAC},
+		[crPixelFormat_EAC_RG11_Signed] = {0, 0, GL_COMPRESSED_SIGNED_RG11_EAC},
+		[crPixelFormat_ASTC_4x4] = {0, 0, GL_COMPRESSED_RGBA_ASTC_4x4_KHR},
+		[crPixelFormat_ASTC_4x4_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_4x4_KHR},
+		[crPixelFormat_ASTC_5x4] = {0, 0, GL_COMPRESSED_RGBA_ASTC_5x4_KHR},
+		[crPixelFormat_ASTC_5x4_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x4_KHR},
+		[crPixelFormat_ASTC_5x5] = {0, 0, GL_COMPRESSED_RGBA_ASTC_5x5_KHR},
+		[crPixelFormat_ASTC_5x5_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_5x5_KHR},
+		[crPixelFormat_ASTC_6x5] = {0, 0, GL_COMPRESSED_RGBA_ASTC_6x5_KHR},
+		[crPixelFormat_ASTC_6x5_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x5_KHR},
+		[crPixelFormat_ASTC_6x6] = {0, 0, GL_COMPRESSED_RGBA_ASTC_6x6_KHR},
+		[crPixelFormat_ASTC_6x6_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_6x6_KHR},
+		[crPixelFormat_ASTC_8x5] = {0, 0, GL_COMPRESSED_RGBA_ASTC_8x5_KHR},
+		[crPixelFormat_ASTC_8x5_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x5_KHR},
+		[crPixelFormat_ASTC_8x6] = {0, 0, GL_COMPRESSED_RGBA_ASTC_8x6_KHR},
+		[crPixelFormat_ASTC_8x6_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x6_KHR},
+		[crPixelFormat_ASTC_8x8] = {0, 0, GL_COMPRESSED_RGBA_ASTC_8x8_KHR},
+		[crPixelFormat_ASTC_8x8_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_8x8_KHR},
+		[crPixelFormat_ASTC_10x5] = {0, 0, GL_COMPRESSED_RGBA_ASTC_10x5_KHR},
+		[crPixelFormat_ASTC_10x5_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x5_KHR},
+		[crPixelFormat_ASTC_10x6] = {0, 0, GL_COMPRESSED_RGBA_ASTC_10x6_KHR},
+		[crPixelFormat_ASTC_10x6_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x6_KHR},
+		[crPixelFormat_ASTC_10x8] = {0, 0, GL_COMPRESSED_RGBA_ASTC_10x8_KHR},
+		[crPixelFormat_ASTC_10x8_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x8_KHR},
+		[crPixelFormat_ASTC_10x10] = {0, 0, GL_COMPRESSED_RGBA_ASTC_10x10_KHR},
+		[crPixelFormat_ASTC_10x10_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_10x10_KHR},
+		[crPixelFormat_ASTC_12x10] = {0, 0, GL_COMPRESSED_RGBA_ASTC_12x10_KHR},
+		[crPixelFormat_ASTC_12x10_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x10_KHR},
+		[crPixelFormat_ASTC_12x12] = {0, 0, GL_COMPRESSED_RGBA_ASTC_12x12_KHR},
+		[crPixelFormat_ASTC_12x12_SRGB] = {0, 0, GL_COMPRESSED_SRGB8_ALPHA8_ASTC_12x12_KHR},
 	};
 
 crTextureHandle crGL4CreateTexture ( const crTextureDescriptor Descriptor )
@@ -174,6 +228,44 @@ bool crGL4Update2DTextureRegion ( const crTextureHandle Handle, const uvec2 Lowe
 	//glPixelStorei(GL_UNPACK_SKIP_ROWS, 0); // No rows skipped
 	//glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0); // No pixels skipped
 
+	if ( crPixelFormatIsCompressed ( SourcePixelFormat ) )
+		{
+		unsigned BlockWidth = 0, BlockHeight = 0, BlockBytes = 0;
+		if ( crPixelFormatBlockSize ( SourcePixelFormat, &BlockWidth, &BlockHeight, &BlockBytes ) == false )
+			return false;
+		if ( ( ( LowerLeft.x % BlockWidth ) != 0 ) || ( ( LowerLeft.y % BlockHeight ) != 0 ) )
+			return false;
+		if ( ( ( RegionDimensions.x % BlockWidth ) != 0 ) && ( ( LowerLeft.x + RegionDimensions.x ) != TextureInformation->Dimensions.x ) )
+			return false;
+		if ( ( ( RegionDimensions.y % BlockHeight ) != 0 ) && ( ( LowerLeft.y + RegionDimensions.y ) != TextureInformation->Dimensions.y ) )
+			return false;
+
+		const GLsizei ImageSize = ( GLsizei ) crPixelFormatDataSize ( SourcePixelFormat, RegionDimensions.x, RegionDimensions.y );
+		const GLenum InternalFormat = ( GLenum ) PixelFormatData[ ( int ) SourcePixelFormat].SizedFormat;
+		if ( crGL4Information.DirectStateAccessEnabled )
+			{
+			glCompressedTextureSubImage2D ( TextureInformation->OpenGLID,
+			                                 0,
+			                                 ( GLint ) LowerLeft.x, ( GLint ) LowerLeft.y,
+			                                 ( GLsizei ) RegionDimensions.x, ( GLsizei ) RegionDimensions.y,
+			                                 InternalFormat,
+			                                 ImageSize,
+			                                 Data );
+			}
+		else
+			{
+			glBindTexture ( GL_TEXTURE_2D, TextureInformation->OpenGLID );
+			glCompressedTexSubImage2D ( GL_TEXTURE_2D,
+			                             0,
+			                             ( GLint ) LowerLeft.x, ( GLint ) LowerLeft.y,
+			                             ( GLsizei ) RegionDimensions.x, ( GLsizei ) RegionDimensions.y,
+			                             InternalFormat,
+			                             ImageSize,
+			                             Data );
+			}
+		return crGL4CheckError();
+		}
+
 	if ( crGL4Information.DirectStateAccessEnabled )
 		{
 		glTextureSubImage2D ( TextureInformation->OpenGLID,
@@ -210,6 +302,41 @@ bool crGL4Update2DTextureRegion ( const crTextureHandle Handle, const uvec2 Lowe
 bool crGL4LoadCubeMapTextureData ( const crTextureHandle Handle, const crPixelFormat SourcePixelFormat, void *Data[6] )
 	{
 	crGL4InternalTextureInfo *TextureInformation = ( crGL4InternalTextureInfo * ) PointerList_GetNodeData ( Handle );
+
+	if ( crPixelFormatIsCompressed ( SourcePixelFormat ) )
+		{
+		const GLsizei ImageSize = ( GLsizei ) crPixelFormatDataSize ( SourcePixelFormat, TextureInformation->Dimensions.x, TextureInformation->Dimensions.y );
+		const GLenum InternalFormat = ( GLenum ) PixelFormatData[ ( int ) SourcePixelFormat].SizedFormat;
+		if ( crGL4Information.DirectStateAccessEnabled )
+			{
+			for ( unsigned Face = 0; Face < 6; ++Face )
+				{
+				glCompressedTextureSubImage3D ( TextureInformation->OpenGLID,
+				                                 0,
+				                                 0, 0, ( GLint ) Face,
+				                                 ( GLsizei ) TextureInformation->Dimensions.x, ( GLsizei ) TextureInformation->Dimensions.y, 1,
+				                                 InternalFormat,
+				                                 ImageSize,
+				                                 Data[Face] );
+				}
+			}
+		else
+			{
+			glBindTexture ( GL_TEXTURE_CUBE_MAP, TextureInformation->OpenGLID );
+			for ( unsigned Face = 0; Face < 6; ++Face )
+				{
+				glCompressedTexSubImage2D ( GL_TEXTURE_CUBE_MAP_POSITIVE_X + Face,
+				                             0,
+				                             0, 0,
+				                             ( GLsizei ) TextureInformation->Dimensions.x, ( GLsizei ) TextureInformation->Dimensions.y,
+				                             InternalFormat,
+				                             ImageSize,
+				                             Data[Face] );
+				}
+			glBindTexture ( GL_TEXTURE_CUBE_MAP, 0 );
+			}
+		return crGL4CheckError();
+		}
 
 	if ( crGL4Information.DirectStateAccessEnabled )
 		{

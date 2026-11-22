@@ -11,10 +11,11 @@ void crDestroyTextureDescriptor ( crTextureDescriptor *Descriptor )
 void crCopyTextureDescriptor ( crTextureDescriptor *Output, const crTextureDescriptor *Input )
 	{
 	memcpy ( Output, Input, sizeof ( crTextureDescriptor ) );
-	Output->Data = malloc ( Input->Dimensions.x * Input->Dimensions.y * BytesPerPixel ( Input->Format ) );
+	const unsigned DataSize = crPixelFormatDataSize ( Input->Format, Input->Dimensions.x, Input->Dimensions.y );
+	Output->Data = malloc ( DataSize );
 	assert ( Output->Data != NULL );
 	if ( Output->Data == NULL )
 		return;
-	memcpy ( Output->Data, Input->Data, Input->Dimensions.x * Input->Dimensions.y * BytesPerPixel ( Input->Format ) );
+	memcpy ( Output->Data, Input->Data, DataSize );
 	Output->TextureName = strdup ( Input->TextureName );
 	}
