@@ -1,0 +1,208 @@
+#include "STBImageLoader.h"
+#include <Platform/Logger.h>
+#define STB_IMAGE_IMPLEMENTATION
+
+#if defined (PLATFORM_COMPILER_GNU)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-compare"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#include <stb/stb_image.h>
+#pragma GCC diagnostic pop
+#include <fnmatch.h>
+#elif defined (PLATFORM_COMPILER_MSVC)
+#pragma warning(push, 0)
+#include <stb/stb_image.h>
+#pragma warning(pop)
+#include <shlwapi.h>
+#endif
+
+bool IsFileLoadableWithSTBI ( const char *Filename )
+	{
+	char *SupportedImageFileExtension[] = { "*.jpg",
+	                                        "*.jpeg",
+	                                        "*.png",
+	                                        "*.bmp",
+	                                        "*.tga",
+	                                        "*.gif"
+	                                      };
+
+	for ( unsigned index = 0; index < sizeof ( SupportedImageFileExtension ) / sizeof ( char * ); ++index )
+		{
+#if defined (PLATFORM_COMPILER_MSVC)
+		if ( PathMatchSpecA ( Filename, SupportedImageFileExtension[index] ) == TRUE )
+			return true;
+#else
+		if ( fnmatch ( SupportedImageFileExtension[index], Filename, 0 ) == 0 )
+			return true;
+#endif
+		}
+	return false;
+	}
+
+bool LoadTextureDescriptorFromFileWithSTBI ( const char *ImageFile, crTextureDescriptor *Descriptor )
+	{
+	ivec2 ImageSize;
+	int Channels;
+	crPixelFormat ImageFormat;
+
+	stbi_uc *Image = stbi_load ( ImageFile, &ImageSize.x, &ImageSize.y, &Channels, 0 );
+	if ( !Image )
+		{
+		LOG_ERROR ( "Unable to load texture from '%s'", ImageFile );
+		return false;
+		}
+	switch ( Channels )
+		{
+		case 1:
+			ImageFormat = crPixelFormat_Red8;
+			break;
+		case 2:
+			ImageFormat = crPixelFormat_RedGreen88;
+			break;
+		case 3:
+			ImageFormat = crPixelFormat_RedGreenBlue888;
+			break;
+		case 4:
+			ImageFormat = crPixelFormat_RedGreenBlueAlpha8888;
+			break;
+		default:
+			stbi_image_free ( Image );
+			return false;
+		}
+
+	Descriptor->Type = crTextureType_Texture2D;
+	Descriptor->Dimensions.x = ImageSize.x;
+	Descriptor->Dimensions.y = ImageSize.y;
+	Descriptor->Format = ImageFormat;
+	Descriptor->Mipmapped = true;
+	Descriptor->Data = calloc ( ImageSize.x * ImageSize.y, Channels );
+	Descriptor->FilterSettings = ( crTextureFilterSettings )
+		{
+		crTextureFilter_Linear, crTextureFilter_Linear
+		};
+	Descriptor->WrapSettings = ( crTextureWrapSettings )
+		{
+		crTextureWrapMode_Repeat, crTextureWrapMode_Repeat
+		};
+	if ( Descriptor->Data == NULL )
+		return false;
+	memcpy ( Descriptor->Data, Image, ImageSize.x * ImageSize.y * Channels );
+	Descriptor->TextureName = strdup ( ImageFile );
+	stbi_image_free ( Image );
+	return true;
+	}
+
+bool LoadTextureDescriptorFromMemoryWithSTBI ( const void *Pointer, const unsigned Length, crTextureDescriptor *Descriptor )
+	{
+	ivec2 ImageSize;
+	int Channels;
+	crPixelFormat ImageFormat;
+
+	stbi_uc *Image = stbi_load_from_memory ( ( stbi_uc * ) Pointer, Length, &ImageSize.x, &ImageSize.y, &Channels, 0 );
+	if ( !Image )
+		{
+		LOG_ERROR ( "Unable to load texture from memory" );
+		return false;
+		}
+	switch ( Channels )
+		{
+		case 1:
+			ImageFormat = crPixelFormat_Red8;
+			break;
+		case 2:
+			ImageFormat = crPixelFormat_RedGreen88;
+			break;
+		case 3:
+			ImageFormat = crPixelFormat_RedGreenBlue888;
+			break;
+		case 4:
+			ImageFormat = crPixelFormat_RedGreenBlueAlpha8888;
+			break;
+		default:
+			stbi_image_free ( Image );
+			return false;
+		}
+
+	Descriptor->Type = crTextureType_Texture2D;
+	Descriptor->Dimensions.x = ImageSize.x;
+	Descriptor->Dimensions.y = ImageSize.y;
+	Descriptor->Format = ImageFormat;
+	Descriptor->Mipmapped = true;
+	Descriptor->Data = calloc ( ImageSize.x * ImageSize.y, Channels );
+	if ( Descriptor->Data == NULL )
+		{
+		stbi_image_free ( Image );
+		return false;
+		}
+	Descriptor->FilterSettings = ( crTextureFilterSettings )
+		{
+		crTextureFilter_Linear, crTextureFilter_Linear
+		};
+	Descriptor->WrapSettings = ( crTextureWrapSettings )
+		{
+		crTextureWrapMode_Repeat, crTextureWrapMode_Repeat
+		};
+	memcpy ( Descriptor->Data, Image, ImageSize.x * ImageSize.y * Channels );
+	stbi_image_free ( Image );
+	return true;
+	}
+
+
+crTextureHandle LoadCubemapTextureFromFileWithSTBI ( const char *ImageFile[6] )
+	{
+	ivec2 ImageSize;
+	int Channels;
+	crPixelFormat ImageFormat;
+
+	stbi_uc *Images[6] = { 0 };
+	for ( unsigned Face = 0; Face < 6; ++Face )
+		{
+		Images[Face] = stbi_load ( ImageFile[Face], &ImageSize.x, &ImageSize.y, &Channels, 0 );
+		if ( !Images[Face] )
+			{
+			LOG_ERROR ( "Unable to load texture from '%s'", ImageFile[Face] );
+			goto OnError;
+			}
+
+		switch ( Channels )
+			{
+			case 1:
+				ImageFormat = crPixelFormat_Red8;
+				break;
+			case 2:
+				ImageFormat = crPixelFormat_RedGreen88;
+				break;
+			case 3:
+				ImageFormat = crPixelFormat_RedGreenBlue888;
+				break;
+			case 4:
+				ImageFormat = crPixelFormat_RedGreenBlueAlpha8888;
+				break;
+			default:
+				goto OnError;
+			}
+		}
+
+	crTextureDescriptor TextureDescriptor = { 0 };
+	TextureDescriptor.Type = crTextureType_TextureCubeMap;
+	TextureDescriptor.Dimensions.x = ImageSize.x;
+	TextureDescriptor.Dimensions.y = ImageSize.y;
+	TextureDescriptor.Format = ImageFormat;
+	TextureDescriptor.Mipmapped = true;
+	TextureDescriptor.Data = NULL;
+	crTextureHandle Texture = crCreateTexture ( TextureDescriptor );
+
+	void *VoidPointer[6];
+	for ( unsigned Face = 0; Face < 6; ++Face )
+		VoidPointer[Face] = Images[Face];
+	if ( crLoadCubeMapTextureData ( Texture, ImageFormat, VoidPointer ) == false )
+		goto OnError;
+
+	for ( unsigned Face = 0; Face < 6; ++Face )
+		stbi_image_free ( Images[Face] );
+	return Texture;
+OnError:
+	for ( unsigned Face = 0; Face < 6; ++Face )
+		stbi_image_free ( Images[Face] );
+	return crTextureHandle_Invalid;
+	}

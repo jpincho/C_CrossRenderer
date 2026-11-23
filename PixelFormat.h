@@ -2,8 +2,17 @@
 #include "PlatformIncludes.h"
 
 BEGIN_C_DECLARATIONS
+struct crPixelFormatInfo
+	{
+	unsigned Bytes;
+	bool Mipmaps;
+	unsigned BlockWidth, BlockHeight, BlockBytes;
+	unsigned MinBlocksX, MinBlocksY;
+	};
+
 typedef enum
 	{
+	crPixelFormat_Invalid = -1,
 	crPixelFormat_Red8 = 0,
 	crPixelFormat_RedGreen88,
 	crPixelFormat_RedGreenBlue888,
@@ -65,11 +74,86 @@ typedef enum
 	crPixelFormat_ASTC_12x10_SRGB,
 	crPixelFormat_ASTC_12x12,
 	crPixelFormat_ASTC_12x12_SRGB,
+	crPixelFormat_Red8_SRGB,
+	crPixelFormat_RedGreen88_SRGB,
+	crPixelFormat_RedGreenBlue888_SRGB,
+	crPixelFormat_RedGreenBlueAlpha8888_SRGB,
+	crPixelFormat_Red8_Signed,
+	crPixelFormat_RedGreen88_Signed,
+	crPixelFormat_RedGreenBlue888_Signed,
+	crPixelFormat_RedGreenBlueAlpha8888_Signed,
+	crPixelFormat_Red8_UInt,
+	crPixelFormat_RedGreen88_UInt,
+	crPixelFormat_RedGreenBlue888_UInt,
+	crPixelFormat_RedGreenBlueAlpha8888_UInt,
+	crPixelFormat_Red8_SInt,
+	crPixelFormat_RedGreen88_SInt,
+	crPixelFormat_RedGreenBlue888_SInt,
+	crPixelFormat_RedGreenBlueAlpha8888_SInt,
+	crPixelFormat_Red16,
+	crPixelFormat_RedGreen16,
+	crPixelFormat_RedGreenBlue16,
+	crPixelFormat_RedGreenBlueAlpha16,
+	crPixelFormat_Red16_Signed,
+	crPixelFormat_RedGreen16_Signed,
+	crPixelFormat_RedGreenBlue16_Signed,
+	crPixelFormat_RedGreenBlueAlpha16_Signed,
+	crPixelFormat_Red16_UInt,
+	crPixelFormat_RedGreen16_UInt,
+	crPixelFormat_RedGreenBlue16_UInt,
+	crPixelFormat_RedGreenBlueAlpha16_UInt,
+	crPixelFormat_Red16_SInt,
+	crPixelFormat_RedGreen16_SInt,
+	crPixelFormat_RedGreenBlue16_SInt,
+	crPixelFormat_RedGreenBlueAlpha16_SInt,
+	crPixelFormat_Red16_Float,
+	crPixelFormat_RedGreen16_Float,
+	crPixelFormat_RedGreenBlue16_Float,
+	crPixelFormat_RedGreenBlueAlpha16_Float,
+	crPixelFormat_Red32_UInt,
+	crPixelFormat_RedGreen32_UInt,
+	crPixelFormat_RedGreenBlue32_UInt,
+	crPixelFormat_RedGreenBlueAlpha32_UInt,
+	crPixelFormat_Red32_SInt,
+	crPixelFormat_RedGreen32_SInt,
+	crPixelFormat_RedGreenBlue32_SInt,
+	crPixelFormat_RedGreenBlueAlpha32_SInt,
+	crPixelFormat_Red32_Float,
+	crPixelFormat_RedGreen32_Float,
+	crPixelFormat_RedGreenBlue32_Float,
+	crPixelFormat_RedGreenBlueAlpha32_Float,
+	crPixelFormat_RedGreenBlueAlpha4444,
+	crPixelFormat_BlueGreenRedAlpha4444,
+	crPixelFormat_AlphaRedGreenBlue4444,
+	crPixelFormat_AlphaBlueGreenRed4444,
+	crPixelFormat_BlueGreenRed565,
+	crPixelFormat_RedGreenBlueAlpha5551,
+	crPixelFormat_BlueGreenRedAlpha5551,
+	crPixelFormat_AlphaRedGreenBlue1555,
+	crPixelFormat_AlphaBlueGreenRed1555,
+	crPixelFormat_AlphaRedGreenBlue2101010,
+	crPixelFormat_AlphaBlueGreenRed2101010,
+	crPixelFormat_AlphaRedGreenBlue2101010_UInt,
+	crPixelFormat_AlphaBlueGreenRed2101010_UInt,
+	crPixelFormat_RedGreenBlue_11_11_10_Float,
+	crPixelFormat_RedGreenBlueE5,
+	crPixelFormat_Alpha8,
+	crPixelFormat_Depth16,
+	crPixelFormat_Depth32_Float,
+	crPixelFormat_Stencil8,
+	crPixelFormat_Depth24_Stencil8,
+	crPixelFormat_Depth32_Float_Stencil8,
+	crPixelFormat_PVRTC1_2BPP,
+	crPixelFormat_PVRTC1_2BPP_SRGB,
+	crPixelFormat_PVRTC1_4BPP,
+	crPixelFormat_PVRTC1_4BPP_SRGB,
+	crPixelFormat_PVRTC2_2BPP,
+	crPixelFormat_PVRTC2_2BPP_SRGB,
+	crPixelFormat_PVRTC2_4BPP,
+	crPixelFormat_PVRTC2_4BPP_SRGB,
 	crPixelFormat_Count
 	} crPixelFormat;
 
-int BytesPerPixel ( const crPixelFormat Format );
-bool crPixelFormatIsCompressed ( const crPixelFormat Format );
-bool crPixelFormatBlockSize ( const crPixelFormat Format, unsigned *BlockWidth, unsigned *BlockHeight, unsigned *BlockBytes );
 unsigned crPixelFormatDataSize ( const crPixelFormat Format, const unsigned Width, const unsigned Height );
+struct crPixelFormatInfo crGetPixelFormatInfo ( const crPixelFormat Format );
 END_C_DECLARATIONS
