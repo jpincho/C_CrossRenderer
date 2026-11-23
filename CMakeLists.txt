@@ -5,6 +5,16 @@ include ( target_warning_options.cmake )
 
 include_directories(ExternalModules)
 
+option ( CROSS_RENDERER_USE_KHRONOS_KTX "Use Khronos KTX library" true )
+
+if ( CROSS_RENDERER_USE_KHRONOS_KTX )
+    if ( NOT TARGET ktx )
+        include ( FetchContent )
+        FetchContent_Declare ( KTX GIT_REPOSITORY https://github.com/KhronosGroup/KTX-Software GIT_TAG v5.0.0-rc2 GIT_SHALLOW TRUE )
+        FetchContent_MakeAvailable  ( KTX )
+    endif()
+endif()
+
 # OpenGL backend
 set ( OpenGL_GL_PREFERENCE GLVND )
 find_package ( OpenGL QUIET )
@@ -93,6 +103,13 @@ target_link_libraries ( C_CrossRenderer PUBLIC ${CROSS_RENDERER_LIBRARIES} )
 target_link_libraries ( C_CrossRenderer PUBLIC Platform )
 target_link_libraries ( C_CrossRenderer PUBLIC Math )
 target_link_libraries ( C_CrossRenderer PUBLIC WindowManager )
+
+if ( CROSS_RENDERER_USE_KHRONOS_KTX )
+    target_link_libraries ( C_CrossRenderer PUBLIC ktx )
+    # gl_format.h and vkformat_enum.h name the GL and Vulkan constants stored in KTX files.
+    target_include_directories ( C_CrossRenderer PRIVATE $<TARGET_PROPERTY:ktx,SOURCE_DIR>/src )
+endif()
+
 target_warning_options ( C_CrossRenderer HIGH AS_ERRORS )
 
 # Tests

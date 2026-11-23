@@ -1,5 +1,10 @@
+#include "CrossRendererConfig.h"
 #include "CommonLoaders.h"
 #include "STBImageLoader.h"
+
+#if defined ( CROSS_RENDERER_USE_KHRONOS_KTX )
+#include "KTXImageLoader.h"
+#endif
 
 #include "PlatformIncludes.h"
 #include <Platform/Logger.h>
@@ -77,11 +82,19 @@ OnError:
 
 bool crLoadTextureDescriptorFromFile ( const char *ImageFile, crTextureDescriptor *Descriptor )
 	{
+#if defined ( CROSS_RENDERER_USE_KHRONOS_KTX )
+	if ( IsFileLoadableWithKTX ( ImageFile ) )
+		return LoadTextureDescriptorFromFileWithKTX ( ImageFile, Descriptor );
+#endif
 	return LoadTextureDescriptorFromFileWithSTBI ( ImageFile, Descriptor );
 	}
 
 bool crLoadTextureDescriptorFromMemory ( const void *Pointer, const unsigned Length, crTextureDescriptor *Descriptor )
 	{
+#if defined ( CROSS_RENDERER_USE_KHRONOS_KTX )
+	if ( LoadTextureDescriptorFromMemoryWithKTX ( Pointer, Length, Descriptor ) == true )
+		return true;
+#endif
 	return LoadTextureDescriptorFromMemoryWithSTBI ( Pointer, Length, Descriptor );
 	}
 
@@ -131,6 +144,10 @@ OnError:
 
 bool crIsValidTextureFile ( const char *Filename )
 	{
+#if defined ( CROSS_RENDERER_USE_KHRONOS_KTX )
+	if ( IsFileLoadableWithKTX ( Filename ) )
+		return true;
+#endif
 	if ( IsFileLoadableWithSTBI ( Filename ) )
 		return true;
 	return false;

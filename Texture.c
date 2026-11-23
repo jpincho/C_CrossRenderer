@@ -17,5 +17,6 @@ void crCopyTextureDescriptor ( crTextureDescriptor *Output, const crTextureDescr
 	if ( Output->Data == NULL )
 		return;
 	memcpy ( Output->Data, Input->Data, DataSize );
-	Output->TextureName = strdup ( Input->TextureName );
+	if ( Input->TextureName )
+		Output->TextureName = strdup ( Input->TextureName );
 	}
